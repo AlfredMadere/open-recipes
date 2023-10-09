@@ -1,4 +1,5 @@
 Stories
+
 As a broke college student, I want to maximize my money to meals ratio and so that I can make the most cost effective food possible. 
 As a first year college student, I want to minimize the necessary appliances for my meals so that I can eat in my dorm with no amenities. 
 As a busy college student, I want to learn what meals take little amounts of time but are still healthy, so that I can eat well and have time to do everything I need to do in a day. 
@@ -14,6 +15,7 @@ As a forgetful student i want to remember what recipes i know how to cook so alw
 As a student i want to know what the minimum set of ingredients i need to buy to use up my currently existing ingredients so food doesn’t go bad
 
 Exceptions
+
 No available recipes with ingredient constraints from user: If no recipes can be found with the users food items, the site will give back an error to the user and ask them to purchase different ingredients before requesting available recipes, and will suggest ingredients
 No available recipes with time constraints from user: If no recipes can be found with the users timing needs, the site will give back an error to the user and ask them to adjust their schedule according to the shortest length time available recipes. 
 Credit card declines when ordering premium features: If a credit card gets declined when purchasing premium features, the site will give back an error to the user and ask them to try a different credit card instead.
