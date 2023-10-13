@@ -90,7 +90,7 @@ Represents application users
 ]
 ```
 
-## 3. Recipet - `/recipe/` 
+## 3. Recipe - `/recipe/` 
 
 ### `/recipe/{recipe_id}` (GET)
 
@@ -137,87 +137,6 @@ Represents application users
     }
 ]
 ```
-
-## 3. Ingredient - `/ingredient/`
-
-### `/ingredient/{ingredient_id}/` (GET)
-
-**Response**
-
-```json
-[
-    {
-        "id": "number",
-        "name": "string",
-        "description": "string",
-        "ingredient_category_id": "string"
-    }
-]
-```
-
-### `/ingredient/` (POST)
-
-**Request**
-
-```json
-[
-    {
-        "name": "string",
-        "description": "string",
-        "ingredient_category_id": "string"
-    }
-]
-```
-
-**Response**
-
-```json
-[
-    {
-        "id": "number",
-        "name": "string",
-        "description": "string",
-        "ingredient_category_id": "string"
-    }
-]
-```
-
-## **3. Recipe** - `/recipe/`
-
-### `/recipe/{recipe_id}` (GET)
-**Response**:
-```json
-{
-    "id": "number",
-    "name": "string",
-    "description": "string",
-    "procedure": "string",
-    "author_id": "number"
-}
-```
-
-### `/recipe/` (POST)
-**Request**:
-```json
-{
-    "name": "string",
-    "description": "string",
-    "procedure": "string",
-    "author_id": "number"
-}
-```
-**Response**:
-```json
-{
-    "id": "number",
-    "name": "string",
-    "description": "string",
-    "procedure": "string",
-    "author_id": "number"
-}
-```
-
----
 
 ## **4. Ingredient** - `/ingredient/`
 
