@@ -6,6 +6,7 @@ As a first year college student, I want to minimize the necessary appliances for
 
 As a busy college student, I want to learn what meals take little amounts of time but are still healthy, so that I can eat well and have time to do everything I need to do in a day. 
 
+I am a change 
 As a student with a lot of allergies, I want to be able to make unique meals every day so that I don’t experience food fatigue and struggle to eat. 
 
 As a mother, I want to be able to can create lists of easy recipes that I know my child likes that I make at home so they can learn to cook.
