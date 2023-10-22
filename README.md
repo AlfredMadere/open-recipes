@@ -9,6 +9,8 @@
 Molly Sandler - mosandle@calpoly.edu
 Alfred Madere - amadere@calpoly.edu
 Mihir Chintawar- mchintaw@calpoly.edu
+Kassi Winter - kkwinter@calpoly.edu
+
 
 
 ---
