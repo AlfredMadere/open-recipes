@@ -8,7 +8,9 @@ from typing import List, Union
 
 from fastapi import FastAPI
 
-from .models import Ingredient, Recipe, RecipeList, Review, User
+from models import Ingredient, Recipe, RecipeList, Review, User
+from database import engine 
+from sqlalchemy import text
 
 app = FastAPI(
     title='Recipe Service API',
@@ -39,6 +41,14 @@ def get_recipe_lists() -> List[RecipeList]:
     Get all recipe lists
     """
     pass
+
+@app.get('/recipe-lists/', response_model=List[RecipeList])
+def get_recipe_lists() -> List[RecipeList]:
+    """
+    Get all recipe lists
+    """
+    pass
+
 
 
 @app.post(
@@ -91,9 +101,23 @@ def get_users() -> List[User]:
     pass
 
 
+@app.get('/users/{user_id}',response_model=User)
+def get_user(user_id: int) -> List[User]:
+    """
+    Get all users
+    """
+    with engine.begin() as conn:
+        result = conn.execute(text(f"SELECT * FROM users WHERE id = {user_id}"))
+        id, name, email, phone = result.fetchone()
+        return User(id=id, name=name, email=email, phone=phone)
+
 @app.post('/users', response_model=None, responses={'201': {'model': User}})
 def post_users(body: User) -> Union[None, User]:
     """
     Create a new user
     """
     pass
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host='0.0.0.0', port=8000)
