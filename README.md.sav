@@ -1,0 +1,5 @@
+##Quick start instructions
+1. inside of the `frontend` directory run `npm install`
+2. Run `npx expo start`
+3. Download Expo Go mobile app (https://expo.dev/client)
+4. Follow instructions in console - scan QR code with camera. you can also just press `i` or `a` to get IOS or Android emulators on your computer
