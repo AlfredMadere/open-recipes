@@ -1,0 +1,218 @@
+openapi: 3.0.0
+info:
+  title: Recipe Service API
+  version: 1.0.0
+  description: API for managing recipes, ingredients, users, and reviews.
+
+paths:
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /recipes:
+    get:
+      summary: Get all recipes
+      responses:
+        '200':
+          description: A list of recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+
+    post:
+      summary: Create a new recipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+      responses:
+        '201':
+          description: Recipe created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+
+  /recipe-lists:
+    get:
+      summary: Get all recipe lists
+      responses:
+        '200':
+          description: A list of recipe lists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipeList'
+    post:
+      summary: Create a new recipe list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeList'
+      responses:
+        '201':
+          description: Recipe list created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeList'
+
+  /reviews:
+    get:
+      summary: Get all reviews
+      responses:
+        '200':
+          description: A list of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+    post:
+      summary: Create a new review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+
+  /ingredients:
+    get:
+      summary: Get all ingredients
+      responses:
+        '200':
+          description: A list of ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+    post:
+      summary: Create a new ingredient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+      responses:
+        '201':
+          description: Ingredient created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        mins_prep:
+          type: integer
+        category_id:
+          type: integer
+        mins_cook:
+          type: integer
+        description:
+          type: string
+        author_id:
+          type: integer
+        default_servings:
+          type: integer
+
+    RecipeList:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        stars:
+          type: integer
+        author_id:
+          type: integer
+        content:
+          type: string
+        recipe_id:
+          type: integer
+
+    Ingredient:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ingredient_category_id:
+          type: integer
+        storage_location_id:
+          type: integer
+
