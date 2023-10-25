@@ -3,5 +3,9 @@
 2. Run `npm run ios`
 
 
-##Tamagui documentation
-https://tamagui.dev/docs/components/button/1.28.0
+## Documentation reference
+Tamagui (component library): https://tamagui.dev/docs/components/button/1.28.0
+
+Expo (framework for managing react-native development): https://docs.expo.dev/
+
+React Native: https://reactnative.dev/docs/getting-started
