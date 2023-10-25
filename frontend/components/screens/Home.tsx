@@ -16,7 +16,7 @@ export default function HomeScreen({navigation}) {
     <View style={styles.container}>
       <H1>Welcome 307 Team!</H1>
       <Paragraph>
-        This we will be using tamagui which makes front end development hella
+        This we will be using tamagui I made A COOL CHANFEwhich makes front end YOOOO development hella
         easy and good looking. Use the tamagui components!
       </Paragraph>
       <Button
