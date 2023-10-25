@@ -4,7 +4,15 @@ import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import { TamaguiProvider } from "tamagui";
 import tamaguiConfig from "./tamagui.config";
-import { H1, Button, Paragraph} from "tamagui";
+import { H1, Button, Paragraph } from "tamagui";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import HomeScreen from "./components/screens/Home";
+import DetailsScreen from "./components/screens/Details";
+
+
+ 
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [loaded] = useFonts({
@@ -23,22 +31,14 @@ export default function App() {
   }
   return (
     <TamaguiProvider config={tamaguiConfig}>
-      <View style={styles.container}>
-        <H1>Welcome 307 Team!</H1>
-        <Paragraph>This we will be using tamagui which makes front end development hella easy and good looking. Use the tamagui components!</Paragraph>
-        <Button>
-          <Text>Look how easy it is to make buttons</Text>
-        </Button>
-      </View>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Details" component={DetailsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+      
     </TamaguiProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
