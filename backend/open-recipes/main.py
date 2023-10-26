@@ -24,6 +24,20 @@ def get_ingredients() -> List[Ingredient]:
     """
     pass
 
+@app.get('/ingredients/{id}', response_model=Ingredient)
+def get_ingredient(id : int) -> Ingredient:
+    """
+    Get an ingredient by id
+    """
+    pass
+
+@app.post("/ingredients/{id}")
+def update_ingredient(id: int, ingredient : Ingredient) -> Ingredient:
+    pass
+
+@app.delete("/ingredient/{id}")
+def 
+
 
 @app.post('/ingredients', response_model=None, responses={'201': {'model': Ingredient}})
 def post_ingredients(body: Ingredient) -> Union[None, Ingredient]:
