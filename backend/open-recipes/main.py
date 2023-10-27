@@ -8,7 +8,7 @@ from typing import List, Union
 
 from fastapi import FastAPI
 
-from models import Ingredient, Recipe, RecipeList, Review, User
+from models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe
 from database import engine 
 from sqlalchemy import text
 
@@ -26,6 +26,23 @@ def get_ingredients() -> List[Ingredient]:
     """
     pass
 
+@app.get('/ingredients/{id}', response_model=Ingredient)
+def get_ingredient(id : int) -> Ingredient:
+    """
+    Get an ingredient by id
+    """
+    pass
+
+@app.post("/ingredients/{id}")
+def update_ingredient(id: int, ingredient : Ingredient) -> Ingredient:
+    with engine.begin() as conn:
+        result = conn.execute(text(f"UPDATE ingredients SET name = :name, email = :email, phone = :phone WHERE id = :id",{"name":ingredient.name,"email":ingredient.email,"phone":ingredient.phone,"id":id}))
+        id, name, email, phone = result.fetchone()
+        return User(id=id, name=name, email=email, phone=phone) 
+
+@app.delete("/ingredient/{id}")
+def delete_ingredient(id: int) -> None:
+    pass
 
 @app.post('/ingredients', response_model=None, responses={'201': {'model': Ingredient}})
 def post_ingredients(body: Ingredient) -> Union[None, Ingredient]:
@@ -60,6 +77,21 @@ def post_recipe_lists(body: RecipeList) -> Union[None, RecipeList]:
     """
     pass
 
+@app.get('/recipe-lists/{id}', response_model=RecipeList)
+def get_recipe_list(id: int) -> RecipeList:
+    """
+    Get a recipe list by id
+    """
+    pass
+
+@app.post("/recipe-lists/{id}")
+def update_recipe_list(id: int, recipe_list : RecipeList) -> RecipeList:
+    pass
+
+@app.delete("/recipe-lists/{id}")
+def delete_recipe_list(id: int) -> None:
+    pass
+
 
 @app.get('/recipes', response_model=List[Recipe])
 def get_recipes() -> List[Recipe]:
@@ -69,37 +101,107 @@ def get_recipes() -> List[Recipe]:
     pass
 
 
-@app.post('/recipes', response_model=None, responses={'201': {'model': Recipe}})
-def post_recipes(body: Recipe) -> Union[None, Recipe]:
+@app.post('/recipes', response_model=None, responses={'201': {'model': PopulatedRecipe}})
+def post_recipes(body: PopulatedRecipe) -> Union[None, PopulatedRecipe]:
     """
     Create a new recipe
     """
+    tags = body.tags
+    
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id)
+                                   VALUES (
+                                   :name,
+                                   :mins_prep,
+                                   :mins_cook,
+                                   :description,
+                                   :default_servings,
+                                   :author_id)"""
+                                   
+            ), {"name":body.name,
+             "author_id":body.author['id'],
+             "mins_prep":body.mins_prep,
+             "mins_cook":body.mins_cook
+             ,"description":body.description,
+             "default_servings":body.default_servings})
+        id,name,mins_prep,mins_cook,description,default_servings,author_id = result.fetchone()
+        recipe = PopulatedRecipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id)
+
+        #FIXME: make this one query
+        for tag in tags:
+            result = conn.execute(text(f"""INSERT INTO tag_x_recipe
+                            VALUES (
+                            :tag_id,
+                            :recipe_id)"""
+                            ,
+            {"tag_id":tag.id,
+                "recipe_id":body.id}))
+            recipe.tags.append(tag)
+        return recipe
+        
+        
+    
+
+
+@app.get('/recipes/{id}', response_model=Recipe)
+def get_recipe(id: int) -> Recipe:
+    """
+    Get a recipe by id
+    """
     pass
 
+@app.post("/recipes/{id}")
+def update_recipe(id: int, recipe : Recipe) -> Recipe:
+    pass
+
+@app.delete("/recipes/{id}")
+def delete_recipe(id: int) -> None:
+    pass
 
 @app.get('/reviews', response_model=List[Review])
 def get_reviews() -> List[Review]:
     """
     Get all reviews
     """
-    pass
-
+    with engine.begin() as conn:
+        result = conn.execute(text(f"SELECT id, stars, author_id, content, recipe_id, FROM reviews ORDER BY created_at"))
+        id, name, email, phone = result.fetchone()
+        return User(id=id, name=name, email=email, phone=phone)
 
 @app.post('/reviews', response_model=None, responses={'201': {'model': Review}})
 def post_reviews(body: Review) -> Union[None, Review]:
     """
     Create a new review
     """
+    with engine.begin() as conn:
+        result = conn.execute(text(f"INSERT INTO reviews stars, author_id, content, recipe_id values (:stars,:author_id,:content,:recipe_id)",{"stars":body.stars,"author_id":body.author.id,"content":body.content,"recipe_id":body.recepie.id}))
+        id, name, email, phone = result.fetchone()
+        return User(id=id, name=name, email=email, phone=phone)
+
+@app.get('/reviews/{id}', response_model=Review)
+def get_review(id: int) -> Review:
+    """
+    Get a review by id
+    """
     pass
 
+@app.post("/reviews/{id}")
+def update_review(id: int, review : Review) -> Review:
+    pass
+
+@app.delete("/reviews/{id}")
+def delete_review(id: int) -> None:
+    pass
 
 @app.get('/users', response_model=List[User])
 def get_users() -> List[User]:
     """
     Get all users
     """
-    pass
-
+    with engine.begin() as conn:
+        result = conn.execute(text(f"SELECT id, name, email, phone FROM users ORDER BY id"))
+        id, name, email, phone = result.fetchone()
+        return User(id=id, name=name, email=email, phone=phone)
 
 @app.get('/users/{user_id}',response_model=User)
 def get_user(user_id: int) -> List[User]:
@@ -116,7 +218,30 @@ def post_users(body: User) -> Union[None, User]:
     """
     Create a new user
     """
-    pass
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""INSERT INTO "user" (name, email, phone)
+                                    VALUES (:name, :email, :phone);"""
+                                    ),{"name":body.name,"phone":body.phone,"email":body.email})
+        id, name, email, phone = result.fetchone()
+        return User(id=id, name=name, email=email, phone=phone)
+
+@app.post("/users/{id}")
+def update_user(id: int, user : User) -> User:
+
+    with engine.begin() as conn:
+        result = conn.execute(text(f"UPDATE users SET name = :name, email = :email, phone = :phone WHERE id = :id",{"name":user.name,"phone":user.phone,"email":user.email,"id":id}))
+        id, name, email, phone = result.fetchone()
+        return User(id=id, name=name, email=email, phone=phone)
+
+@app.delete("/users/{id}")
+def delete_user(id: int) -> None:
+    with engine.begin() as conn:
+        result = conn.execute(text(f"DELETE FROM users WHERE id = :id",{"id":id}))
+        id, name, email, phone = result.fetchone()
+        return User(id=id, name=name, email=email, phone=phone)
+
+
+
 
 if __name__ == '__main__':
     import uvicorn
