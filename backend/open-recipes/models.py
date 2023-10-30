@@ -8,6 +8,12 @@ from typing import Optional,Literal,Tuple
 from pydantic import BaseModel
 
 
+#TODO: define all request types 
+class CreateUserRequest(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+
 class User(BaseModel):
     id: Optional[int] = None
     name: Optional[str] = None
@@ -31,7 +37,15 @@ class RecepieTag(BaseModel):
     value: Optional[str] = None
 
 
-
+class CreateRecipeRequest(BaseModel):
+    name: Optional[str] = None
+    mins_prep: Optional[int] = None
+    mins_cook: Optional[int] = None
+    description: Optional[str] = None
+    default_servings: Optional[int] = None
+    procedure: Optional[str] = None
+    created_at: Optional[str] = None
+    author_id: Optional[int] = None 
 
 class Recipe(BaseModel):
     id: Optional[int] = None
@@ -42,6 +56,7 @@ class Recipe(BaseModel):
     default_servings: Optional[int] = None
     created_at: Optional[str] = None
     author_id: Optional[str] = None
+    procedure: Optional[str] = None
 
     def get_author(self, engine):
         with engine.connect() as conn:
@@ -90,8 +105,13 @@ class PopulatedRecipe(Recipe):
         super().__init__(*args, **kwargs)
         self.author = kwargs.get('author', None)
         self.tags = kwargs.get('tags', [])
+
     
-        
+
+
+class CreateRecipeListRequest(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
     
     
 class RecipeList(BaseModel):
