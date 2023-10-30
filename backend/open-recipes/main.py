@@ -11,6 +11,7 @@ from fastapi import FastAPI
 from models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest
 from database import engine 
 from sqlalchemy import text
+import uvicorn
 
 app = FastAPI(
     title='Recipe Service API',
@@ -262,6 +263,9 @@ def delete_user(id: int) -> None:
 
 
 
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+if __name__ == "__main__":
+    config = uvicorn.Config(
+        "open-recipes.main:app", port=3000, log_level="info", reload=True, env_file=".env"
+    )
+    server = uvicorn.Server(config)
+    server.run()
