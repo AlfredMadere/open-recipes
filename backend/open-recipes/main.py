@@ -256,16 +256,17 @@ def update_user(id: int, user : User) -> User:
 @app.delete("/users/{id}")
 def delete_user(id: int) -> None:
     with engine.begin() as conn:
-        result = conn.execute(text(f"DELETE FROM users WHERE id = :id",{"id":id}))
+        result = conn.execute(text(f"""DELETE FROM "user" WHERE id = :id""",{"id":id}))
         id, name, email, phone = result.fetchone()
         return User(id=id, name=name, email=email, phone=phone)
 
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    import uvicorn
     config = uvicorn.Config(
-        "open-recipes.main:app", port=3000, log_level="info", reload=True, env_file=".env"
+        app, port=8000, log_level="info", reload=True, env_file=".env"
     )
     server = uvicorn.Server(config)
     server.run()
