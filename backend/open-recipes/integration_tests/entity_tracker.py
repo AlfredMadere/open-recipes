@@ -18,7 +18,10 @@ class EntityTracker:
   
   def remove_all(self):
     with engine.begin() as conn:
-      conn.execute(text(f"""DELETE FROM "user" WHERE id IN ({','.join([str(user_id) for user_id in self.users])})"""))
+      print("deleting everything")
+      conn.execute(text(f"""DELETE FROM recipe_list"""))
+      conn.execute(text(f"""DELETE FROM recipe"""))
+      conn.execute(text(f"""DELETE FROM "user" """))
       # conn.execute(text(f"DELETE FROM recipes WHERE id IN ({','.join([str(recipe_id) for recipe_id in self.recipes])})"))
       # conn.execute(text(f"DELETE FROM recipe_lists WHERE id IN ({','.join([str(recipe_list_id) for recipe_list_id in self.recipe_lists])})"))
       # conn.execute(text(f"DELETE FROM reviews WHERE id IN ({','.join([str(review_id) for review_id in self.reviews])})"))
