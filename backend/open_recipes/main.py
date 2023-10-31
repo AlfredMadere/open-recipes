@@ -225,7 +225,7 @@ def get_users() -> List[User]:
     Get all users
     """
     with engine.begin() as conn:
-        result = conn.execute(text(f"SELECT id, name, email, phone FROM user ORDER BY id"))
+        result = conn.execute(text(f"SELECT id, name, email, phone FROM "user" ORDER BY id"))
         id, name, email, phone = result.fetchone()
         return User(id=id, name=name, email=email, phone=phone)
 
