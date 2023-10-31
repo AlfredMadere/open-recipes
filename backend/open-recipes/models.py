@@ -112,6 +112,13 @@ class PopulatedRecipe(Recipe):
 class CreateRecipeListRequest(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+
+
+class RecipeListResponse(BaseModel):
+    id: Optional[int] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    recipes: list[Recipe] = []
     
     
 class RecipeList(BaseModel):

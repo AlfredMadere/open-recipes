@@ -8,7 +8,7 @@ from typing import List, Union
 
 from fastapi import FastAPI
 
-from models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest
+from models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse
 from database import engine 
 from sqlalchemy import text
 import uvicorn
@@ -71,7 +71,7 @@ def get_recipe_lists() -> List[RecipeList]:
 
 #SMOKE TESTED
 @app.post(
-    '/recipe-lists', response_model=None, responses={'201': {'model': RecipeList}}
+    '/recipe-lists', response_model=None, status_code=201, responses={'201': {'model': RecipeList}}
 )
 def post_recipe_lists(body: CreateRecipeListRequest) -> Union[None, RecipeList]:
     """
@@ -96,7 +96,13 @@ def get_recipe_list(id: int) -> RecipeList:
     with engine.begin() as conn:
         result = conn.execute(text(f"""SELECT id, name, description FROM recipe_list WHERE id = :recipe_id"""),{"recipe_id": id})
         id, name, description = result.fetchone()
-        return RecipeList(id=id, name=name, description= description)
+        result = conn.execute(text(f"""SELECT id, name, description, mins_prep, mins_cook, default_servings, author_id, procedure
+                                        FROM recipe
+                                        JOIN recipe_x_recipe_list AS rl ON rl.recipe_id = recipe.id
+                                        WHERE rl.recipe_list_id = :list_id"""),{"list_id": id})
+        rows = result.fetchall()
+        recipes = [Recipe(id=row[0], name=row[1], mins_prep=row[2], mins_cook=row[3], description=row[4], default_servings=row[5], author_id=row[6], procedure=row[7]) for row in rows]
+        return RecipeListResponse(id=id, name=name, description= description, recipes=recipes)
 
 @app.post("/recipe-lists/{id}")
 def update_recipe_list(id: int, recipe_list : RecipeList) -> RecipeList:
@@ -120,7 +126,7 @@ def get_recipes() -> List[Recipe]:
 
 #SMOKE TESTED
 #FIXME: increment created at in database
-@app.post('/recipes', response_model=None, responses={'201': {'model': CreateRecipeRequest}})
+@app.post('/recipes', response_model=None, status_code=201, responses={'201': {'model': CreateRecipeRequest}})
 def post_recipes(body: CreateRecipeRequest) -> Union[None, Recipe]:
     """
     Create a new recipe
@@ -159,7 +165,7 @@ def get_recipe(id: int) -> Recipe:
         id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure = result.fetchone()
         return Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure)
 
-@app.post("/recipes/{id}")
+@app.post("/recipes/{id}", status_code=201, response_model=None)
 def update_recipe(id: int, recipe : Recipe) -> Recipe:
     pass
 
@@ -167,7 +173,7 @@ def update_recipe(id: int, recipe : Recipe) -> Recipe:
 def delete_recipe(id: int) -> None:
     pass
 
-@app.post('/recipes/{recipe_id}/recipe-lists/{recipe_list_id}', response_model=None)
+@app.post('/recipes/{recipe_id}/recipe-lists/{recipe_list_id}', status_code=201, response_model=None)
 def add_recipe_to_recipe_list(recipe_id: int, recipe_list_id: int) -> None:
     with engine.begin() as conn:
         conn.execute(text(f"INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES (:recipe_id, :recipe_list_id)"),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
@@ -230,7 +236,7 @@ def get_user(user_id: int) -> List[User]:
         return User(id=id, name=name, email=email, phone=phone)
 
 #SMOKE TESTED
-@app.post('/users', response_model=None, responses={'201': {'model': User}})
+@app.post('/users', response_model=None,status_code=201, responses={'201': {'model': User}})
 def post_users(body: CreateUserRequest) -> Union[None, User]:
     """
     Create a new user
