@@ -8,8 +8,8 @@ from typing import List, Union
 
 from fastapi import FastAPI
 
-from models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse
-from database import engine 
+from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse
+from open_recipes.database import engine 
 from sqlalchemy import text
 import uvicorn
 
