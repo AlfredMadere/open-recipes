@@ -99,11 +99,12 @@ The server responds with the created recipe data, including the id.
 This is now stored in the database, so Bob can access it, and eventually share it. Note that the list that Bob created is not yet associated with him because we haven't implemented sessions. This is still a useful feature.
 
 # Testing results
-<Repeated for each step of the workflow>
+
 1. The curl statement called. You can find this in the /docs site for your 
 API under each endpoint. For example, for my site the /catalogs/ endpoint 
 curl call looks like:
 curl -X 'GET' \
   'https://centralcoastcauldrons.vercel.app/catalog/' \
   -H 'accept: application/json'
+
 2. The response you received in executing the curl statement.
