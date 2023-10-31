@@ -20,7 +20,7 @@ def setup():
 
 def teardown():
     # print("teardown")
-    # test_entities.remove_all()
+    test_entities.remove_all()
     pass
 
 @pytest.fixture(scope="session", autouse=True)
