@@ -277,7 +277,7 @@ import uvicorn
 
 if __name__ == "__main__":
     config = uvicorn.Config(
-        app, port=3000, log_level="info", reload=True, env_file=".env"
+        app, port=3000, log_level="info", reload=True
     )
     server = uvicorn.Server(config)
     server.run()
