@@ -1,0 +1,21 @@
+
+
+POST /user
+
+ { 
+  "first_name": "Bob", 
+  "last_name": "Sandler", 
+  "email": "bob@example.com", 
+  "phone": "123-456-7890"
+ }
+
+Response
+
+ { 
+  "id": 1, 
+  "first_name": "Bob", 
+  "last_name": "Sandler", 
+  "email": "123-456-7890"
+ }
+
+ 
