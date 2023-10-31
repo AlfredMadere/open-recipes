@@ -20,6 +20,11 @@ app = FastAPI(
 )
 
 
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
 @app.get('/ingredients', response_model=List[Ingredient])
 def get_ingredients() -> List[Ingredient]:
     """
