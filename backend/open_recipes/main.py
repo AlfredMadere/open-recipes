@@ -8,8 +8,8 @@ from typing import List, Union
 
 from fastapi import FastAPI
 
-from models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse
-from database import engine 
+from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse
+from open_recipes.database import engine 
 from sqlalchemy import text
 import uvicorn
 
@@ -18,6 +18,11 @@ app = FastAPI(
     version='1.0.0',
     description='API for managing recipes, ingredients, users, and reviews.',
 )
+
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
 
 
 @app.get('/ingredients', response_model=List[Ingredient])
@@ -220,7 +225,7 @@ def get_users() -> List[User]:
     Get all users
     """
     with engine.begin() as conn:
-        result = conn.execute(text(f"SELECT id, name, email, phone FROM user ORDER BY id"))
+        result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" ORDER BY id"""))
         id, name, email, phone = result.fetchone()
         return User(id=id, name=name, email=email, phone=phone)
 
@@ -268,11 +273,11 @@ def delete_user(id: int) -> None:
 
 
 
+import uvicorn
 
-if __name__ == '__main__':
-    import uvicorn
+if __name__ == "__main__":
     config = uvicorn.Config(
-        app, port=8000, log_level="info", reload=True, env_file=".env"
+        app, port=3000, log_level="info", reload=True
     )
     server = uvicorn.Server(config)
     server.run()

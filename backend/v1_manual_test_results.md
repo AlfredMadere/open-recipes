@@ -103,8 +103,85 @@ This is now stored in the database, so Bob can access it, and eventually share i
 1. The curl statement called. You can find this in the /docs site for your 
 API under each endpoint. For example, for my site the /catalogs/ endpoint 
 curl call looks like:
-curl -X 'GET' \
-  'https://centralcoastcauldrons.vercel.app/catalog/' \
-  -H 'accept: application/json'
 
-2. The response you received in executing the curl statement.
+curl -X 'POST' \
+  'https://open-recipe.onrender.com/users' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d ' { 
+  "name": " Bob Sandler", 
+  "email": "bob@example.com", 
+  "phone": "123-456-7890"
+ }
+'
+
+Response:
+
+Response
+ ```json
+{
+  "id": 4,
+  "name": " Bob Sandler",
+  "email": "bob@example.com",
+  "phone": "123-456-7890"
+}```
+
+curl -X 'POST' \
+  'https://open-recipe.onrender.com/recipe-lists' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{ 
+  "name": "My s tier baked goods", 
+  "description": "A one stop shop for all for all my fans to make my bakery items"
+}'
+
+ ```json
+{ 
+  "name": "My s tier baked goods", 
+  "description": "A one stop shop for all for all my fans to make my bakery items"
+}
+```
+
+Response
+
+```json
+{
+  "id": 1,
+  "name": "My s tier baked goods",
+  "description": "A one stop shop for all for all my fans to make my bakery items"
+}
+```
+
+curl -X 'POST' \
+  'https://open-recipe.onrender.com/recipes' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "Secret Cake Recipe",
+  "mins_prep": 20,
+  "mins_cook": 30,
+  "description": "A delicious and secret cake recipe.",
+  "default_servings": 4,
+  "procedure": "Step 1: Mix ingredients... Step 2: Bake...",
+  "author_id": 4
+}'
+
+{
+  "id": 1,
+  "name": "Secret Cake Recipe",
+  "mins_prep": 20,
+  "mins_cook": 30,
+  "description": "A delicious and secret cake recipe.",
+  "default_servings": 4,
+  "created_at": null,
+  "author_id": "4",
+  "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
+}
+
+
+curl -X 'POST' \
+  'https://open-recipe.onrender.com/recipes/1/recipe-lists/1' \
+  -H 'accept: application/json' \
+  -d ''
+
+"OK"
