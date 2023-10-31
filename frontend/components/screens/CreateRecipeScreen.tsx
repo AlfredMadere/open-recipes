@@ -1,7 +1,7 @@
 import { Button, H1, Paragraph, Text, View } from "tamagui";
 import { StyleSheet } from "react-native";
 
-export default function HomeScreen({ navigation }) {
+export default function CreateRecipeScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -13,15 +13,10 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <H1>Welcome 307 Team!</H1>
+      <H1>Create Recipe Page</H1>
       <Paragraph>
-        This we will be using tamagui I made A COOL CHANFEwhich makes front end
-        YOOOO development hella easy and good looking. Use the tamagui
-        components!
+       This page shoul have a bunch of form inputs on it and a submit button at the bottom
       </Paragraph>
-      <Button onPress={() => navigation.navigate("Details")}>
-        <Text>Go to Details</Text>
-      </Button>
     </View>
   );
 }
