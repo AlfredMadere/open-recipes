@@ -1,0 +1,10 @@
+{
+  "id": 123456,
+  "name": "Secret Cake Recipe",
+  "mins_prep": 20,
+  "mins_cook": 30,
+  "description": "A delicious and secret cake recipe.",
+  "default_servings": 4,
+  "procedure": "Step 1: Mix ingredients... Step 2: Bake...",
+  "author_id": 1
+}
