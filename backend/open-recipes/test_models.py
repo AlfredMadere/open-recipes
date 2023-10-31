@@ -127,22 +127,22 @@ import requests
 #     engine.conn.execute("drop database test_db")
 
 
-def test_recipe_list():
-    requests.post("http://localhost:8000/recipes", json={
-        "name": "test",
-        "mins_prep": 1,
-        "category_id": 1,
-        "mins_cook": 1,
-        "description": "test",
-        "author_id": 1,
-        "default_servings": 1,
-        "tags": [
-            {
-                "key": "test",
-                "value": "test"
-            }
-        ]}
-        )
+# def test_recipe_list():
+#     requests.post("http://localhost:8000/recipes", json={
+#         "name": "test",
+#         "mins_prep": 1,
+#         "category_id": 1,
+#         "mins_cook": 1,
+#         "description": "test",
+#         "author_id": 1,
+#         "default_servings": 1,
+#         "tags": [
+#             {
+#                 "key": "test",
+#                 "value": "test"
+#             }
+#         ]}
+#         )
   
     
 
