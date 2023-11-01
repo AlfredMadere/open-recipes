@@ -4,8 +4,11 @@ import { View } from "react-native";
 function _layout() {
   return ( 
     <Tabs>
-      <Tabs.Screen name="one" options={{tabBarLabel: "One", headerTitle: "One"}} />
-      <Tabs.Screen name="two" options={{tabBarLabel: "Two", headerTitle: "Two"}} />
+      <Tabs.Screen name="feed" options={{tabBarLabel: "Feed", headerTitle: "Feed"}} />
+      <Tabs.Screen name="search" options={{tabBarLabel: "Search", headerTitle: "Search"}} />
+      <Tabs.Screen name="create-recipe" options={{tabBarLabel: "Create", headerTitle: "Create Recipe"}} />
+      <Tabs.Screen name="lists" options={{tabBarLabel: "Lists", headerTitle: "Lists"}} />
+      <Tabs.Screen name="profile" options={{ tabBarLabel: "Profile", headerTitle: "Profile " }} />
       </Tabs>
    );
 }
