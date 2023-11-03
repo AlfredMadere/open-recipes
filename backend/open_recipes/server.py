@@ -21,11 +21,9 @@ app = FastAPI(
     description='API for managing recipes, ingredients, users, and reviews.',
 )
 
-
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
 
 #TODO: temporarily add user_id parameter to ingredients endpoints. Eventually replace with sessionid
 @app.get('/ingredients/', response_model=List[Ingredient])
