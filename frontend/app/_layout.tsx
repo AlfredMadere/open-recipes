@@ -46,6 +46,7 @@ const StackLayout = () => {
           name="login"
           options={{ title: "Login Modal", presentation: "modal" }}
         />
+        <Stack.Screen name="recipes/[id]" options={{ title: "Recipe", presentation: "modal" }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="[missing]" options={{ title: "404" }} />
        </Stack>

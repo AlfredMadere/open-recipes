@@ -13,8 +13,6 @@ import {
   YStack,
 } from "tamagui";
 
-
-
 export default function Feed() {
   const router = useRouter();
   const recipes = [
@@ -75,7 +73,6 @@ export default function Feed() {
                 <RecipeCard
                   key={recipe.id}
                   recipe={recipe}
-                  
                 />
               );
             })
@@ -104,6 +101,8 @@ type RecipeCardProps = {
 
 export function RecipeCard(props: RecipeCardProps) {
   const recipe = props.recipe
+    const router = useRouter();
+
 
   return (
     <Card
@@ -120,7 +119,7 @@ export function RecipeCard(props: RecipeCardProps) {
       </Card.Header>
       <Card.Footer padded>
         <XStack flex={1} />
-        <Button borderRadius="$10">View</Button>
+        <Button borderRadius="$10" onPress={() => {router.push(`/recipes/${recipe.id}`)}}>View</Button>
       </Card.Footer>
     </Card>
   );
