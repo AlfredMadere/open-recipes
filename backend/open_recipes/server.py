@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import List, Union
 
 from fastapi import FastAPI
-from typing import Annotated
+from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
 from fastapi import Depends, FastAPI
 from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse
@@ -33,7 +33,13 @@ def get_ingredients(engine : Annotated[Engine, Depends(get_engine)]) -> List[Ing
     """
     Get all ingredients
     """
-    pass
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
+                                   FROM ingredient
+                                   ORDER BY id"""))
+        rows = result.fetchall()
+        ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
+        return ingredients
 
 @app.get('/ingredients/{id}', response_model=Ingredient)
 def get_ingredient(id : int,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
@@ -152,15 +158,46 @@ def delete_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) 
 
 #TODO: fixme and implement search
 @app.get('/recipes', response_model=List[Recipe])
-def get_recipes(engine : Annotated[Engine, Depends(get_engine)]) -> List[Recipe]:
+def get_recipes(name: Optional[str], max_time : Optional[int], engine : Annotated[Engine, Depends(get_engine)]) -> List[Recipe]:
     """
     Get all recipes
     """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
+
+    print("Name:", name)  # Debug: Print the value of name
+    print("Max Time:", max_time)  # Debug: Prin
+    #
+    if( name == None and max_time == None):
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
                                    default_servings, procedure FROM "recipe" """))
-        id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchone()
-        return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
+            id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchall()
+
+            return [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in result]
+    elif(name != None and max_time == None):
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
+                                   default_servings, procedure FROM "recipe" WHERE name ILIKE :name"""), {"name":f"%{name}%"})
+            print("Generated SQL Query:", result._saved_cursor.statement)
+
+            id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchall()
+
+            return [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in result]
+
+        
+    elif(name == None and max_time != None):
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
+                                   default_servings, procedure FROM "recipe" WHERE mins_cook + mins_prep <= :max_time"""), {"max_time":max_time})
+            id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchall()
+            return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
+
+    else:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
+                                   default_servings, procedure FROM "recipe" WHERE mins_cook + mins_prep <= :max_time AND name ILIKE :name"""), {"max_time":max_time, "name": f"%{name}%"})
+            id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchall()
+            return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
+            
     
 
 #SMOKE TESTED

@@ -5,8 +5,8 @@ import dotenv
 from fastapi.testclient import TestClient
 dotenv.load_dotenv()
 # base_route = "http://127.0.0.1:8000"
-from .server import app
-from .database import get_engine
+from open_recipes.server import app
+from open_recipes.database import get_engine
 from sqlalchemy import create_engine, text
 client = TestClient(app)
 
@@ -79,7 +79,7 @@ def test_create_recipe_list():
     recipe_list_id = response.json()['id']
 
     # Send a GET request to verify the recipe list was created
-    response = client.get(f"/recipe-lists/{recipe_list_id}")
+    response = client.get(f'/recipe-lists/{recipe_list_id}')
     assert response.status_code == 200
     assert response.json()['name'] == 'My Recipes'
 
@@ -117,3 +117,26 @@ def test_add_recipe_to_recipe_list():
     assert response.status_code == 200
     assert len(response.json()['recipes']) == 1
     assert response.json()['recipes'][0]['name'] == 'Spaghetti Carbonara'
+
+
+@pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
+def test_search_by_name():
+    # Create a recipe
+    response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese', "mins_prep": 20, "mins_cook": 30})
+    recipe_id_0 = response.json()['id']
+    response = client.post(f'/recipes', json={'name': 'Spaghetti meatballs', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese', "mins_prep": 10, "mins_cook": 30})
+    recipe_id_1 = response.json()['id']
+
+    #Search for recipe by name
+
+    response = client.get(f"/recipes?name={'Spaghetti Carbonara'}")
+    assert response.status_code == 200
+    assert len(response.json()['recipes']) == 2
+    assert response.json()['recipes'][0]['name'] == 'Spaghetti Carbonara'
+    assert response.json()['recipes'][1]['name'] == 'Spaghetti meatballs'
+
+    response = client.get(f'/recipes?name=meatballs')
+    assert response.status_code == 200
+    assert len(response.json()['recipes']) == 2
+    assert response.json()['recipes'][0]['name'] == 'Spaghetti meatballs'
+    assert response.json()['recipes'][1]['name'] == 'Spaghetti Carbonara'
