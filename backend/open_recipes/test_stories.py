@@ -27,7 +27,7 @@ def setup():
 
     with engine.begin() as conn:
         #drop all values from all tables
-        #conn.execute(text('TRUNCATE "user CASCADE'))
+        conn.execute(text('TRUNCATE "user" CASCADE'))
         conn.execute(text("TRUNCATE recipe_list CASCADE"))
         conn.execute(text("TRUNCATE recipe CASCADE"))
         conn.execute(text("TRUNCATE recipe_tag CASCADE"))
@@ -79,7 +79,7 @@ def test_create_recipe_list():
     recipe_list_id = response.json()['id']
 
     # Send a GET request to verify the recipe list was created
-    response = client.get("/recipe-lists/{recipe_list_id}")
+    response = client.get(f"/recipe-lists/{recipe_list_id}")
     assert response.status_code == 200
     assert response.json()['name'] == 'My Recipes'
 

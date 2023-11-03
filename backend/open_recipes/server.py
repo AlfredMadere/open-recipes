@@ -96,9 +96,6 @@ def get_recipe_lists(engine : Annotated[Engine, Depends(get_engine)]) -> List[Re
             recipe = RecipeList(id=id, name=name, description=description)
             recipeListAll.append(recipe)
         return recipeListAll
-    pass
-
-#SMOKE TESTED
 @app.post(
     '/recipe-lists', response_model=None, status_code=201, responses={'201': {'model': RecipeList}}
 )
@@ -117,7 +114,7 @@ def post_recipe_lists(body: CreateRecipeListRequest,engine : Annotated[Engine, D
         return RecipeList(id=id, name=name, description=description)
 
 #SMOKE TESTED
-@app.get('/recipe-lists/{id}', response_model=None)
+@app.get('/recipe-lists/{id}', response_model=RecipeListResponse)
 def get_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> RecipeList:
     """
     Get a recipe list by id
@@ -130,7 +127,8 @@ def get_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> 
                                         JOIN recipe_x_recipe_list AS rl ON rl.recipe_id = recipe.id
                                         WHERE rl.recipe_list_id = :list_id"""),{"list_id": id})
         rows = result.fetchall()
-        recipes = [Recipe(id=row[0], name=row[1], mins_prep=row[2], mins_cook=row[3], description=row[4], default_servings=row[5], author_id=row[6], procedure=row[7]) for row in rows]
+        recipes = [Recipe(id=row.id, name=row.name, description=row.description, mins_prep=row.mins_prep, mins_cook=row.mins_cook, default_servings=row.default_servings, author_id=row.author_id, procedure=row.procedure) for row in rows]
+        print(recipes)
         return RecipeListResponse(id=id, name=name, description= description, recipes=recipes)
 
 @app.post("/recipe-lists/{id}")
