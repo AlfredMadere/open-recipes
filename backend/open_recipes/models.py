@@ -203,6 +203,7 @@ class IngredientCategory(BaseModel):
 class Ingredient(BaseModel):
     id: Optional[int] = None
     name: Optional[str] = None
-    category: Optional[IngredientCategory] = None
+    category_id: Optional[int] = None
+    type: Optional[str] = None
     storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
 
