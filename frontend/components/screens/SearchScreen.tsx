@@ -38,7 +38,7 @@ export default function SearchScreen() {
   });
 
 // object with search term and filters
-//filters should have a state
+// filters should have a state
 // when selected the state should be true, give it a different color
 
   return (
@@ -51,7 +51,7 @@ export default function SearchScreen() {
       padding="$2"
     >
       <InputDemo size="$4" />
-      <XStack space="$2">
+      <XStack space="$2">  
         <Button themeInverse size="$2">
           Breakfasts
         </Button>
