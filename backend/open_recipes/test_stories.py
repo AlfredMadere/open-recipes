@@ -45,7 +45,7 @@ def teardown():
     app.dependency_overrides = {}
     pass
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture( autouse=True)
 def before_and_after_all():
     setup()
     yield
@@ -120,23 +120,33 @@ def test_add_recipe_to_recipe_list():
 
 
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
-def test_search_by_name():
+def test_search():
     # Create a recipe
     response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese', "mins_prep": 20, "mins_cook": 30})
     recipe_id_0 = response.json()['id']
-    response = client.post(f'/recipes', json={'name': 'Spaghetti meatballs', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese', "mins_prep": 10, "mins_cook": 30})
+    response = client.post(f'/recipes', json={'name': 'Spaghetti meatballs', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese', "mins_prep": 10, "mins_cook": 9})
     recipe_id_1 = response.json()['id']
 
     #Search for recipe by name
 
-    response = client.get(f"/recipes?name={'Spaghetti Carbonara'}")
+    response = client.get(f"/recipes?name={'Carbonara'}")
     assert response.status_code == 200
-    assert len(response.json()['recipes']) == 2
-    assert response.json()['recipes'][0]['name'] == 'Spaghetti Carbonara'
-    assert response.json()['recipes'][1]['name'] == 'Spaghetti meatballs'
+    assert len(response.json()['recipe']) == 1
+    assert response.json()['recipe'][0]['name'] == 'Spaghetti Carbonara'
 
-    response = client.get(f'/recipes?name=meatballs')
+    response = client.get(f'/recipes')
     assert response.status_code == 200
-    assert len(response.json()['recipes']) == 2
-    assert response.json()['recipes'][0]['name'] == 'Spaghetti meatballs'
-    assert response.json()['recipes'][1]['name'] == 'Spaghetti Carbonara'
+    assert len(response.json()['recipe']) == 2
+    assert response.json()['recipe'][0]['name'] == 'Spaghetti Carbonara'
+    assert response.json()['recipe'][1]['name'] == 'Spaghetti meatballs'
+
+    #Search for recipe by time
+    response = client.get(f"/recipes?max_time=20")
+    assert response.status_code == 200
+    assert len(response.json()['recipe']) == 1
+    assert response.json()['recipe'][0]['name'] == 'Spaghetti meatballs'
+
+    #Search by time and name
+    response = client.get(f"/recipes?name={'Carbonara'}&max_time=20")
+    assert response.status_code == 200
+    assert len(response.json()['recipe']) == 0
