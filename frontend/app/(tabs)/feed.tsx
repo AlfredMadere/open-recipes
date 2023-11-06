@@ -8,53 +8,73 @@ import {
   Image,
   Paragraph,
   ScrollView,
+  Spinner,
+  Text,
   View,
   XStack,
   YStack,
 } from "tamagui";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Recipe } from "../interfaces/models";
+
+
+
+
 
 export default function Feed() {
   const router = useRouter();
-  const recipes = [
-    {
-      name: "Epic Recipe 1",
-      description: "Super delicious recipe",
-      id: 1,
-      mins_prep: 20,
-      mins_cook: 30,
-      category_id: 1,
-      author_id: 1,
-      created_at: "2022-01-01 00:00:00",
-      procedure: "Make it",
-      default_servings: 1,
-    },
-    {
-      name: "Epic Recipe 2",
-      description: "ANOTHER AMAXZONG Super delicious recipe",
-      id: 2,
-      mins_prep: 20,
-      mins_cook: 30,
-      category_id: 1,
-      author_id: 1,
-      created_at: "2022-01-01 00:00:00",
-      procedure: "Make it",
-      default_servings: 1,
-    },
-    {
-      name: "Epic Recipe",
-      description: "Super delicious recipe",
-      id: 3,
-      mins_prep: 20,
-      mins_cook: 30,
-      category_id: 1,
-      author_id: 1,
-      created_at: "2022-01-01 00:00:00",
-      procedure: "Make it",
-      default_servings: 1,
-    },
-  ];
+  const queryClient = useQueryClient();
+
+  async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
+    const response = await axios.get("https://open-recipes.onrender.com/recipes");
+    console.log('response.data', response.data);
+    return response.data;
+  }
+  const query = useQuery({queryKey: ["recipes_feed"], queryFn: getRecipesFeed});
+
+  // const recipes = [
+  //   {
+  //     name: "Epic Recipe 1",
+  //     description: "Super delicious recipe",
+  //     id: 1,
+  //     mins_prep: 20,
+  //     mins_cook: 30,
+  //     category_id: 1,
+  //     author_id: 1,
+  //     created_at: "2022-01-01 00:00:00",
+  //     procedure: "Make it",
+  //     default_servings: 1,
+  //   },
+  //   {
+  //     name: "Epic Recipe 2",
+  //     description: "ANOTHER AMAXZONG Super delicious recipe",
+  //     id: 2,
+  //     mins_prep: 20,
+  //     mins_cook: 30,
+  //     category_id: 1,
+  //     author_id: 1,
+  //     created_at: "2022-01-01 00:00:00",
+  //     procedure: "Make it",
+  //     default_servings: 1,
+  //   },
+  //   {
+  //     name: "Epic Recipe",
+  //     description: "Super delicious recipe",
+  //     id: 3,
+  //     mins_prep: 20,
+  //     mins_cook: 30,
+  //     category_id: 1,
+  //     author_id: 1,
+  //     created_at: "2022-01-01 00:00:00",
+  //     procedure: "Make it",
+  //     default_servings: 1,
+  //   },
+  // ];
   return (
     <View style={{ width: "100%" }}>
+      {query.error && <Text>{JSON.stringify(query.error)}</Text>}
+      {query.isFetching && <Spinner size="large" color="$orange10" />}
       <ScrollView style={{ width: "100%" }}>
         <YStack
           $sm={{
@@ -67,17 +87,9 @@ export default function Feed() {
           paddingHorizontal="$4"
           space
         >
-          {
-            recipes.map((recipe) => {
-              return (
-                <RecipeCard
-                  key={recipe.id}
-                  recipe={recipe}
-                />
-              );
-            })
-          }
-          
+          {query.data?.recipe.map((recipe) => {
+            return <RecipeCard key={recipe.id} recipe={recipe} />;
+          })}
         </YStack>
       </ScrollView>
     </View>

@@ -47,7 +47,7 @@ export default function One() {
     {
       name: "Epic Recipe 4",
       description: "Super delicious recipe",
-      id: 1,
+      id: 4,
       mins_prep: 20,
       mins_cook: 30,
       category_id: 1,
@@ -59,7 +59,7 @@ export default function One() {
     {
       name: "Epic Recipe 5",
       description: "Super delicious recipe",
-      id: 1,
+      id: 5,
       mins_prep: 20,
       mins_cook: 30,
       category_id: 1,
@@ -71,7 +71,7 @@ export default function One() {
     {
       name: "Epic Recipe 6",
       description: "Super delicious recipe",
-      id: 1,
+      id: 6,
       mins_prep: 20,
       mins_cook: 30,
       category_id: 1,

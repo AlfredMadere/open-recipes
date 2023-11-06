@@ -5,6 +5,9 @@ import { Button } from "react-native";
 import tamaguiConfig from "../tamagui.config";
 import { TamaguiProvider, Theme } from "tamagui";
 import { useEffect } from "react";
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 const StackLayout = () => {
   const router = useRouter();
@@ -25,6 +28,7 @@ const StackLayout = () => {
 
   return (
     <TamaguiProvider config={tamaguiConfig}>
+      <QueryClientProvider  client={queryClient}>
       <Theme name="light" >
       <Stack>
         <Stack.Screen name="index" options={{ title: "Home" }} />
@@ -51,6 +55,7 @@ const StackLayout = () => {
         <Stack.Screen name="[missing]" options={{ title: "404" }} />
        </Stack>
       </Theme>
+      </QueryClientProvider>
     </TamaguiProvider>
   );
 };
