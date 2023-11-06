@@ -13,7 +13,8 @@ export default function Form () {
       author_id: "",
       created_at: "",
       procedure: "",
-      default_servings: ""
+      default_servings: "",
+      ingredients: ""
     }
   );
 
@@ -28,11 +29,6 @@ export default function Form () {
         ...newRecipe,
         ["description"]: value
       })
-    else if (name === "id")
-      setNewRecipe ({
-        ...newRecipe,
-        ["id"]: value
-      })
     else if (name === "mins_prep")
       setNewRecipe ({
         ...newRecipe,
@@ -43,21 +39,6 @@ export default function Form () {
         ...newRecipe,
         ["mins_cook"]: value
       })  
-    else if (name === "category_id")
-      setNewRecipe ({
-        ...newRecipe,
-        ["category_id"]: value
-      })
-    else if (name === "author_id")
-      setNewRecipe ({
-        ...newRecipe,
-        ["author_id"]: value
-      })
-    else if (name === "created_at")
-      setNewRecipe ({
-        ...newRecipe,
-        ["created_at"]: value
-      })
     else if (name === "procedure")
       setNewRecipe ({
         ...newRecipe,
@@ -67,6 +48,11 @@ export default function Form () {
       setNewRecipe ({
         ...newRecipe,
         ["default_servings"]: value
+      })
+    else
+      setNewRecipe ({
+        ...newRecipe,
+        ["ingredients"]: value
       })
   }
 
@@ -87,6 +73,16 @@ export default function Form () {
           style={styles.input}
           value={newRecipe.description}
           onChangeText={(value) => handleChange("description", value)}
+        />
+      </View>
+      
+      <View style={styles.inputContainer}>
+        <Text>Number of Servings</Text>
+        <TextInput
+          style={styles.input}
+          value={newRecipe.default_servings}
+          onChangeText={(value) => handleChange("default_servings", value)}
+          keyboardType="numeric"
         />
       </View>
 
@@ -121,14 +117,16 @@ export default function Form () {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text>Number of Servings</Text>
+        <Text>Ingredients</Text>
         <TextInput
           style={styles.input}
-          value={newRecipe.default_servings}
-          onChangeText={(value) => handleChange("default_servings", value)}
-          keyboardType="numeric"
+          value={newRecipe.ingredients}
+          onChangeText={(value) => handleChange("ingredients", value)}
+          multiline
         />
       </View>
+
+      
     </ScrollView>
   );
 };

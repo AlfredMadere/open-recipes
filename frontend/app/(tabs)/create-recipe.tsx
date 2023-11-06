@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import {Button, View, Text, StyleSheet } from 'react-native';
 import Table from '../../components/table'
 import Form from '../../components/form';
+import { Link } from 'expo-router';
 
 export default function Page() {
   const router = useRouter();
@@ -10,7 +11,6 @@ export default function Page() {
   return (
     <View style={styles.container}>
     <View style={styles.content}>
-      <Text style={styles.header}>Create Recipe</Text>
       <Form />
     </View>
     <View style={styles.buttonContainer}>
