@@ -73,7 +73,7 @@ export default function Form () {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.inputContainer}>
-        <Text>Name</Text>
+        <Text>Recipe Name</Text>
         <TextInput
           style={styles.input}
           value={newRecipe.name}
@@ -91,7 +91,7 @@ export default function Form () {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text>Minutes to Prepare</Text>
+        <Text>Prep Time</Text>
         <TextInput
           style={styles.input}
           value={newRecipe.mins_prep}
@@ -101,7 +101,7 @@ export default function Form () {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text>Minutes to Cook</Text>
+        <Text>Cook Time</Text>
         <TextInput
           style={styles.input}
           value={newRecipe.mins_cook}
@@ -111,36 +111,7 @@ export default function Form () {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text>Category ID</Text>
-        <TextInput
-          style={styles.input}
-          value={newRecipe.category_id}
-          onChangeText={(value) => handleChange("category_id", value)}
-          keyboardType="numeric"
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Text>Author ID</Text>
-        <TextInput
-          style={styles.input}
-          value={newRecipe.author_id}
-          onChangeText={(value) => handleChange("author_id", value)}
-          keyboardType="numeric"
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Text>Created At</Text>
-        <TextInput
-          style={styles.input}
-          value={newRecipe.created_at}
-          onChangeText={(value) => handleChange("created_at", value)}
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Text>Procedure</Text>
+        <Text>Instructions</Text>
         <TextInput
           style={styles.input}
           value={newRecipe.procedure}
@@ -150,7 +121,7 @@ export default function Form () {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text>Default Servings</Text>
+        <Text>Number of Servings</Text>
         <TextInput
           style={styles.input}
           value={newRecipe.default_servings}
