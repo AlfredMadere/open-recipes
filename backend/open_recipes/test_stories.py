@@ -50,7 +50,13 @@ def before_and_after_all():
     setup()
     yield
     teardown()
-    
+
+
+#Follow the format below to create tests for every useful endpoint on the /docs page. If an endpoint is not in a user story, just manually test it by going to /docs and making sure it works
+#For all endpoints used in user stories create tests that make sure they work, if they don't work, fix em.
+#look up how to skip tests in pytest and skip all tests you aren't working on so it does take years to run OR comment everything out that you aren't running but this is sus
+#after all tests are running, create the curl stories as shown in v1....manuletestsf.md, ACTUALLY RUN the curl commands to make sure they work
+#make sure all user stories line up with our curl tests and that our functionality will work when peer reviewed
 
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_create_user():
