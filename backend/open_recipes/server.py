@@ -351,6 +351,13 @@ def get_recipe_tags(recipe_id: int,engine : Annotated[Engine, Depends(get_engine
         rows = result.fetchall()
         return [Tag(id=id, key=key, value=value) for id, key, value in rows]
 
+@app.post('/recipes/{recipe_id}/ingredients/{ingredient_id}', status_code=201, response_model=None)
+def add_ingredient_to_recipe(recipe_id: int, ingredient_id: int, engine : Annotated[Engine, Depends(get_engine)]) -> None:
+    with engine.begin() as conn:
+        #FIXME: add ability to specify quantity and unit
+        conn.execute(text(f"INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (:recipe_id, :ingredient_id, :quantity)"),{"recipe_id":recipe_id,"ingredient_id":ingredient_id, "quantity":1})
+        return "OK"
+
 @app.get('/reviews', response_model=List[Review])
 def get_reviews(engine : Annotated[Engine, Depends(get_engine)]) -> List[Review]:
     """

@@ -259,9 +259,10 @@ def test_create_ingredient():
     assert response.json()[0]['name'] == 'Spaghetti'
 
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
-def test_user_search():
+def test_user_inventory_search():
     # create ingreadient with user
     user_response = client.post("/users", json={'name': 'John Doe', 'email': 'john@dioe.com'})
+    assert user_response.status_code == 201
 
     user_id = user_response.json()['id']
 
@@ -269,38 +270,58 @@ def test_user_search():
     response2 = client.post(f'/ingredients', json={'name': 'Bacon',"type":"meat","storage":"FRIDGE"})
     response3 = client.post(f'/ingredients', json={'name': 'Eggs',"type":"dairy","storage":"FRIDGE"})
     response4 = client.post(f'/ingredients', json={'name': 'Parmesan',"type":"dairy","storage":"FRIDGE"})
+    assert response1.status_code == 201
+    assert response2.status_code == 201
+    assert response3.status_code == 201
+    assert response4.status_code == 201
 
     # add pho ingredients not to user
 
     response5 = client.post(f'/ingredients', json={'name': 'Noodles',"type":"noodles","storage":"PANTRY"})
     response6 = client.post(f'/ingredients', json={'name': 'Beef',"type":"meat","storage":"FRIDGE"})
     response7 = client.post(f'/ingredients', json={'name': 'Cinnamon',"type":"spice","storage":"PANTRY"})
+    assert response5.status_code == 201
+    assert response6.status_code == 201
+    assert response7.status_code == 201
 
 
     response = client.post(f'/users/{user_id}/ingredients/{response1.json()["id"]}')
+    assert response.status_code == 201
     response = client.post(f'/users/{user_id}/ingredients/{response2.json()["id"]}')
+    assert response.status_code == 201
     response = client.post(f'/users/{user_id}/ingredients/{response3.json()["id"]}')
+    assert response.status_code == 201
     response = client.post(f'/users/{user_id}/ingredients/{response4.json()["id"]}')
+    assert response.status_code == 201
 
     # create recipe
     response_recipe1 = client.post(f'/recipes', json=recipe_1_popo)
+    assert response_recipe1.status_code == 201
     recipe_id1 = response_recipe1.json()['id']
 
     response_recipe2 = client.post(f'/recipes', json=recipe_2_popo)
+    assert response_recipe2.status_code == 201
     recipe_id2 = response_recipe2.json()['id']
 
     # add ingredients to recipe
     response = client.post(f'/recipes/{recipe_id1}/ingredients/{response1.json()["id"]}')
+    assert response.status_code == 201
     response = client.post(f'/recipes/{recipe_id1}/ingredients/{response2.json()["id"]}')
+    assert response.status_code == 201
     response = client.post(f'/recipes/{recipe_id1}/ingredients/{response3.json()["id"]}')
+    assert response.status_code == 201
     response = client.post(f'/recipes/{recipe_id1}/ingredients/{response4.json()["id"]}')
+    assert response.status_code == 201
 
     response = client.post(f'/recipes/{recipe_id2}/ingredients/{response5.json()["id"]}')
+    assert response.status_code == 201
     response = client.post(f'/recipes/{recipe_id2}/ingredients/{response6.json()["id"]}')
+    assert response.status_code == 201
     response = client.post(f'/recipes/{recipe_id2}/ingredients/{response7.json()["id"]}')
+    assert response.status_code == 201
 
     # search for recipes with user ingredients
-    response = client.get(f'recipes?use_inventory_of={user_id}')
+    response = client.get(f'/recipes?use_inventory_of={user_id}')
     assert response.status_code == 200
 
     assert len(response.json()['recipe']) == 1
