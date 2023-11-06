@@ -141,7 +141,6 @@ const GridComponent = ({ data }) => {
   );
 };
 
-
 type RecipeCardProps = {
   recipe: {
     name: string;
