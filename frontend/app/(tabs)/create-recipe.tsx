@@ -1,18 +1,41 @@
 import { useRouter } from "expo-router";
-import { Button, H1, Text, View } from "tamagui";
+import React, {useState} from 'react';
+import {Button, View, Text, StyleSheet } from 'react-native';
+import Table from '../../components/table'
+import Form from '../../components/form';
 
 export default function Page() {
   const router = useRouter();
+  const [recipes, setRecipes] = useState([]);
   return (
-    <View>
-      <H1>Create Recipe!</H1>
-      <Button style={{ backgroundColor: "red" }}>TAMA WORKS</Button>
+    <View style={styles.container}>
+    <View style={styles.content}>
+      <Text style={styles.header}>Create Recipe</Text>
+      <Form />
     </View>
-    // <TamaView>
-    //   <TamaText style={{ fontSize: 20 }}>Create Recipe Page!</TamaText>
-    //   <TamaButton>
-    //     <TamaText> Tama works!</TamaText>
-    //   </TamaButton>
-    // </TamaView>
+    <View style={styles.buttonContainer}>
+      <Button title="Cancel" color="red" />
+      <Button title="Create" color="green" />
+    </View>
+  </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+});
