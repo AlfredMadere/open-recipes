@@ -19,12 +19,8 @@ export default function One() {
       created_at: "2022-01-01 00:00:00",
       procedure: "Make it",
       default_servings: 1,
-<<<<<<< HEAD
     },
     {
-=======
-    },{
->>>>>>> af22d79 (List Feature - 1st Sprint)
       name: "Epic Recipe 2",
       description: "ANOTHER AMAXZONG Super delicious recipe",
       id: 2,
@@ -51,11 +47,7 @@ export default function One() {
     {
       name: "Epic Recipe 4",
       description: "Super delicious recipe",
-<<<<<<< HEAD
       id: 4,
-=======
-      id: 1,
->>>>>>> af22d79 (List Feature - 1st Sprint)
       mins_prep: 20,
       mins_cook: 30,
       category_id: 1,
@@ -67,11 +59,7 @@ export default function One() {
     {
       name: "Epic Recipe 5",
       description: "Super delicious recipe",
-<<<<<<< HEAD
       id: 5,
-=======
-      id: 1,
->>>>>>> af22d79 (List Feature - 1st Sprint)
       mins_prep: 20,
       mins_cook: 30,
       category_id: 1,
@@ -83,11 +71,7 @@ export default function One() {
     {
       name: "Epic Recipe 6",
       description: "Super delicious recipe",
-<<<<<<< HEAD
       id: 6,
-=======
-      id: 1,
->>>>>>> af22d79 (List Feature - 1st Sprint)
       mins_prep: 20,
       mins_cook: 30,
       category_id: 1,
@@ -97,12 +81,9 @@ export default function One() {
       default_servings: 1,
     },
   ];
-<<<<<<< HEAD
 
 
 
-=======
->>>>>>> af22d79 (List Feature - 1st Sprint)
   return (
     <View style={{width: '100%', flex: 1}}>
       <View style={{flex: 1, marginVertical: 20}}>
@@ -124,12 +105,9 @@ export default function One() {
     </View>
   );
 }
-<<<<<<< HEAD
 
 
 
-=======
->>>>>>> af22d79 (List Feature - 1st Sprint)
 const GridComponent = ({ data }) => {
   return (
     <FlatList
@@ -147,12 +125,8 @@ const GridComponent = ({ data }) => {
         }}
         paddingHorizontal="$4"
         space>
-<<<<<<< HEAD
           {
                 data.map((recipe) => {
-=======
-          {data.map((recipe) => {
->>>>>>> af22d79 (List Feature - 1st Sprint)
                   return (
                     <RecipeCard
                       key={recipe.id}
@@ -167,10 +141,6 @@ const GridComponent = ({ data }) => {
   );
 };
 
-<<<<<<< HEAD
-
-=======
->>>>>>> af22d79 (List Feature - 1st Sprint)
 type RecipeCardProps = {
   recipe: {
     name: string;
@@ -208,8 +178,4 @@ export function RecipeCard(props: RecipeCardProps) {
       </Card.Footer>
     </Card>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> af22d79 (List Feature - 1st Sprint)
