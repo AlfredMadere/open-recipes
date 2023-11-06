@@ -207,3 +207,11 @@ class Ingredient(BaseModel):
     type: Optional[str] = None
     storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
 
+class Tag(BaseModel):
+    id: Optional[int] = None
+    key: Optional[str] = None
+    value: Optional[str] = None
+
+class CreateTagRequest(BaseModel):
+    key: Optional[str] = None
+    value: Optional[str] = None

@@ -6,14 +6,18 @@ from __future__ import annotations
 
 from typing import List, Union
 
+
 from fastapi import FastAPI
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
 from fastapi import Depends, FastAPI
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse
+from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
 from open_recipes.database import get_engine 
-from sqlalchemy import text
+from sqlalchemy import text, func, distinct, case
+import sqlalchemy
 import uvicorn
+from pydantic import BaseModel
+
 
 app = FastAPI(
     title='Recipe Service API',
@@ -27,20 +31,33 @@ def read_root():
 
 #TODO: temporarily add user_id parameter to ingredients endpoints. Eventually replace with sessionid
 @app.get('/ingredients/', response_model=List[Ingredient])
-def get_ingredients(engine : Annotated[Engine, Depends(get_engine)]) -> List[Ingredient]:
+def get_ingredients(user_id : int | None ,engine : Annotated[Engine, Depends(get_engine)]) -> List[Ingredient]:
     """
     Get all ingredients
     """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
-                                   FROM ingredient
-                                   ORDER BY id"""))
-        rows = result.fetchall()
-        ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
-        return ingredients
+    if user_id is None:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
+                                    FROM ingredient
+                                    ORDER BY id"""))
+            rows = result.fetchall()
+            ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
+    else:
+        pass
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
+                                    FROM ingredient
+                                    JOIN user_x_ingredient ON ingredient.id = user_x_ingredient.ingredient_id
+                                    JOIN user ON user.id = user_x_ingredient.user_id
+                                    WHERE user.id = :user
+                                    ORDER BY id"""),{"user":user_id})
+            rows = result.fetchall()
+            ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
+    return ingredients
+
 
 @app.get('/ingredients/{id}', response_model=Ingredient)
-def get_ingredient(id : int,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
+def get_ingredient(id : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
     """
     Get an ingredient by id
     """
@@ -48,42 +65,49 @@ def get_ingredient(id : int,engine : Annotated[Engine, Depends(get_engine)]) -> 
         result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
                                    FROM ingredient
                                    WHERE id = :id"""))
-        id, name, type, storage, category_id = result.fetchone()
+        id, name, storage, type, category_id = result.fetchone()
         return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
 
 @app.post("/ingredients/{id}")
-def update_ingredient(id: int, ingredient : Ingredient ,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
+def update_ingredient(id: int | None, ingredient : Ingredient ,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
     """
     Update an ingredient by id 
     """
+    query_string = f"""UPDATE ingredient 
+                                    SET name = :name, type = :type, storage = :storage, category_id = :category_id
+                                    WHERE id = :id"""
     with engine.begin() as conn:
-        result = conn.execute(text(f"""UPDATE ingredient 
-                                   SET name = :name, type = :type, storage = :storage, category_id = :category_id
-                                   WHERE id = :id""",{"name":ingredient.name, "type":ingredient.type, "storage": ingredient.storage, "category_id": ingredient.category_id}))
+        result = conn.execute(text(query_string,{"name":ingredient.name, "type":ingredient.type, "storage": ingredient.storage, "category_id": ingredient.category_id}))
         id, name, type, storage, category_id = result.fetchone()
         return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
 
+        
+
 @app.delete("/ingredient/{id}")
-def delete_ingredient(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> str:
+def delete_ingredient(id: int,user : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> str:
     with engine.begin() as conn:
         conn.execute(text(f"""DELETE FROM ingredient
                             WHERE id = :id""",{"id":id}))
         return "OK" 
  
 @app.post('/ingredients', response_model=None, status_code=201, responses={'201': {'model': Ingredient}})
-def post_ingredients(body: Ingredient,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Ingredient]:
+def post_ingredients(body: Ingredient, engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Ingredient]:
     """
     Create a new ingredient
     """
     with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO ingredient (name, description)
-                                    VALUES (:name, :description)
-                                    RETURNING id, name, description 
+        result = conn.execute(text(f"""INSERT INTO ingredient (name, type, storage, category_id)
+                                    VALUES (:name, :type, :storage, :category_id)
+                                    RETURNING id, name, type, storage, category_id
                                    """
-                                    ),{"name":body.name,"description":body.description})
-        
-        id, name, description= result.fetchone()
-        return RecipeList(id=id, name=name, description=description)
+                                    ), {"name":body.name, "type":body.type, "storage":body.storage, "category_id":body.category_id})
+        id, name, type, storage, category_id = result.fetchone()
+        print(id, name, storage, type, category_id)
+
+        return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id)
+    
+    
+
 
 #SMOKE TESTED
 @app.get('/recipe-lists', response_model=List[RecipeList])
@@ -154,9 +178,16 @@ def delete_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) 
         return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
  
 
+
+class SearchResults(BaseModel):
+    recipe: List[Recipe]
+    next_cursor: Optional[int]
+    prev_cursor: Optional[int]
+    
+
 #TODO: fixme and implement search
-@app.get('/recipes', response_model=List[Recipe])
-def get_recipes(name: Optional[str], max_time : Optional[int], engine : Annotated[Engine, Depends(get_engine)]) -> List[Recipe]:
+@app.get('/recipes', response_model=SearchResults)
+def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | None = None, max_time : int | None = None, cursor: int = 0, tag_key: str | None = None, tag_value: str | None = None, use_inventory_of: int | None = None) -> SearchResults:
     """
     Get all recipes
     """
@@ -164,39 +195,88 @@ def get_recipes(name: Optional[str], max_time : Optional[int], engine : Annotate
     print("Name:", name)  # Debug: Print the value of name
     print("Max Time:", max_time)  # Debug: Prin
     #
-    if( name == None and max_time == None):
-        with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
-                                   default_servings, procedure FROM "recipe" """))
-            id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchall()
 
-            return [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in result]
-    elif(name != None and max_time == None):
-        with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
-                                   default_servings, procedure FROM "recipe" WHERE name ILIKE :name"""), {"name":f"%{name}%"})
-            print("Generated SQL Query:", result._saved_cursor.statement)
+    metadata_obj = sqlalchemy.MetaData()
+    recipe = sqlalchemy.Table("recipe", metadata_obj, autoload_with=engine)
+    recipe_x_tag = sqlalchemy.Table("recipe_x_tag", metadata_obj, autoload_with=engine)
+    recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
+    recipe_ingredients= sqlalchemy.Table("recipe_ingredients", metadata_obj, autoload_with=engine)
+    user_x_ingredient= sqlalchemy.Table("user_x_ingredient", metadata_obj, autoload_with=engine)
+    page_size = 10
 
-            id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchall()
-
-            return [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in result]
-
+    stmt = (
+        sqlalchemy.select(
+            recipe.c.id,
+            recipe.c.name,
+            recipe.c.mins_prep,
+            recipe.c.category_id,
+            recipe.c.mins_cook,
+            recipe.c.description,
+            recipe.c.author_id,
+            recipe.c.default_servings,
+            recipe.c.procedure
+        )
+        .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
+        .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
         
-    elif(name == None and max_time != None):
-        with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
-                                   default_servings, procedure FROM "recipe" WHERE mins_cook + mins_prep <= :max_time"""), {"max_time":max_time})
-            id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchall()
-            return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
+    )
 
-    else:
-        with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, 
-                                   default_servings, procedure FROM "recipe" WHERE mins_cook + mins_prep <= :max_time AND name ILIKE :name"""), {"max_time":max_time, "name": f"%{name}%"})
-            id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchall()
-            return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
-            
+    if name is not None:
+        stmt = stmt.where(recipe.c.name.ilike(f"%{name}%"))
+    if max_time is not None:
+        stmt = stmt.where(recipe.c.mins_cook + recipe.c.mins_prep <= max_time)
+    if tag_key is not None:
+        stmt = stmt.where(recipe_tag.c.key == tag_key)
+    if tag_value is not None:
+        stmt = stmt.where(recipe_tag.c.value == tag_value)
+    if use_inventory_of is not None:
+       stmt = (stmt
+            .join(recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id)
+            .outerjoin(user_x_ingredient, 
+                       (recipe_ingredients.c.ingredient_id == user_x_ingredient.c.ingredient_id) & 
+                       (user_x_ingredient.c.user_id == use_inventory_of))
+            .group_by(
+                recipe.c.id,
+                recipe.c.name,
+                recipe.c.mins_prep,
+                recipe.c.category_id,
+                recipe.c.mins_cook,
+                recipe.c.description,
+                recipe.c.author_id,
+                recipe.c.default_servings,
+                recipe.c.procedure
+            )
+            .having(
+                func.count(distinct(recipe_ingredients.c.ingredient_id)) == 
+                func.count(distinct(case((user_x_ingredient.c.ingredient_id != None, recipe_ingredients.c.ingredient_id),)))
+            )
+    )
+
+    stmt = (stmt.limit(page_size + 1)
+        .offset(cursor)
+        .order_by(recipe.c.name)
+    )
+
+
+    print('statement', stmt)
     
+    with engine.connect() as conn:
+        result = conn.execute(stmt)
+        rows = result.fetchall()
+
+    recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in rows]
+
+    next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
+    prev_cursor = cursor - page_size if cursor > 0 else None
+    
+    search_result = SearchResults(
+        prev_cursor= prev_cursor,
+        next_cursor= next_cursor,
+        recipe= recipes_result 
+    )
+
+    return search_result
+
 
 #SMOKE TESTED
 #FIXME: increment created at in database
@@ -204,7 +284,7 @@ def get_recipes(name: Optional[str], max_time : Optional[int], engine : Annotate
 def post_recipes(body: CreateRecipeRequest,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Recipe]:
     """
     Create a new recipe
-    """    
+    """
     with engine.begin() as conn:
         result = conn.execute(text(f"""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id, procedure)
                                    VALUES (
@@ -251,6 +331,29 @@ def delete_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> No
 def add_recipe_to_recipe_list(recipe_id: int, recipe_list_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
     with engine.begin() as conn:
         conn.execute(text(f"INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES (:recipe_id, :recipe_list_id)"),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
+        return "OK"
+
+@app.post('/recipes/{recipe_id}/tags/{tag_id}', status_code=201, response_model=None)
+def add_recipe_tag(recipe_id: int, tag_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
+    with engine.begin() as conn:
+        conn.execute(text(f"INSERT INTO recipe_x_tag (recipe_id, tag_id) VALUES (:recipe_id, :tag_id)"),{"recipe_id":recipe_id,"tag_id":tag_id})
+        return "OK"
+
+@app.get('/recipes/{recipe_id}/tags', response_model=List[Tag])
+def get_recipe_tags(recipe_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""SELECT rt.id, rt.key, rt.value 
+                                   FROM recipe_x_tag rxt
+                                   JOIN recipe_tag rt on rxt.tag_id = rt.id 
+                                   WHERE rxt.recipe_id = :recipe_id"""),{"recipe_id":recipe_id})
+        rows = result.fetchall()
+        return [Tag(id=id, key=key, value=value) for id, key, value in rows]
+
+@app.post('/recipes/{recipe_id}/ingredients/{ingredient_id}', status_code=201, response_model=None)
+def add_ingredient_to_recipe(recipe_id: int, ingredient_id: int, engine : Annotated[Engine, Depends(get_engine)]) -> None:
+    with engine.begin() as conn:
+        #FIXME: add ability to specify quantity and unit
+        conn.execute(text(f"INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (:recipe_id, :ingredient_id, :quantity)"),{"recipe_id":recipe_id,"ingredient_id":ingredient_id, "quantity":1})
         return "OK"
 
 @app.get('/reviews', response_model=List[Review])
@@ -345,15 +448,48 @@ def update_user(id: int, user : User,engine : Annotated[Engine, Depends(get_engi
 @app.delete("/users/{id}")
 def delete_user(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
     with engine.begin() as conn:
-        result = conn.execute(text(f"""DELETE FROM "user" WHERE id = :id""",{"id":id}))
+        result = conn.execute(text(f"""DELETE FROM "user" WHERE id = :id"""),{"id":id})
         id, name, email, phone = result.fetchone()
         return User(id=id, name=name, email=email, phone=phone)
 
+@app.get("/users/{user_id}/ingredients/", response_model=None,status_code=200)
+def get_users_inventory(user_id: int,engine : Annotated[Engine, Depends(get_engine)]  ) -> list[Ingredient]:
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""
+        SELECT id, name, type, storage, category_id
+        FROM ingredient
+        JOIN user_x_ingredient ON ingredient.id = user_x_ingredient.ingredient_id
+        WHERE user_x_ingredient.user_id = :user_id
+
+"""),{"user_id":user_id})
+        rows = result.fetchall()
+        return [Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) for id, name, type, storage, category_id in rows]
+
+@app.post("/users/{user_id}/ingredients/{ingredient_id}", response_model=None,status_code=201)
+def add_ingredient_to_user_inventory(user_id: int, ingredient_id: int, engine: Annotated[Engine, Depends(get_engine)]) -> str:
+    with engine.begin() as conn:
+        conn.execute(text(f"INSERT INTO user_x_ingredient (user_id, ingredient_id) VALUES (:user_id, :ingredient_id)"),{"user_id":user_id,"ingredient_id":ingredient_id})
+        return "OK"
 
 
-import uvicorn
+@app.post("/tags", response_model=None,status_code=201, responses={'201': {'model': Tag}})
+def create_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Tag]:
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""INSERT INTO recipe_tag (key, value) VALUES (:key, :value) RETURNING id, key, value"""),{"key":tag.key,"value":tag.value})
+        id, key, value = result.fetchone()
+        return Tag(id=id, key=key, value=value)
+
+
+@app.get('/tags/{id}', response_model=List[Tag])
+def get_tags(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":id})
+        id, key, value = result.fetchone()
+        return Tag(id=id, key=key, value=value)
 
 if __name__ == "__main__":
+    import uvicorn
+
     config = uvicorn.Config(
         app, port=3000, log_level="info", reload=True
     )
