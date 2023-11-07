@@ -167,13 +167,12 @@ class Review(BaseModel):
     created_at: Optional[str] = None
 
 
-
 class BareReview(BaseModel):
     id: Optional[int] = None
     stars: Optional[int] = None
     author_id: Optional[str] = None
     content: Optional[str] = None
-    recepie_id: Optional[r] = None
+    recepie_id: Optional[str] = None
     created_at: Optional[str] = None  
 
     def to_review(self,engine):
