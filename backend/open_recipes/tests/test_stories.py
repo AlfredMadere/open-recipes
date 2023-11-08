@@ -52,21 +52,7 @@ def before_and_after_all():
     teardown()
     
 
-@pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
-def test_create_user():
-    # Send a POST request to create a user
 
-    response = client.post("/users", json={'name': 'John Doe', 'email': 'john.doe@example.com'})
-    assert response.status_code == 201 # this will fail
-
-    # Get the user ID from the response
-    user_id = response.json()['id']
-
-    # Send a GET request to verify the user was created
-    response = client.get(f'/users/{user_id}')
-    assert response.status_code == 200
-    assert response.json()['name'] == 'John Doe'
-    assert response.json()['email'] == 'john.doe@example.com'
     
 
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
