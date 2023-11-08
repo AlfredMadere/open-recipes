@@ -314,4 +314,40 @@ def test_user_inventory_search():
     assert response.json()['recipe'][0]['name'] == 'Spaghetti Carbonara'
 
 
+@pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
+def test_get_ingredients_from_recipe():
+    
+    # Create a recipe
+    response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
+    recipe_id = response.json()['id']
+    # Create a recipe list
+    response = client.post(f'/recipe-lists', json={'name': 'My Recipes'})
+    recipe_list_id = response.json()['id']
+    # Add the recipe to the recipe list
+    response = client.post(f'/recipes/{recipe_id}/recipe-lists/{recipe_list_id}')
+    assert response.status_code == 201
+    # Send a GET request to verify the recipe was added to the recipe list
+    response = client.get(f'/recipe-lists/{recipe_list_id}')
+    assert response.status_code == 200
+    assert len(response.json()['recipes']) == 1
+    assert response.json()['recipes'][0]['name'] == 'Spaghetti Carbonara'
+    #get back [INGREDIENT]
+    response_recipe1 = client.post(f'/recipes', json=recipe_1_popo)
+    assert response_recipe1.status_code == 201
+    response1 = client.post(f'/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
+    response2 = client.post(f'/ingredients', json={'name': 'Bacon',"type":"meat","storage":"FRIDGE"})
+    assert response1.status_code == 201
+    assert response2.status_code == 201
+    response = client.get(f'/recipe/{recipe_id}/ingredients')
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    assert response.json()['ingredients'][0]['name'] == 'Spaghetti'
+    assert response.json()['ingredients'][0]['name'] == 'Bacon'
+
+
+
+
+
+
+
 
