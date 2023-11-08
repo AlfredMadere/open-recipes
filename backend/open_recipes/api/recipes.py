@@ -158,13 +158,13 @@ def get_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Recip
         id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure = result.fetchone()
         return Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure)
 
-@router.post("/{id}", status_code=201, response_model=None)
-def update_recipe(id: int, recipe : Recipe,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
-    pass
+# @router.post("/{id}", status_code=201, response_model=None)
+# def update_recipe(id: int, recipe : Recipe,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
+#     pass
 
-@router.delete("/{id}")
-def delete_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
-    pass
+# @router.delete("/{id}")
+# def delete_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
+#     pass
 
 @router.post('/{recipe_id}/recipe-lists/{recipe_list_id}', status_code=201, response_model=None)
 def add_recipe_to_recipe_list(recipe_id: int, recipe_list_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:

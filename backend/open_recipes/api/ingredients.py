@@ -58,27 +58,27 @@ def get_ingredient(id : int | None,engine : Annotated[Engine, Depends(get_engine
         id, name, storage, type, category_id = result.fetchone()
         return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
 
-@router.post("/{id}")
-def update_ingredient(id: int | None, ingredient : Ingredient ,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
-    """
-    Update an ingredient by id 
-    """
-    query_string = f"""UPDATE ingredient 
-                                    SET name = :name, type = :type, storage = :storage, category_id = :category_id
-                                    WHERE id = :id"""
-    with engine.begin() as conn:
-        result = conn.execute(text(query_string,{"name":ingredient.name, "type":ingredient.type, "storage": ingredient.storage, "category_id": ingredient.category_id}))
-        id, name, type, storage, category_id = result.fetchone()
-        return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
+# @router.post("/{id}")
+# def update_ingredient(id: int | None, ingredient : Ingredient ,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
+#     """
+#     Update an ingredient by id 
+#     """
+#     query_string = f"""UPDATE ingredient 
+#                                     SET name = :name, type = :type, storage = :storage, category_id = :category_id
+#                                     WHERE id = :id"""
+#     with engine.begin() as conn:
+#         result = conn.execute(text(query_string,{"name":ingredient.name, "type":ingredient.type, "storage": ingredient.storage, "category_id": ingredient.category_id}))
+#         id, name, type, storage, category_id = result.fetchone()
+#         return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
 
         
 
-@router.delete("/ingredient/{id}")
-def delete_ingredient(id: int,user : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> str:
-    with engine.begin() as conn:
-        conn.execute(text(f"""DELETE FROM ingredient
-                            WHERE id = :id""",{"id":id}))
-        return "OK" 
+# @router.delete("/ingredient/{id}")
+# def delete_ingredient(id: int,user : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> str:
+#     with engine.begin() as conn:
+#         conn.execute(text(f"""DELETE FROM ingredient
+#                             WHERE id = :id""",{"id":id}))
+#         return "OK" 
  
 @router.post('', response_model=None, status_code=201, responses={'201': {'model': Ingredient}})
 def post_ingredients(body: Ingredient, engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Ingredient]:
