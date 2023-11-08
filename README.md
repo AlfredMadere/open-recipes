@@ -46,5 +46,5 @@ We propose to develop a service for a meal planning and recipe management  aimed
 - Recipe scaling based on the number of people.
 - Premium features for paying customers.
 
-
-hello from new branch
+#### Contributing
+See frontend/README.md for information about our coding standards.
