@@ -6,7 +6,10 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "echo \"Error: no test specified\"",
+    "lint": "npx eslint . && npx prettier --check ."
+
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
