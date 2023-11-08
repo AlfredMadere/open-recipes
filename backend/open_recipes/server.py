@@ -91,23 +91,23 @@ def get_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> 
         print(recipes)
         return RecipeListResponse(id=id, name=name, description= description, recipes=recipes)
 
-@app.post("/recipe-lists/{id}")
-def update_recipe_list(id: int, recipe_list : RecipeList, engine : Annotated[Engine, Depends(get_engine)]) -> RecipeList:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""UPDATE recipe_list 
-                                   SET name = :name, description = :description
-                                   WHERE id = :id""",{"name":recipe_list.name, "description":recipe_list.description, "id":id}))
-        id, name, description = result.fetchone()
-        return RecipeList(id=id, name=name, description=description)
+# @app.post("/recipe-lists/{id}")
+# def update_recipe_list(id: int, recipe_list : RecipeList, engine : Annotated[Engine, Depends(get_engine)]) -> RecipeList:
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"""UPDATE recipe_list 
+#                                    SET name = :name, description = :description
+#                                    WHERE id = :id""",{"name":recipe_list.name, "description":recipe_list.description, "id":id}))
+#         id, name, description = result.fetchone()
+#         return RecipeList(id=id, name=name, description=description)
 
-@app.delete("/recipe-lists/{id}")
-def delete_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""DELETE FROM recipe_list 
-                                   WHER
-                                   default_servings, procedure FROM "recipe" """))
-        id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchone()
-        return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
+# @app.delete("/recipe-lists/{id}")
+# def delete_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"""DELETE FROM recipe_list 
+#                                    WHER
+#                                    default_servings, procedure FROM "recipe" """))
+#         id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchone()
+#         return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
  
 
 
@@ -116,49 +116,49 @@ class SearchResults(BaseModel):
     next_cursor: Optional[int]
     prev_cursor: Optional[int]
     
-@app.get('/reviews', response_model=List[Review])
-def get_reviews(engine : Annotated[Engine, Depends(get_engine)]) -> List[Review]:
-    """
-    Get all reviews
-    """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"SELECT id, stars, author_id, content, recipe_id, FROM reviews ORDER BY created_at"))
-        id, name, email, phone = result.fetchone()
-        return User(id=id, name=name, email=email, phone=phone)
+# @app.get('/reviews', response_model=List[Review])
+# def get_reviews(engine : Annotated[Engine, Depends(get_engine)]) -> List[Review]:
+#     """
+#     Get all reviews
+#     """
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"SELECT id, stars, author_id, content, recipe_id, FROM reviews ORDER BY created_at"))
+#         id, name, email, phone = result.fetchone()
+#         return User(id=id, name=name, email=email, phone=phone)
 
-@app.post('/reviews', response_model=None, responses={'201': {'model': Review}})
-def post_reviews(body: Review,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Review]:
-    """
-    Create a new review
-    """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"INSERT INTO reviews stars, author_id, content, recipe_id values (:stars,:author_id,:content,:recipe_id)",{"stars":body.stars,"author_id":body.author.id,"content":body.content,"recipe_id":body.recepie.id}))
-        id, stars, author_id, content, recipe_id = result.fetchone()
-        return User(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
+# @app.post('/reviews', response_model=None, responses={'201': {'model': Review}})
+# def post_reviews(body: Review,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Review]:
+#     """
+#     Create a new review
+#     """
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"INSERT INTO reviews stars, author_id, content, recipe_id values (:stars,:author_id,:content,:recipe_id)",{"stars":body.stars,"author_id":body.author.id,"content":body.content,"recipe_id":body.recepie.id}))
+#         id, stars, author_id, content, recipe_id = result.fetchone()
+#         return User(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
 
-@app.get('/reviews/{id}', response_model=Review)
-def get_review(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Review:
-    """
-    Get a review by id
-    """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT stars, author_id, content, recipe_id FROM review WHERE id = :id"""),{"id":id})
-        id, stars, author_id, content, recipe_id = result.fetchone()
-        return Review(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
+# @app.get('/reviews/{id}', response_model=Review)
+# def get_review(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Review:
+#     """
+#     Get a review by id
+#     """
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"""SELECT stars, author_id, content, recipe_id FROM review WHERE id = :id"""),{"id":id})
+#         id, stars, author_id, content, recipe_id = result.fetchone()
+#         return Review(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
 
-@app.post("/reviews/{id}")
-def update_review(id: int, review : Review,engine : Annotated[Engine, Depends(get_engine)]) -> Review:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"UPDATE review SET stars = :stars, author_id = :author_id, content = :content, recipe_id = :recipe_id WHERE id = :id",{"stars":review.stars,"author_id":review.author_id, "content":review.content,  "recipe_id":review.recipe_id, "id":id}))
-        id, stars, author_id, content, recipe_id = result.fetchone()
-        return Review(id=id, stars = stars, author_id = author_id, content = content, recipe_id = recipe_id)
+# @app.post("/reviews/{id}")
+# def update_review(id: int, review : Review,engine : Annotated[Engine, Depends(get_engine)]) -> Review:
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"UPDATE review SET stars = :stars, author_id = :author_id, content = :content, recipe_id = :recipe_id WHERE id = :id",{"stars":review.stars,"author_id":review.author_id, "content":review.content,  "recipe_id":review.recipe_id, "id":id}))
+#         id, stars, author_id, content, recipe_id = result.fetchone()
+#         return Review(id=id, stars = stars, author_id = author_id, content = content, recipe_id = recipe_id)
 
-@app.delete("/reviews/{id}")
-def delete_review(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""DELETE FROM "reviews" WHERE id = :id""",{"id":id}))
-        id, stars, author_id, content, recipe_id = result.fetchone()
-        return Review(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
+# @app.delete("/reviews/{id}")
+# def delete_review(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"""DELETE FROM "reviews" WHERE id = :id""",{"id":id}))
+#         id, stars, author_id, content, recipe_id = result.fetchone()
+#         return Review(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
 
 @app.post("/tags", response_model=None,status_code=201, responses={'201': {'model': Tag}})
 def create_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Tag]:

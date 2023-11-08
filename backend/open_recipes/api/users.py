@@ -58,20 +58,20 @@ def post_users(body: CreateUserRequest,engine : Annotated[Engine, Depends(get_en
         id, name, email, phone = result.fetchone()
         return User(id=id, name=name, email=email, phone=phone)
 
-@router.post("/{id}")
-def update_user(id: int, user : User,engine : Annotated[Engine, Depends(get_engine)]) -> User:
+# @router.post("/{id}")
+# def update_user(id: int, user : User,engine : Annotated[Engine, Depends(get_engine)]) -> User:
 
-    with engine.begin() as conn:
-        result = conn.execute(text(f"UPDATE users SET name = :name, email = :email, phone = :phone WHERE id = :id",{"name":user.name,"phone":user.phone,"email":user.email,"id":id}))
-        id, name, email, phone = result.fetchone()
-        return User(id=id, name=name, email=email, phone=phone)
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"UPDATE users SET name = :name, email = :email, phone = :phone WHERE id = :id",{"name":user.name,"phone":user.phone,"email":user.email,"id":id}))
+#         id, name, email, phone = result.fetchone()
+#         return User(id=id, name=name, email=email, phone=phone)
 
-@router.delete("/{id}")
-def delete_user(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""DELETE FROM "user" WHERE id = :id"""),{"id":id})
-        id, name, email, phone = result.fetchone()
-        return User(id=id, name=name, email=email, phone=phone)
+# @router.delete("/{id}")
+# def delete_user(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
+#     with engine.begin() as conn:
+#         result = conn.execute(text(f"""DELETE FROM "user" WHERE id = :id"""),{"id":id})
+#         id, name, email, phone = result.fetchone()
+#         return User(id=id, name=name, email=email, phone=phone)
 
 @router.get("/{user_id}/ingredients/", response_model=None,status_code=200)
 def get_users_inventory(user_id: int,engine : Annotated[Engine, Depends(get_engine)]  ) -> list[Ingredient]:

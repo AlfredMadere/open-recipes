@@ -372,5 +372,51 @@ def test_user_inventory_search():
     assert response.json()['recipe'][0]['name'] == 'Spaghetti Carbonara'
 
 
-    
+
+#marked
+@pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
+def test_get_ingredients_from_recipe():
+    # Create a recipe
+    response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
+    recipe_id1 = response.json()['id']
+    # Create another recipe
+    response2 = client.post(f'/recipes', json={'name': 'Penne and Butter', 'instructions': 'Cook penne, add butter'})
+    recipe_id2 = response2.json()['id']
+    #add ingredients for recipe1
+    response1 = client.post(f'/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
+    response2 = client.post(f'/ingredients', json={'name': 'Bacon',"type":"meat","storage":"FRIDGE"})
+    assert response1.status_code == 201
+    assert response2.status_code == 201
+    #add ingredients for recipe2
+    response3 = client.post(f'/ingredients', json={'name': 'Penne',"type":"pasta","storage":"PANTRY"})
+    response4 = client.post(f'/ingredients', json={'name': 'Butter',"type":"dairy","storage":"FRIDGE"})
+    response5 = client.post(f'/ingredients', json={'name': 'Bacon',"type":"meat","storage":"FRIDGE"})
+    assert response3.status_code == 201
+    assert response4.status_code == 201
+    assert response5.status_code == 201
+    # add ingredients to recipe1
+    response = client.post(f'/recipes/{recipe_id1}/ingredients/{response1.json()["id"]}')
+    assert response.status_code == 201
+    response = client.post(f'/recipes/{recipe_id1}/ingredients/{response2.json()["id"]}')
+    assert response.status_code == 201
+    # add ingredients to recipe2
+    response = client.post(f'/recipes/{recipe_id2}/ingredients/{response3.json()["id"]}')
+    assert response.status_code == 201
+    response = client.post(f'/recipes/{recipe_id2}/ingredients/{response4.json()["id"]}')
+    assert response.status_code == 201
+    response = client.post(f'/recipes/{recipe_id2}/ingredients/{response5.json()["id"]}')
+    assert response.status_code == 201
+    #check length and name of ingredients in one
+    response = client.get(f'/recipes/{recipe_id1}/ingredients')
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    # assert response.json()[0]['name'] == 'Spaghetti'
+    # assert response.json()[0]['name'] == 'Bacon'
+    #check length and name of ingredients in two
+    response = client.get(f'/recipes/{recipe_id2}/ingredients')
+    assert response.status_code == 200
+    assert len(response.json()) == 3
+    # assert response.json()[0]['name'] == 'Penne'
+    # assert response.json()[0]['name'] == 'Butter'
+    # assert response.json()[0]['name'] == 'Bacon'
 
