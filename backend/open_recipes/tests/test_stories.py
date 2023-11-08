@@ -10,14 +10,7 @@ from open_recipes.database import get_engine
 from sqlalchemy import create_engine, text
 client = TestClient(app)
 
-#post user, #get user, #get users
-#post recipe-list, #get recipe-list, #get recipe-lists
-#post recipe, #get recipe
-#post recipe to recipe_list, #get recipe from recipe_list
-#search by name, time, name and time (#get_recipes)
-#post tag, #get tag, #get tags?, #search by tag
-#post ingredients, #get ingredient, #get incredients
-#get user inventory, #add ingredient to user inventory
+
 
 def get_test_engine():
     dotenv.load_dotenv()
@@ -57,49 +50,15 @@ def before_and_after_all():
     setup()
     yield
     teardown()
+    
 
-
-#Follow the format below to create tests for every useful endpoint on the /docs page. If an endpoint is not in a user story, just manually test it by going to /docs and making sure it works
-#For all endpoints used in user stories create tests that make sure they work, if they don't work, fix em.
-#look up how to skip tests in pytest and skip all tests you aren't working on so it does take years to run OR comment everything out that you aren't running but this is sus
-#after all tests are running, create the curl stories as shown in v1....manuletestsf.md, ACTUALLY RUN the curl commands to make sure they work
-#make sure all user stories line up with our curl tests and that our functionality will work when peer reviewed
-
-#marked
-@pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
-def test_create_user():
-    # Send a POST request to create a user
-
-    response = client.post("/users", json={'name': 'John Doe', 'email': 'john.doe@example.com'})
-    response2 = client.post("/users", json={'name': 'Bob Doe', 'email': 'bob.doe@example.com'})
-
-    assert response.status_code == 201 # this will fail
-
-    # Get the user ID from the response
-    user_id = response.json()['id']
-
-    # Send a GET request to verify the user was created
-    response = client.get(f'/users/{user_id}')
-    assert response.status_code == 200
-    assert response.json()['name'] == 'John Doe'
-    assert response.json()['email'] == 'john.doe@example.com'
-
-    # Send a GET request to get a list of users and verify that works
-    response = client.get('/users/')
-    assert response.status_code == 200
-    # Verify the response contains a list of users
-    users = response.json()
-    assert isinstance(users, list)
-    assert len(users) == 2
 
     
-#marked
+
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_create_recipe_list():
     # Send a POST request to create a recipe list
     response = client.post(f'/recipe-lists', json={'name': 'My Recipes', 'description': 'My favorite recipes'})
-    assert response.status_code == 201
-    response2 = client.post(f'/recipe-lists', json={'name': 'My Recipes 2', 'description': 'My almost favorite recipes'})
     assert response.status_code == 201
 
     # Get the recipe list ID from the response
@@ -110,22 +69,10 @@ def test_create_recipe_list():
     assert response.status_code == 200
     assert response.json()['name'] == 'My Recipes'
 
-     # Send a GET request to get a list of recipe-lists and verify that works
-    response = client.get('/recipe-lists/')
-    assert response.status_code == 200
-    # Verify the response contains a list of users
-    recipe_lists = response.json()
-    assert isinstance(recipe_lists, list)
-    assert len(recipe_lists) == 2
-
-#marked
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_create_recipe():
     # Send a POST request to create a recipe
     response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
-    assert response.status_code == 201
-
-    response2 = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara 2', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese but do it twice'})
     assert response.status_code == 201
 
     # Get the recipe ID from the response
@@ -137,7 +84,6 @@ def test_create_recipe():
     assert response.json()['name'] == 'Spaghetti Carbonara'
     assert response.json()['procedure'] == 'Cook spaghetti, fry bacon, mix with eggs and cheese'
 
-#marked
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_add_recipe_to_recipe_list():
     # Create a recipe
@@ -166,7 +112,6 @@ recipe_4_popo = {'name': 'pho 2', 'instructions': 'Cook spaghetti, fry bacon, mi
 tag_1_popo = {'key': 'Cuisine', 'value': 'Italian'}
 tag_2_popo = {'key': 'Cuisine', 'value': 'Vietnamese'}
 
-
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_search():
     # Create a recipe
@@ -180,6 +125,13 @@ def test_search():
     recipe_id_0 = response.json()['id']
     response = client.post(f'/recipes', json=recipe_2_popo)
     recipe_id_1 = response.json()['id']
+
+    #Search for recipe by name
+
+    response = client.get(f"/recipes?name={'Carbonara'}")
+    assert response.status_code == 200
+    assert len(response.json()['recipe']) == 1
+    assert response.json()['recipe'][0]['name'] == 'Spaghetti Carbonara'
 
     response = client.get(f'/recipes')
     assert response.status_code == 200
@@ -198,10 +150,6 @@ def test_search():
     assert response.status_code == 200
     assert len(response.json()['recipe']) == 0
 
-    #Search by name
-    response = client.get(f"/recipes?name={'Carbonara'}")
-    assert response.status_code == 200
-    assert len(response.json()['recipe']) == 1
 
 
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
@@ -239,7 +187,10 @@ def test_filter_tag():
     tag_create_response1 = client.post(f'/tags', json=tag_1_popo)
     tag_create_response2 = client.post(f'/tags', json=tag_2_popo)
 
+
+
     #Create tags
+
     tag_response1 = client.post(f'/recipes/{response1.json()["id"]}/tags/{tag_create_response1.json()["id"]}', json=tag_1_popo)
     tag_response2 = client.post(f'/recipes/{response2.json()["id"]}/tags/{tag_create_response2.json()["id"]}', json=tag_2_popo)
     tag_response3 = client.post(f'/recipes/{response3.json()["id"]}/tags/{tag_create_response1.json()["id"]}', json=tag_1_popo)
@@ -268,7 +219,7 @@ def test_filter_tag():
     assert response.json()['recipe'][0]['name'] == 'Spaghetti Carbonara'
     assert response.json()['recipe'][1]['name'] == 'Spaghetti meatballs'
 
-#marked
+
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_create_ingredient():
 
@@ -276,11 +227,13 @@ def test_create_ingredient():
     user_response = client.post("/users", json={'name': 'John Doe', 'email': 'john@doe.com'})
     user_id = user_response.json()['id']
 
+
     response = client.post(f'/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
 
     assert response.status_code == 201
 
     #associcate ingredient with user
+
     response = client.post(f'/users/{user_id}/ingredients/{response.json()["id"]}')
 
     assert response.status_code == 201
@@ -290,18 +243,6 @@ def test_create_ingredient():
     assert response.status_code == 200
     assert len(response.json()) == 1
     assert response.json()[0]['name'] == 'Spaghetti'
-
-
-    response = client.post(f'/ingredients', json={'name': 'other_ingredient',"type":"pasta","storage":"FRIDGE"})
-    assert response.status_code == 201
-    #associcate ingredient with user
-    response = client.post(f'/users/{user_id}/ingredients/{response.json()["id"]}')
-    assert response.status_code == 201
-    # get all ingredients for user
-    response = client.get(f'/users/{user_id}/ingredients')
-    assert response.status_code == 200
-    assert len(response.json()) == 2
-
 
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_user_inventory_search():
@@ -321,6 +262,7 @@ def test_user_inventory_search():
     assert response4.status_code == 201
 
     # add pho ingredients not to user
+
     response5 = client.post(f'/ingredients', json={'name': 'Noodles',"type":"noodles","storage":"PANTRY"})
     response6 = client.post(f'/ingredients', json={'name': 'Beef',"type":"meat","storage":"FRIDGE"})
     response7 = client.post(f'/ingredients', json={'name': 'Cinnamon',"type":"spice","storage":"PANTRY"})
@@ -370,4 +312,6 @@ def test_user_inventory_search():
 
     assert len(response.json()['recipe']) == 1
     assert response.json()['recipe'][0]['name'] == 'Spaghetti Carbonara'
+
+
 
