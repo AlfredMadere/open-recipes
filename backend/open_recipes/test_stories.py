@@ -420,3 +420,29 @@ def test_get_ingredients_from_recipe():
     # assert response.json()[0]['name'] == 'Butter'
     # assert response.json()[0]['name'] == 'Bacon'
 
+
+
+def test_flow_2():
+    # Create a user
+    response = client.post("/users", json={'name': 'Bob Sandler', 'email': 'bob@sandler.com'})
+    assert response.status_code == 201
+
+    response = client.post("/recipe-lists", json={'name': 'My Recipes', 'description': 'My favorite recipes'})
+    assert response.status_code == 201
+    recipe_list_id = response.json()['id']
+    # Create a recipe
+    response = client.post("/recipes", json={'name': 'Spaghetti Carbonara', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
+    assert response.status_code == 201
+
+    # Get the recipe ID from the response
+    recipe_id = response.json()['id']
+    print(recipe_id,recipe_list_id)
+    # Add the recipe to the recipe list
+    response = client.post(f'/recipe-lists/{recipe_list_id}/recipe/{recipe_id}')
+    assert response.status_code == 201
+
+    # Send a GET request to verify the recipe was added to the recipe list
+    response = client.get(f'/recipe-lists/{recipe_list_id}')
+    assert response.status_code == 200
+    assert len(response.json()['recipes']) == 1
+    assert response.json()['recipes'][0]['name'] == 'Spaghetti Carbonara'
