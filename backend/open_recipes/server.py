@@ -71,7 +71,23 @@ def post_recipe_lists(body: CreateRecipeListRequest,engine : Annotated[Engine, D
                                     ),{"name":body.name,"description":body.description})
         
         id, name, description= result.fetchone()
+        print(id, name, description)
         return RecipeList(id=id, name=name, description=description)
+
+@app.post('/recipe-lists/{recipe_list_id}/recipe/{recipe_id}',status_code=201, response_model=Recipe)
+def post_recipe_to_list(recipe_id: int, recipe_list_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
+    """
+    Add a recipe to a recipe list
+    """
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id)
+                                    VALUES (:recipe_id, :recipe_list_id)
+                                    RETURNING recipe_id, recipe_list_id 
+                                   """
+                                    ),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
+        
+        recipe_id, recipe_list_id = result.fetchone()
+        return Recipe(recipe_id=recipe_id, recipe_list_id=recipe_list_id)
 
 #SMOKE TESTED
 @app.get('/recipe-lists/{id}', response_model=RecipeListResponse)
