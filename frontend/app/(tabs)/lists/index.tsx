@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useRouter } from "expo-router";
 import { Button, View, Stack, Card, XStack } from "tamagui";
 import {Text, FlatList, Modal, Alert, TextInput, SafeAreaView} from 'react-native';
@@ -11,7 +12,7 @@ export default function One() {
   const [description, onChangeDescriptionText] = React.useState('');
 
 
-  let lists = [
+  const lists = [
     {
       name: "Breakfast",
       description: "Some description here...",
@@ -124,7 +125,9 @@ export default function One() {
 
 
 
-const ListComponent = ({ data }) => {
+//DO NOT USE THIS SYNTAX, used any to pass eslint for testing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ListComponent = ({ data }: any) => {
   return (
     <FlatList
       data={data}

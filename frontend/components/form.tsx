@@ -129,7 +129,7 @@ export default function Form () {
       
     </ScrollView>
   );
-};
+}
   
 const styles = StyleSheet.create({
   container: {

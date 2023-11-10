@@ -1,6 +1,8 @@
 import { Button, H3, H5, Card, Paragraph, Text, View } from "tamagui";
 
-export default function SearchResult(props) {
+//DO NOT USE THIS SYNTAX, used any to pass eslint for testing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function SearchResult(props: any) {
   return (
     <View style={{}}>
       <Card

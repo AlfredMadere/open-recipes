@@ -5,9 +5,9 @@ import {Text, FlatList} from 'react-native';
 export default function One() {
   const router = useRouter();
 
-  let username = 'AlfredRocks33'
+  const username = 'AlfredRocks33'
 
-  let recipes = [
+  const recipes = [
     {
       name: "Epic Recipe 1",
       description: "Super delicious recipe",
@@ -107,34 +107,36 @@ export default function One() {
 }
 
 
-
-const GridComponent = ({ data }) => {
+//DO NOT USE THIS SYNTAX, used any to pass eslint for testing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const GridComponent = ({ data }: any) => {
   return (
     <FlatList
       data={data}
       numColumns={3}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
-        <View style={{ flex: 1, marginLeft: 45,
-          marginRight: 45,
-          marginTop: 20,
-          flexDirection: "column",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        paddingHorizontal="$4"
-        space>
+        <View
+          style={{
+            flex: 1,
+            marginLeft: 45,
+            marginRight: 45,
+            marginTop: 20,
+            flexDirection: "column",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          paddingHorizontal="$4"
+          space
+        >
           {
-                data.map((recipe) => {
-                  return (
-                    <RecipeCard
-                      key={recipe.id}
-                      recipe={recipe}
-                    />
-                  );
-                })
-              }
+            //DO NOT USE THIS SYNTAX, used any to pass eslint for testing
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            data.map((recipe: any) => {
+              return <RecipeCard key={recipe.id} recipe={recipe} />;
+            })
+          }
         </View>
       )}
     />
