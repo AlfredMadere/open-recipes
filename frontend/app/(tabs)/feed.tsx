@@ -23,15 +23,6 @@ import { Recipe } from "../interfaces/models";
 
 
 export default function Feed() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
-
-  async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
-    const response = await axios.get("https://open-recipes.onrender.com/recipes");
-    console.log('response.data', response.data);
-    return response.data;
-  }
-  const query = useQuery({queryKey: ["recipes_feed"], queryFn: getRecipesFeed});
 
   // const recipes = [
   //   {
@@ -71,6 +62,9 @@ export default function Feed() {
   //     default_servings: 1,
   //   },
   // ];
+
+
+  
   return (
     <View style={{ width: "100%" }}>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
