@@ -20,6 +20,7 @@ from pydantic import BaseModel
 from open_recipes.api.users import router as user_router
 from open_recipes.api.recipes import router as recipe_router 
 from open_recipes.api.ingredients import router as ingredient_router
+from open_recipes.api.tags import router as tag_router 
 
 
 
@@ -32,6 +33,7 @@ app = FastAPI(
 app.include_router(user_router)
 app.include_router(recipe_router)
 app.include_router(ingredient_router)
+app.include_router(tag_router)
 
 
 @app.get("/")
@@ -176,20 +178,8 @@ class SearchResults(BaseModel):
 #         id, stars, author_id, content, recipe_id = result.fetchone()
 #         return Review(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
 
-@app.post("/tags", response_model=None,status_code=201, responses={'201': {'model': Tag}})
-def create_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Tag]:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO recipe_tag (key, value) VALUES (:key, :value) RETURNING id, key, value"""),{"key":tag.key,"value":tag.value})
-        id, key, value = result.fetchone()
-        return Tag(id=id, key=key, value=value)
 
 
-@app.get('/tags/{id}', response_model=List[Tag])
-def get_tags(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":id})
-        id, key, value = result.fetchone()
-        return Tag(id=id, key=key, value=value)
 
 if __name__ == "__main__":
     import uvicorn
