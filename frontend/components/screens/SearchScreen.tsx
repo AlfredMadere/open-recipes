@@ -31,6 +31,28 @@ export default function SearchScreen() {
     value: string;
   };
 
+  type RecipeProps = {
+    id: number;
+    name: string;
+    mins_prep: number;
+    mins_cook: number;
+    description: string;
+    default_servings: number;
+    created_at: string;
+    author_id: string;
+    procedure: string;
+
+    next_cursor: 0;
+    prev_cursor: 0;
+  };
+
+  type tagProps = {
+    id: number;
+    key: string;
+    value: string;
+  };
+
+
   const onPressButton = (props: onPressButtonProps) => {
     // Code for the first action
     setFilterKey(props.key);
@@ -101,33 +123,7 @@ export default function SearchScreen() {
 
 
 
-  type RecipeProps = {
-    id: number;
-    name: string;
-    mins_prep: number;
-    mins_cook: number;
-    description: string;
-    default_servings: number;
-    created_at: string;
-    author_id: string;
-    procedure: string;
-
-    next_cursor: 0;
-    prev_cursor: 0;
-  };
-
   
-  // Alert.alert("Search Text: " + searchText.length + 
-  // "\nFilter Key: " + filterKey.length + "\nFilter Value: " + filterValue.length + 
-  // "\nIs pressed true? " + pressed);
-  
-
-  type tagProps = {
-    id: number;
-    key: string;
-    value: string;
-  };
-
   async function getFilters() {
 
     const response = await axios.get(
@@ -157,9 +153,6 @@ export default function SearchScreen() {
     );
   });
 
-  // object with search term and filters
-  // filters should have a state
-  // when selected the state should be true, give it a different color
 
   return (
     <YStack
@@ -174,7 +167,6 @@ export default function SearchScreen() {
         size="$4"
         searchText={searchText}
         setSearchText={setSearchText}
-       
         onPressGoButton={onPressGoButton}
       />
       <XStack space="$2">{filters}</XStack>
@@ -188,9 +180,7 @@ type InputTextProps = {
   searchText: string;
   setSearchText: Function;
   onPressGoButton: Function;
-
-  }
-
+}
 
 function InputText(props : InputTextProps) {
   
