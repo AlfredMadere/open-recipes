@@ -1,21 +1,25 @@
+*note for reviewer. render takes about two minutes to wake up after the first call 
+**ALSO anywhere with the angled brackets, a unique value must be inputted, (this is sometimes returned from your previous query).
 
-We did not have enough detail in our original user flows, so here is an enhanced version of one of our original ones below. 
+
+We did not have enough detail in our original user flows, so there is an enhanced version of one of our original ones below, which we then do the stuff for.  
 
 ###Use Case 1.0: Searching for a Recipe
-Bob wants to browse recipes based on a name of a food he is craving, Spaghetti Carbonara.
+Jim wants to browse recipes based on the food he is craving, Spaghetti Carbonara.
 
-He first sends a POST request to `/recipes/` with the following recipe data:
+1. He searches what we have by the name of the recipe, Carbonara
+He first sends a GET request to `/recipes/` with the following recipe data:
 ```json
 { "name": "Carbonara"}
 ```
 
-The server processes this request, and returns all recipes containing the word Carbonara. 
+The server processes this request, and returns all recipes containing the word Carbonara in their name. 
 ```json
 {
   "recipe": [
     {
-      "id": 139,
-      "name": "Carbonara 2",
+      "id": 4,
+      "name": "Penne Carbonara",
       "mins_prep": 10,
       "mins_cook": 15,
       "description": "testing",
@@ -25,7 +29,7 @@ The server processes this request, and returns all recipes containing the word C
       "procedure": null
     },
     {
-      "id": 137,
+      "id": 5,
       "name": "Spaghetti Carbonara",
       "mins_prep": 20,
       "mins_cook": 30,
@@ -40,22 +44,21 @@ The server processes this request, and returns all recipes containing the word C
   "prev_cursor": null
 }
 ```
-
 Jim can now make either of these recipes, depending on which fits his needs more. 
-To narrow it down further, he adds another constraint to his search, that the total time for the meal must be less than 30 minutes so he has time to make and eat it before work. 
+2. To narrow it down further in this example, he adds another constraint to his search, that the total time for the meal must be less than 30 minutes so he has time to make and eat it before work. 
 
-He sends another POST request to /recipes/ with the following recipe data:
+He sends another GET request to `/recipes/` with the following recipe data:
 ```json
 { "name": "Carbonara", "max_time": 30}
-``
+```
 
-The server processes this new request, and returns all recipes containing the word Carbonara that has takes than 30 minutes total. 
+The server processes this new request, and returns all recipes containing the word Carbonara that also take less than 30 minutes total to prep and cook.
 ```json
 {
   "recipe": [
     {
-      "id": 139,
-      "name": "Carbonara 2",
+      "id": 4,
+      "name": "Penne Carbonara",
       "mins_prep": 10,
       "mins_cook": 15,
       "description": "testing",
@@ -65,29 +68,29 @@ The server processes this new request, and returns all recipes containing the wo
       "procedure": null
     }
     ]}
-    ```
+```
 
-Jim now has only one available recipe to choose from, so he selects this vague Carbonara 2 recipe and makes it and it is delicious! He is so happy he used our service. 
+Jim now has only one available recipe to choose from, so he decides on Penne Carbonara for dinner today!
 
 # Testing results
 
-1. The curl statement called
-
+1. 
+```json 
 curl -X 'GET' \
-  'http://127.0.0.1:3000/recipes?name=Carbonara&cursor=0' \
+  'https://open-recipes.onrender.com/recipes?name=Carbonara&cursor=0' \
   -H 'accept: application/json'
+```
 
 Response:
-
 Response
  ```json
 {
   "recipe": [
     {
-      "id": 139,
-      "name": "Carbonara 2",
+      "id": 4,
+      "name": "Penne Carbonara",
       "mins_prep": 10,
-      "mins_cook": 25,
+      "mins_cook": 15,
       "description": "testing",
       "default_servings": 4,
       "created_at": null,
@@ -95,7 +98,7 @@ Response
       "procedure": null
     },
     {
-      "id": 137,
+      "id": 5,
       "name": "Spaghetti Carbonara",
       "mins_prep": 20,
       "mins_cook": 30,
@@ -108,18 +111,19 @@ Response
   ],
   "next_cursor": null,
   "prev_cursor": null
-}```
-
-curl -X 'GET' \
-  'http://127.0.0.1:3000/recipes?name=Carbonara&max_time=30&cursor=0' \
+}
+```
+```json
+2. curl -X 'GET' \
+  'https://open-recipes.onrender.com/recipes?name=Carbonara&max_time=30&cursor=0' \
   -H 'accept: application/json'
-
+```
  ```json
 {
   "recipe": [
     {
-      "id": 139,
-      "name": "Carbonara 2",
+      "id": 4,
+      "name": "Penne Carbonara",
       "mins_prep": 10,
       "mins_cook": 15,
       "description": "testing",
@@ -145,13 +149,12 @@ Bob is a great baker and wants to compile his baked goods recipes so he can keep
  { 
   "first_name": "Bob", 
   "last_name": "Sandler", 
-  "email": "bob@example.com", 
+  "email": <unique email>, 
   "phone": "123-456-7890"
  }
 ```
 
 The server processes the request and creates a new user account with a generated unique user_id.
-
 The server responds with the created user data, including the user_id.
 
 ```json
@@ -159,7 +162,7 @@ The server responds with the created user data, including the user_id.
   "id": 1,
   "first_name": "Bob", 
   "last_name": "Sandler", 
-  "email": "bob@example.com", 
+  "email": <unqiue email>, 
   "phone": "123-456-7890"
 }
 ```
@@ -176,7 +179,6 @@ He now has his user activated so that he can continue to create a recipeList. He
 ```
 
 The server processes the request and creates a new RecipeList with an assigned id in our database.
-
 The server responds with the created RecipeList, including the id.
 
 ```json
@@ -188,7 +190,6 @@ The server responds with the created RecipeList, including the id.
 ```
 
 This is now stored in our database, so Bob can access it, add recipes to it, and eventually share it with the world. 
-
 3. Finally he wants to add his first recipe to his list "My s tier baked goods"
 
 He first sends a POST request to `/recipe/` with the following recipe data:
@@ -205,12 +206,11 @@ He first sends a POST request to `/recipe/` with the following recipe data:
 }
 ```
 The server processes the request and creates a new recipe with an assigned id in our database.
-
 The server responds with the created recipe data, including the id.
 
 ```json
 {
-  "id": 123456,
+  "id": 6,
   "name": "Secret Cake Recipe",
   "mins_prep": 20,
   "mins_cook": 30,
@@ -225,7 +225,7 @@ The server responds with the created recipe data, including the id.
 
 ```json
 {
-  "recipe_id": 123456,
+  "recipe_id": 6,
   "recipe_list_id": 123
 }
 ```
@@ -234,20 +234,19 @@ This is now stored in the database, so Bob can access it, and eventually share i
 
 # Testing results
 
-1. The curl statement called. You can find this in the /docs site for your 
-API under each endpoint. For example, for my site the /catalogs/ endpoint 
-curl call looks like:
-
+1. 
+```json
 curl -X 'POST' \
   'https://open-recipe.onrender.com/users' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d ' { 
   "name": " Bob Sandler", 
-  "email": "bob@example.com", 
+  "email": <unique email>, 
   "phone": "123-456-7890"
  }
-'
+ ```
+
 
 Response:
 
@@ -256,10 +255,13 @@ Response
 {
   "id": 4,
   "name": " Bob Sandler",
-  "email": "bob@example.com",
+  "email": <unique email>,
   "phone": "123-456-7890"
-}```
+}
+```
 
+2. 
+```json
 curl -X 'POST' \
   'https://open-recipe.onrender.com/recipe-lists' \
   -H 'accept: application/json' \
@@ -268,6 +270,7 @@ curl -X 'POST' \
   "name": "My s tier baked goods", 
   "description": "A one stop shop for all for all my fans to make my bakery items"
 }'
+```
 
  ```json
 { 
@@ -275,17 +278,17 @@ curl -X 'POST' \
   "description": "A one stop shop for all for all my fans to make my bakery items"
 }
 ```
-
-Response
-
+Response:
 ```json
 {
-  "id": 1,
+  "id": <returned_list_id>,
   "name": "My s tier baked goods",
   "description": "A one stop shop for all for all my fans to make my bakery items"
 }
 ```
 
+3. 
+```json 
 curl -X 'POST' \
   'https://open-recipe.onrender.com/recipes' \
   -H 'accept: application/json' \
@@ -299,9 +302,11 @@ curl -X 'POST' \
   "procedure": "Step 1: Mix ingredients... Step 2: Bake...",
   "author_id": 4
 }'
+```
 
+```json
 {
-  "id": 1,
+  "id": <returned_id>,
   "name": "Secret Cake Recipe",
   "mins_prep": 20,
   "mins_cook": 30,
@@ -311,32 +316,96 @@ curl -X 'POST' \
   "author_id": "4",
   "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
 }
+```
 
-
+4. 
+```json
 curl -X 'POST' \
-  'https://open-recipe.onrender.com/recipes/1/recipe-lists/1' \
+  'https://open-recipe.onrender.com/recipes/<returned_id>/recipe-lists/<returned_list_id>' \
   -H 'accept: application/json' \
   -d ''
-
-"OK"
-
-
-
-
-
-###Use Case 3: Retrieving Recipe Ingredients
-
-Carol wants to view the ingredients required for the "Secret Cake Recipe" that Bob recently posted, because she heard its absolutely delicious. 
-
-Assuming she already has her user created, She first sends a GET request to /recipe/137/ingredient/ where 137 is the "Secret Cake Recipe" id.
+```
+Response
 ```json
-{"id": 137}
+"OK"
+```
+
+###Use Case 3: Making a Recipe you want to try
+
+Jim wants to make the "Secret Cake Recipe" that Bob recently added, because he heard its absolutely delicious
+
+He first sends a GET request to /recipe/6/ingredient/ where 6 is the "Secret Cake Recipe" id.
+```json
+{"id": 6}
 ```
 
 The server processes the request and retrieves the recipe instructions from our database
 
 ```json
-{  "id": 137,
+{  "id": 6,
+  "name": "Secret Cake Recipe",
+  "mins_prep": 20,
+  "mins_cook": 30,
+  "description": "A delicious and secret cake recipe",
+  "default_servings": 4,
+  "created_at": "string",
+  "author_id": 4,
+  "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
+}
+```
+
+He then gets the ingredients necessary for this recipe, using the same recipe id (6)
+He sends a GET request to `/recipes/{recipe_id}/ingredients` where 6 is the "Secret Cake Recipe" id.
+```json
+{"id": 6}
+```
+The server processes the request and retrieves the recipe instructions from our database
+```json
+[
+  {
+    "id": 1,
+    "name": "Eggs",
+    "category_id": null,
+    "type": "eggs",
+    "storage": "FRIDGE"
+  },
+  {
+    "id": 2,
+    "name": "Flour",
+    "category_id": null,
+    "type": "baking",
+    "storage": "PANTRY"
+  },
+  {
+    "id": 3,
+    "name": "Frozen Banana",
+    "category_id": null,
+    "type": "produce",
+    "storage": "FREEZER"
+  },
+  {
+    "id": 4,
+    "name": "Milk",
+    "category_id": null,
+    "type": "dairy",
+    "storage": "FRIDGE"
+  }
+]
+```
+He can now follow the recipe instructions with the given ingredients! He agrees the cake is delicious!
+
+# Testing results
+1. 
+```json 
+curl -X 'GET' \
+  'https://open-recipes.onrender.com/recipes/6' \
+  -H 'accept: application/json'
+```
+Response:
+Response
+ ```json
+{
+  "id": 6,
   "name": "Secret Cake Recipe",
   "mins_prep": 20,
   "mins_cook": 30,
@@ -348,28 +417,43 @@ The server processes the request and retrieves the recipe instructions from our 
 }
 ```
 
-She then gets the ingredients necessary for this recipe, using the same recipe id (137) #TODO Complete
-
-
-# Testing results
-
+2. 
+```json 
 curl -X 'GET' \
-  'http://127.0.0.1:3000/recipes/137' \
+  'https://open-recipes.onrender.com/recipes/6/ingredients' \
   -H 'accept: application/json'
-
+```
 Response:
 Response
  ```json
-{
-  "id": 137,
-  "name": "Secret Cake Recipe",
-  "mins_prep": 20,
-  "mins_cook": 30,
-  "description": "A delicious and secret cake recipe",
-  "default_servings": 4,
-  "created_at": "string",
-  "author_id": 1,
-  "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
-}```
-
-#TODO put gets ingredients from recipe in here
+[
+  {
+    "id": 1,
+    "name": "Eggs",
+    "category_id": null,
+    "type": "eggs",
+    "storage": "FRIDGE"
+  },
+  {
+    "id": 2,
+    "name": "Flour",
+    "category_id": null,
+    "type": "baking",
+    "storage": "PANTRY"
+  },
+  {
+    "id": 3,
+    "name": "Frozen Banana",
+    "category_id": null,
+    "type": "produce",
+    "storage": "FREEZER"
+  },
+  {
+    "id": 4,
+    "name": "Milk",
+    "category_id": null,
+    "type": "dairy",
+    "storage": "FRIDGE"
+  }
+]
+```
