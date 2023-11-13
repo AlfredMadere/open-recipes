@@ -23,7 +23,7 @@ export default function SearchScreen() {
   const [searchText, setSearchText] = useState("");
   const [filterKey, setFilterKey] = useState("");
   const [filterValue, setFilterValue] = useState("");
-  const [pressed, setPressed] = useState(false);
+  const [results, setResults] = useState([]);
 
 
   type onPressButtonProps = {
@@ -36,45 +36,71 @@ export default function SearchScreen() {
     setFilterKey(props.key);
     setFilterValue(props.value);
   };
+  
 
-  const onPressGoButton = () => {
-    Alert.alert("HEY");
-    setPressed(true);
+ function onPressGoButton() {
+   
+    let result = [];
+
+  if (searchText.length > 0 && filterKey.length > 0 && filterValue.length) {
+      
+  
+      query2.refetch()
+      //I was using the v4 API, if you read the migrating to v5 use query docs it says they now only support the object format
+      //This query will not run until you call query2.refetch()
+
+    result = query2.data?.recipe.map((recipe: RecipeProps) => {
+          Alert.alert("HEY7");
+      return (
+        <SearchResult
+          key={recipe.id}
+          name={recipe.name}
+          id={recipe.id}
+          mins_prep={recipe.mins_cook}
+          mins_cook={recipe.mins_cook}
+          description={recipe.description}
+          default_servings={recipe.default_servings}
+          created_at={""}
+          author_id={""}
+          procedure={""}
+          next_cursor={recipe.next_cursor}
+          prev_cursor={recipe.next_cursor}
+        ></SearchResult>
+      );
+    })
   }
 
-  async function getFilters() {
+  setResults(result);
+    
 
-    const response = await axios.get(
-      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10"
-    );
-    const responseDataString = JSON.stringify(response.data, null, 2);
+  }
 
+  const req =
+    "https://open-recipes.onrender.com/recipes?name=" +
+    searchText +
+    "&tag_key=" +
+    filterKey +
+    "&tag_value=" +
+    filterValue;
+
+  async function getSearchResults() {
+    const response = await axios.get(req);
+
+    console.log("response.data", response.data);
+    const datares = JSON.stringify(response.data, null, 2);
+    Alert.alert("response.data: " + datares);
     return response.data;
   }
 
-  type getSearchResultsProps = {
-    searchText: Function;
-    filterKey: string;
-    filterValue: string;
-  };
+    const query2 = useQuery({
+      queryKey: ["recipe"],
+      queryFn: getSearchResults,
+      enabled: false,
+    });
 
-  const query1 = useQuery({
-    queryKey: ["tags"],
-    queryFn: getFilters,
-  });
 
-  if (query1.data?.tags && query1.data.tags.length > 0) {
-    // Accessing the first tag's key and id
-    const firstTag = query1.data.tags[0];
-    if (firstTag && firstTag.key && firstTag.id) {
-      const key = firstTag.key;
-      const id = firstTag.id;
 
-      // Now you can use the 'key' and 'id' variables as needed
-    }
-  }
 
-  
   type RecipeProps = {
     id: number;
     name: string;
@@ -94,78 +120,6 @@ export default function SearchScreen() {
   // Alert.alert("Search Text: " + searchText.length + 
   // "\nFilter Key: " + filterKey.length + "\nFilter Value: " + filterValue.length + 
   // "\nIs pressed true? " + pressed);
-         const req =
-      "https://open-recipes.onrender.com/recipes?name=" +
-      searchText +
-      "&tag_key=" +
-      filterKey +
-      "&tag_value=" +
-      filterValue;
-
-
-    // Define getSearchResults outside of the condition
-    
- async function getSearchResults() {
-   Alert.alert("in the body");
-   if (searchText.length > 0 && filterKey.length > 0 && filterValue.length > 0) {
-      const response = await axios.get(req);
-      console.log("response.data", response.data);
-      const datares = JSON.stringify(response.data, null, 2);
-      Alert.alert("response.data: " + datares);
-
-      Alert.alert("still in the body");
-
-      return response.data;
-   }
-     
- }
-
- 
-
-
-
- 
-
- const query2 = useQuery({
-   queryKey: ["recipe"],
-   queryFn: getSearchResults,
- });
-    
-    
-
-  let rows;
-
-  if (searchText.length > 0 && filterKey.length > 0 && filterValue.length > 0 && pressed) {
-  
-   
-  
-
-    rows = query2.data?.recipe.map((recipe: RecipeProps) => {
-
-
-      return (
-        <SearchResult
-          key={recipe.id}
-          name={recipe.name}
-          id={recipe.id}
-          mins_prep={recipe.mins_cook}
-          mins_cook={recipe.mins_cook}
-          description={recipe.description}
-          default_servings={recipe.default_servings}
-          created_at={""}
-          author_id={""}
-          procedure={""}
-          next_cursor={recipe.next_cursor}
-          prev_cursor={recipe.next_cursor}
-        ></SearchResult>
-      );
-    })
-    
-  } 
-    else {
-      rows = [];
-    }
-
   
 
   type tagProps = {
@@ -173,6 +127,22 @@ export default function SearchScreen() {
     key: string;
     value: string;
   };
+
+  async function getFilters() {
+
+    const response = await axios.get(
+      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10"
+    );
+    const responseDataString = JSON.stringify(response.data, null, 2);
+
+    return response.data;
+  }
+
+
+  const query1 = useQuery({
+    queryKey: ["tags"],
+    queryFn: getFilters,
+  });
 
   const filters = query1.data?.tags.map((tag: tagProps) => {
     return (
@@ -204,11 +174,11 @@ export default function SearchScreen() {
         size="$4"
         searchText={searchText}
         setSearchText={setSearchText}
-        pressed={pressed}
-        setPressed={setPressed}
+       
+        onPressGoButton={onPressGoButton}
       />
       <XStack space="$2">{filters}</XStack>
-      <ScrollView>{rows}</ScrollView>
+      <ScrollView>{results}</ScrollView>
     </YStack>
   );
 }
@@ -217,8 +187,7 @@ type InputTextProps = {
   size: SizeTokens;
   searchText: string;
   setSearchText: Function;
-  pressed: boolean;
-  setPressed: Function;
+  onPressGoButton: Function;
 
   }
 
@@ -237,7 +206,7 @@ function InputText(props : InputTextProps) {
           onChangeText={(value) => props.setSearchText(value)}
         />
 
-        <Button onPress={() => props.setPressed(true)} size={props.size}>
+        <Button onPress={() => props.onPressGoButton()} size={props.size}>
           Go
         </Button>
       </XStack>
