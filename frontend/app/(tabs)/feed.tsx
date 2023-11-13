@@ -25,10 +25,9 @@ export default function Feed() {
 
   async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
     const response = await axios.get(
-      "https://open-recipes.onrender.com/recipes"
+      "https://open-recipes.onrender.com/recipes",
     );
     console.log("response.data", response.data);
-  
 
     return response.data;
   }

@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "echo \"Error: no test specified\"",
-    "check": "npx eslint . --max-warnings=-1 && npx prettier --check . || true",
+    "check": "npx eslint . --max-warnings=-1 && npx prettier --check . ",
     "lintfix": "npx eslint . --fix"
   },
   "dependencies": {

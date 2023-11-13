@@ -11,6 +11,6 @@ const Register = () => {
       </Link>
     </View>
   );
-}
+};
 
 export default Register;

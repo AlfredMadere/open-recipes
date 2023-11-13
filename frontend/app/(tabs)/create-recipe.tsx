@@ -24,7 +24,6 @@ export default function Page() {
       fieldArray: [],
       fieldArray2: [],
       instructions: "",
-
     },
     // defaultValues: {
     //   value1: [{ email: "Bill", password: "Luo" }],
@@ -48,11 +47,11 @@ export default function Page() {
     name: "fieldArray2", // unique name for your Field Array
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
+    console.log("Form Data: ", data);
 
-    console.log('Form Data: ', data);
-
-    const items=getValues('fieldArray2');
+    const items = getValues("fieldArray2");
     console.log(items);
   };
 
@@ -320,7 +319,7 @@ const styles = StyleSheet.create({
   ingredient: {
     flexDirection: "row",
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     margin: 0,
     padding: 0,
   },

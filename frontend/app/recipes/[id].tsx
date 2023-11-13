@@ -8,13 +8,15 @@ import { Recipe } from "../interfaces/models";
 
 const Register = () => {
   const queryClient = useQueryClient();
-  const {id} = useGlobalSearchParams();
+  const { id } = useGlobalSearchParams();
   async function getRecipe(): Promise<Recipe> {
-    const response = await axios.get(`https://open-recipes.onrender.com/recipes/${id}`);
-    console.log('response.data', response.data);
+    const response = await axios.get(
+      `https://open-recipes.onrender.com/recipes/${id}`,
+    );
+    console.log("response.data", response.data);
     return response.data;
   }
-  const query = useQuery({queryKey: ["recipe", id], queryFn: getRecipe});
+  const query = useQuery({ queryKey: ["recipe", id], queryFn: getRecipe });
   return (
     <View>
       {query.isLoading && <Spinner />}

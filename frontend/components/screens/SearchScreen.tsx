@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable react/prop-types */
 import {
   Button,
   Input,
@@ -9,7 +11,7 @@ import {
   ScrollView,
   fullscreenStyle,
 } from "tamagui";
-import {Alert} from "react-native";
+import { Alert } from "react-native";
 import SearchResult from "../SearchResult/SearchResult";
 import React, { useState } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
@@ -24,7 +26,6 @@ export default function SearchScreen() {
   const [filterKey, setFilterKey] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [results, setResults] = useState([]);
-
 
   type onPressButtonProps = {
     key: string;
@@ -52,49 +53,42 @@ export default function SearchScreen() {
     value: string;
   };
 
-
   const onPressButton = (props: onPressButtonProps) => {
     // Code for the first action
     setFilterKey(props.key);
     setFilterValue(props.value);
   };
-  
 
- function onPressGoButton() {
-   
+  function onPressGoButton() {
     let result = [];
 
-  if (searchText.length > 0 && filterKey.length > 0 && filterValue.length) {
-      
-  
-      query2.refetch()
+    if (searchText.length > 0 && filterKey.length > 0 && filterValue.length) {
+      query2.refetch();
       //I was using the v4 API, if you read the migrating to v5 use query docs it says they now only support the object format
       //This query will not run until you call query2.refetch()
 
-    result = query2.data?.recipe.map((recipe: RecipeProps) => {
-          Alert.alert("HEY7");
-      return (
-        <SearchResult
-          key={recipe.id}
-          name={recipe.name}
-          id={recipe.id}
-          mins_prep={recipe.mins_cook}
-          mins_cook={recipe.mins_cook}
-          description={recipe.description}
-          default_servings={recipe.default_servings}
-          created_at={""}
-          author_id={""}
-          procedure={""}
-          next_cursor={recipe.next_cursor}
-          prev_cursor={recipe.next_cursor}
-        ></SearchResult>
-      );
-    })
-  }
+      result = query2.data?.recipe.map((recipe: RecipeProps) => {
+        Alert.alert("HEY7");
+        return (
+          <SearchResult
+            key={recipe.id}
+            name={recipe.name}
+            id={recipe.id}
+            mins_prep={recipe.mins_cook}
+            mins_cook={recipe.mins_cook}
+            description={recipe.description}
+            default_servings={recipe.default_servings}
+            created_at={""}
+            author_id={""}
+            procedure={""}
+            next_cursor={recipe.next_cursor}
+            prev_cursor={recipe.next_cursor}
+          ></SearchResult>
+        );
+      });
+    }
 
-  setResults(result);
-    
-
+    setResults(result);
   }
 
   const req =
@@ -114,26 +108,20 @@ export default function SearchScreen() {
     return response.data;
   }
 
-    const query2 = useQuery({
-      queryKey: ["recipe"],
-      queryFn: getSearchResults,
-      enabled: false,
-    });
+  const query2 = useQuery({
+    queryKey: ["recipe"],
+    queryFn: getSearchResults,
+    enabled: false,
+  });
 
-
-
-
-  
   async function getFilters() {
-
     const response = await axios.get(
-      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10"
+      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10",
     );
     const responseDataString = JSON.stringify(response.data, null, 2);
 
     return response.data;
   }
-
 
   const query1 = useQuery({
     queryKey: ["tags"],
@@ -152,7 +140,6 @@ export default function SearchScreen() {
       </Button>
     );
   });
-
 
   return (
     <YStack
@@ -180,11 +167,9 @@ type InputTextProps = {
   searchText: string;
   setSearchText: Function;
   onPressGoButton: Function;
-}
+};
 
-function InputText(props : InputTextProps) {
-  
-
+function InputText(props: InputTextProps) {
   return (
     <View>
       <XStack alignItems="center" space="$2" padding="$2">
@@ -203,4 +188,3 @@ function InputText(props : InputTextProps) {
     </View>
   );
 }
-

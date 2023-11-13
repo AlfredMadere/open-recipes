@@ -17,7 +17,6 @@ type RecipeCardProps = {
 };
 
 export default function SearchResult(props: RecipeCardProps) {
-  
   const router = useRouter();
 
   return (
@@ -43,5 +42,3 @@ export default function SearchResult(props: RecipeCardProps) {
     </View>
   );
 }
-
-
