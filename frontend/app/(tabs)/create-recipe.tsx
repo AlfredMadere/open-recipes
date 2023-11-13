@@ -23,6 +23,7 @@ export default function Page() {
       mins_cook: "",
       fieldArray: [],
       fieldArray2: [],
+      instructions: "",
 
     },
     // defaultValues: {
@@ -48,7 +49,7 @@ export default function Page() {
   });
 
   const onSubmit = (data: any) => {
-    
+
     console.log('Form Data: ', data);
 
     const items=getValues('fieldArray2');
@@ -61,7 +62,7 @@ export default function Page() {
         <Text style={styles.label}>Title</Text>
         <Controller
           control={control}
-          render={({ field: { onChange, onBlur, value} }) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               style={styles.input}
               onBlur={onBlur}
@@ -208,7 +209,6 @@ export default function Page() {
                     onChangeText={field.onChange}
                     value={field.value}
                   />
-                  
                 )}
                 name={`quantity[${index}].value`}
                 defaultValue=""
@@ -267,6 +267,21 @@ export default function Page() {
             }}
           />
         </View>
+        <Text style={styles.label}>Instructions</Text>
+
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={(value) => onChange(value)}
+              value={value}
+            />
+          )}
+          name="instructions"
+          rules={{ required: true }}
+        />
       </ScrollView>
       <View style={styles.footer}>
         <Button
