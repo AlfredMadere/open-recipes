@@ -14,24 +14,28 @@ import {
   XStack,
   YStack,
 } from "tamagui";
+import { Alert } from "react-native";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Recipe } from "../interfaces/models";
-
-
-
-
 
 export default function Feed() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
-    const response = await axios.get("https://open-recipes.onrender.com/recipes");
-    console.log('response.data', response.data);
+    const response = await axios.get(
+      "https://open-recipes.onrender.com/recipes"
+    );
+    console.log("response.data", response.data);
+  
+
     return response.data;
   }
-  const query = useQuery({queryKey: ["recipes_feed"], queryFn: getRecipesFeed});
+  const query = useQuery({
+    queryKey: ["recipes_feed"],
+    queryFn: getRecipesFeed,
+  });
 
   // const recipes = [
   //   {
@@ -112,26 +116,25 @@ type RecipeCardProps = {
 };
 
 export function RecipeCard(props: RecipeCardProps) {
-  const recipe = props.recipe
-    const router = useRouter();
-
+  const recipe = props.recipe;
+  const router = useRouter();
 
   return (
-    <Card
-      elevate
-      size="$4"
-      width={"100%"}
-      height={300}
-      bordered
-      {...props}
-    >
+    <Card elevate size="$4" width={"100%"} height={300} bordered {...props}>
       <Card.Header padded>
         <H2>{recipe.name}</H2>
         <Paragraph theme="alt2">{recipe.description}</Paragraph>
       </Card.Header>
       <Card.Footer padded>
         <XStack flex={1} />
-        <Button borderRadius="$10" onPress={() => {router.push(`/recipes/${recipe.id}`)}}>View</Button>
+        <Button
+          borderRadius="$10"
+          onPress={() => {
+            router.push(`/recipes/${recipe.id}`);
+          }}
+        >
+          View
+        </Button>
       </Card.Footer>
     </Card>
   );
