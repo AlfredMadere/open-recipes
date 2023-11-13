@@ -7,7 +7,9 @@ import {
   YStack,
   View,
   ScrollView,
+  fullscreenStyle,
 } from "tamagui";
+import {Alert} from "react-native";
 import SearchResult from "../SearchResult/SearchResult";
 import React, { useState } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
@@ -16,194 +18,174 @@ import axios from "axios";
 import { Recipe } from "../../app/interfaces/models";
 
 export default function SearchScreen() {
-
   const router = useRouter();
   const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState("");
   const [filterKey, setFilterKey] = useState("");
   const [filterValue, setFilterValue] = useState("");
+  const [pressed, setPressed] = useState(false);
+
 
   type onPressButtonProps = {
     key: string;
     value: string;
   };
 
-  const onPressButton = (props : onPressButtonProps) => {
+  const onPressButton = (props: onPressButtonProps) => {
     // Code for the first action
     setFilterKey(props.key);
     setFilterValue(props.value);
-
   };
 
-
-
-
-  async function getFilters() {
-    // const data = [
-    //   {
-    //     id: "0",
-    //     description: "Super delicious recipe",
-    //     name: "Easy Dinners",
-    //     mins_prep: 20,
-    //     mins_cook: 30,
-    //     category_id: 1,
-    //     author_id: 1,
-    //     created_at: "2022-01-01 00:00:00",
-    //     procedure: "Make it",
-    //     default_servings: 1,
-    //   },
-    //   {
-    //     id: "1",
-    //     description: "Super delicious recipe",
-    //     name: "Quick Snacks",
-    //     mins_prep: 20,
-    //     mins_cook: 30,
-    //     category_id: 1,
-    //     author_id: 1,
-    //     created_at: "2022-01-01 00:00:00",
-    //     procedure: "Make it",
-    //     default_servings: 1,
-    //   },
-    //   {
-    //     id: "2",
-    //     description: "Super delicious recipe",
-    //     name: "Breakfast Foods",
-    //     mins_prep: 20,
-    //     mins_cook: 30,
-    //     category_id: 1,
-    //     author_id: 1,
-    //     created_at: "2022-01-01 00:00:00",
-    //     procedure: "Make it",
-    //     default_servings: 1,
-    //   },
-    //   {
-    //     id: "3",
-    //     description: "Super delicious recipe",
-    //     name: "Dinners for 1 :(",
-    //     mins_prep: 20,
-    //     mins_cook: 30,
-    //     category_id: 1,
-    //     author_id: 1,
-    //     created_at: "2022-01-01 00:00:00",
-    //     procedure: "Make it",
-    //     default_servings: 1,
-    //   },
-    //   {
-    //     id: "4",
-    //     description: "Super delicious recipe",
-    //     name: "Dinners for 2 ;)",
-    //     mins_prep: 20,
-    //     mins_cook: 30,
-    //     category_id: 1,
-    //     author_id: 1,
-    //     created_at: "2022-01-01 00:00:00",
-    //     procedure: "Make it",
-    //     default_servings: 1,
-    //   },
-    //   {
-    //     id: "5",
-    //     description: "Super delicious recipe",
-    //     name: "Dinners for Hubby",
-    //     mins_prep: 20,
-    //     mins_cook: 30,
-    //     category_id: 1,
-    //     author_id: 1,
-    //     created_at: "2022-01-01 00:00:00",
-    //     procedure: "Make it",
-    //     default_servings: 1,
-    //   },
-    // ];
-
-    const response = await axios.get("https://open-recipes.onrender.com/tags");
-    console.log("response.data", response.data);
-    return response.data;
+  const onPressGoButton = () => {
+    Alert.alert("HEY");
+    setPressed(true);
   }
 
-  async function getSearchResults(
-    searchText: string,
-    filterKey: string,
-    filterValue: string
-  ) {
+  async function getFilters() {
+
     const response = await axios.get(
-      "https://open-recipes.onrender.com/recipes?name={searchText}&tag_key={filterKey}&tag_value={filterValue}"
+      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10"
     );
-    console.log("response.data", response.data);
-    console.log(
-      "Getting Recipes with name:",
-      searchText,
-      "with key:",
-      filterKey,
-      "with value: " + filterValue
-    );
+    const responseDataString = JSON.stringify(response.data, null, 2);
+
     return response.data;
   }
 
   type getSearchResultsProps = {
-    searchText: Function,
-    filterKey: string,
-    filterValue: string,
+    searchText: Function;
+    filterKey: string;
+    filterValue: string;
+  };
 
+  const query1 = useQuery({
+    queryKey: ["tags"],
+    queryFn: getFilters,
+  });
+
+  if (query1.data?.tags && query1.data.tags.length > 0) {
+    // Accessing the first tag's key and id
+    const firstTag = query1.data.tags[0];
+    if (firstTag && firstTag.key && firstTag.id) {
+      const key = firstTag.key;
+      const id = firstTag.id;
+
+      // Now you can use the 'key' and 'id' variables as needed
+    }
   }
 
   
-    const query1 = useQuery({
-      queryKey: ["tags"],
-      queryFn: getFilters,
-    });
+  type RecipeProps = {
+    id: number;
+    name: string;
+    mins_prep: number;
+    mins_cook: number;
+    description: string;
+    default_servings: number;
+    created_at: string;
+    author_id: string;
+    procedure: string;
 
-    const query2 = useQuery({
-      queryKey: ["recipes", searchText, filterKey, filterValue],
-      queryFn: () => getSearchResults(searchText, filterKey, filterValue),
-    })
+    next_cursor: 0;
+    prev_cursor: 0;
+  };
+
+  
+  // Alert.alert("Search Text: " + searchText.length + 
+  // "\nFilter Key: " + filterKey.length + "\nFilter Value: " + filterValue.length + 
+  // "\nIs pressed true? " + pressed);
+         const req =
+      "https://open-recipes.onrender.com/recipes?name=" +
+      searchText +
+      "&tag_key=" +
+      filterKey +
+      "&tag_value=" +
+      filterValue;
 
 
-    type RecipeProps = {
-      id: number;
-      name: string;
-      mins_prep: number;
-      mins_cook: number;
-      description: string;
-      default_servings: number;
-      created_at: string;
-      author_id: string;
-      procedure: string;
-
-      next_cursor: 0;
-      prev_cursor: 0;
-      
-    };
+    // Define getSearchResults outside of the condition
     
-      const rows = query2.data?.map((recipe : RecipeProps) => {
-        return (
-          <SearchResult
-            key={recipe.id}
-            name={recipe.name}
-            id={recipe.id} mins_prep={0} mins_cook={0} description={""} default_servings={0} created_at={""} author_id={""} procedure={""} next_cursor={0} prev_cursor={0}          ></SearchResult>
-        );
-      });
+ async function getSearchResults() {
+   Alert.alert("in the body");
+   if (searchText.length > 0 && filterKey.length > 0 && filterValue.length > 0) {
+      const response = await axios.get(req);
+      console.log("response.data", response.data);
+      const datares = JSON.stringify(response.data, null, 2);
+      Alert.alert("response.data: " + datares);
 
-      type tagProps = {
-        
-          id: number;
-          key: string;
-          value: string;
-        
-      };
+      Alert.alert("still in the body");
 
+      return response.data;
+   }
+     
+ }
+
+ 
+
+
+
+ 
+
+ const query2 = useQuery({
+   queryKey: ["recipe"],
+   queryFn: getSearchResults,
+ });
+    
     
 
-    const filters = query1.data?.map((tag : tagProps) => {
+  let rows;
+
+  if (searchText.length > 0 && filterKey.length > 0 && filterValue.length > 0 && pressed) {
+  
+   
+  
+
+    rows = query2.data?.recipe.map((recipe: RecipeProps) => {
+
+
       return (
-        <Button
-          themeInverse
-          size="$2"
-          key={tag.id}
-          onPress={() => onPressButton(tag)}
-        >
-          {tag.value}
-        </Button>
+        <SearchResult
+          key={recipe.id}
+          name={recipe.name}
+          id={recipe.id}
+          mins_prep={recipe.mins_cook}
+          mins_cook={recipe.mins_cook}
+          description={recipe.description}
+          default_servings={recipe.default_servings}
+          created_at={""}
+          author_id={""}
+          procedure={""}
+          next_cursor={recipe.next_cursor}
+          prev_cursor={recipe.next_cursor}
+        ></SearchResult>
       );
-    });
+    })
+    
+  } 
+    else {
+      rows = [];
+    }
+
+  
+
+  type tagProps = {
+    id: number;
+    key: string;
+    value: string;
+  };
+
+  const filters = query1.data?.tags.map((tag: tagProps) => {
+    return (
+      <Button
+        themeInverse
+        size="$3"
+        key={tag.id}
+        onPress={() => onPressButton(tag)}
+      >
+        {tag.value}
+      </Button>
+    );
+  });
 
   // object with search term and filters
   // filters should have a state
@@ -218,10 +200,14 @@ export default function SearchScreen() {
       margin="$3"
       padding="$2"
     >
-      <InputText size="$4" searchText={searchText} setSearchText={setSearchText}/>
-      <XStack space="$2">
-       {filters}
-      </XStack>
+      <InputText
+        size="$4"
+        searchText={searchText}
+        setSearchText={setSearchText}
+        pressed={pressed}
+        setPressed={setPressed}
+      />
+      <XStack space="$2">{filters}</XStack>
       <ScrollView>{rows}</ScrollView>
     </YStack>
   );
@@ -231,6 +217,8 @@ type InputTextProps = {
   size: SizeTokens;
   searchText: string;
   setSearchText: Function;
+  pressed: boolean;
+  setPressed: Function;
 
   }
 
@@ -249,11 +237,11 @@ function InputText(props : InputTextProps) {
           onChangeText={(value) => props.setSearchText(value)}
         />
 
-        <Button size={props.size}>Go</Button>
+        <Button onPress={() => props.setPressed(true)} size={props.size}>
+          Go
+        </Button>
       </XStack>
     </View>
   );
 }
-
-
 

@@ -1,4 +1,4 @@
-import { Button, H3, H5, Card, Paragraph, Text, View } from "tamagui";
+import { Button, H3, H5, Card, Paragraph, Text, View, XStack } from "tamagui";
 import { useRouter } from "expo-router";
 
 type RecipeCardProps = {
@@ -35,6 +35,10 @@ export default function SearchResult(props: RecipeCardProps) {
       >
         <H3>{props.name}</H3>
         <H5>{props.description}</H5>
+        <XStack>
+          <Text>Prep Time: {props.mins_prep}</Text>
+          <Text>Cook Time: {props.mins_cook}</Text>
+        </XStack>
       </Card>
     </View>
   );
