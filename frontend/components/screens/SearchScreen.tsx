@@ -4,24 +4,21 @@ import {
   Button,
   Input,
   SizeTokens,
-  TextArea,
   XStack,
   YStack,
   View,
   ScrollView,
-  fullscreenStyle,
 } from "tamagui";
 import { Alert } from "react-native";
 import SearchResult from "../SearchResult/SearchResult";
 import React, { useState } from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import {  useQuery } from "@tanstack/react-query";
+//import { useRouter } from "expo-router";
 import axios from "axios";
-import { Recipe } from "../../app/interfaces/models";
 
 export default function SearchScreen() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  //const router = useRouter();
+  //const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState("");
   const [filterKey, setFilterKey] = useState("");
   const [filterValue, setFilterValue] = useState("");
@@ -59,6 +56,32 @@ export default function SearchScreen() {
     setFilterValue(props.value);
   };
 
+  function onUseInventory() {
+    let result = [];
+    query3.refetch();
+    result = query2.data?.recipe.map((recipe: RecipeProps) => {
+      Alert.alert("HEY7");
+      return (
+        <SearchResult
+          key={recipe.id}
+          name={recipe.name}
+          id={recipe.id}
+          mins_prep={recipe.mins_cook}
+          mins_cook={recipe.mins_cook}
+          description={recipe.description}
+          default_servings={recipe.default_servings}
+          created_at={""}
+          author_id={""}
+          procedure={""}
+          next_cursor={recipe.next_cursor}
+          prev_cursor={recipe.next_cursor}
+        ></SearchResult>
+      );
+    });
+
+    setResults(result);
+  }
+
   function onPressGoButton() {
     let result = [];
 
@@ -66,9 +89,9 @@ export default function SearchScreen() {
       query2.refetch();
       //I was using the v4 API, if you read the migrating to v5 use query docs it says they now only support the object format
       //This query will not run until you call query2.refetch()
-
+      
       result = query2.data?.recipe.map((recipe: RecipeProps) => {
-        Alert.alert("HEY7");
+        
         return (
           <SearchResult
             key={recipe.id}
@@ -90,6 +113,19 @@ export default function SearchScreen() {
 
     setResults(result);
   }
+
+  async function getInventoryResults() {
+    const response = await axios.get(
+      "https://open-recipes.onrender.com/recipes?cursor=0&use_inventory_of=1"
+    );
+    return response.data;
+  }
+
+  const query3 = useQuery({
+    queryKey: ["inventory_results"],
+    queryFn: getInventoryResults,
+    enabled: false,
+  });
 
   const req =
     "https://open-recipes.onrender.com/recipes?name=" +
@@ -116,9 +152,8 @@ export default function SearchScreen() {
 
   async function getFilters() {
     const response = await axios.get(
-      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10",
+      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10"
     );
-    const responseDataString = JSON.stringify(response.data, null, 2);
 
     return response.data;
   }
@@ -156,7 +191,15 @@ export default function SearchScreen() {
         setSearchText={setSearchText}
         onPressGoButton={onPressGoButton}
       />
-      <XStack space="$2">{filters}</XStack>
+      <ScrollView>
+        <XStack space="$2">
+          {filters}
+          <Button themeInverse size="$3" onPress={() => onUseInventory()}>
+            Use Inventory!
+          </Button>
+        </XStack>
+      </ScrollView>
+
       <ScrollView>{results}</ScrollView>
     </YStack>
   );
