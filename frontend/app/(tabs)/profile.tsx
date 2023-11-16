@@ -15,13 +15,14 @@ import {
 } from "tamagui";
 import { Text, FlatList } from "react-native";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { FlatGrid } from 'react-native-super-grid';
 import axios from "axios";
 import { Recipe } from "../interfaces/models";
 
 export default function One() {
   const router = useRouter();
 
-  const username = "AlfredRocks33";
+  const username = "AlfredRocks33"; 
 
   async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
     const response = await axios.get(
@@ -71,41 +72,15 @@ export default function One() {
   );
 }
 
+
+
+
+
+
+
 //DO NOT USE THIS SYNTAX, used any to pass eslint for testing
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const GridComponent = ({ data }: any) => {
-  return (
-    <FlatList
-      data={data}
-      numColumns={3}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => (
-        <View
-          style={{
-            flex: 1,
-            marginLeft: 45,
-            marginRight: 45,
-            marginTop: 20,
-            flexDirection: "column",
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          paddingHorizontal="$4"
-          space
-        >
-          {
-            //DO NOT USE THIS SYNTAX, used any to pass eslint for testing
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            data.map((recipe: any) => {
-              return <RecipeCard key={recipe.id} recipe={recipe} />;
-            })
-          }
-        </View>
-      )}
-    />
-  );
-};
+
 
 type RecipeCardProps = {
   recipe: {
@@ -127,22 +102,16 @@ export function RecipeCard(props: RecipeCardProps) {
   const router = useRouter();
 
   return (
-    <Card elevate size="$4" width={"100%"} height={70} bordered {...props}>
-      <Card.Header padded>
-        <Text>{recipe.name}</Text>
-        <Paragraph theme="alt2">{recipe.description}</Paragraph>
-      </Card.Header>
-      <Card.Footer padded>
-        <XStack flex={1} />
-        <Button
-          borderRadius="$10"
+    <Card size="$4" width={"45%"} height={60} bordered {...props}>
+      <Button
+          height={60}
+          color={'#00000'}
           onPress={() => {
             router.push(`/recipes/${recipe.id}`);
           }}
         >
-          View
+          {recipe.name}
         </Button>
-      </Card.Footer>
     </Card>
   );
 }
