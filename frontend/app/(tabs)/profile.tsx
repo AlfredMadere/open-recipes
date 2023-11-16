@@ -18,6 +18,7 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { FlatGrid } from 'react-native-super-grid';
 import axios from "axios";
 import { Recipe } from "../interfaces/models";
+import { removeDuplicateIds } from "../../helpers";
 
 export default function One() {
   const router = useRouter();
@@ -28,13 +29,14 @@ export default function One() {
     const response = await axios.get(
       "https://open-recipes.onrender.com/recipes",
     );
-    console.log("response.data", response.data);
     return response.data;
   }
   const query = useQuery({
     queryKey: ["authored_recipes"],
     queryFn: getRecipesFeed,
   });
+
+  const recipes = removeDuplicateIds(query.data?.recipe || []);
 
   return (
     <View style={{ width: "100%" }}>
@@ -63,7 +65,7 @@ export default function One() {
           paddingHorizontal="$4"
           space
         >
-          {query.data?.recipe.map((recipe) => {
+          {recipes.map((recipe) => {
             return <RecipeCard key={recipe.id} recipe={recipe} />;
           })}
         </YStack>

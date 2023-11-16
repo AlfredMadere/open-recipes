@@ -54,6 +54,10 @@ const StackLayout = () => {
               name="recipes/[id]"
               options={{ title: "Recipe", presentation: "modal" }}
             />
+            <Stack.Screen
+              name="update-inventory"
+              options={{ title: "Update Inventory", presentation: "modal" }}
+            />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="[missing]" options={{ title: "404" }} />
           </Stack>

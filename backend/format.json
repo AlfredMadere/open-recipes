@@ -1,10 +1,112 @@
-{
-  "id": 123456,
-  "name": "Secret Cake Recipe",
-  "mins_prep": 20,
-  "mins_cook": 30,
-  "description": "A delicious and secret cake recipe.",
-  "default_servings": 4,
-  "procedure": "Step 1: Mix ingredients... Step 2: Bake...",
-  "author_id": 1
-}
+[
+  {
+    "author_id": null,
+    "created_at": null,
+    "default_servings": null,
+    "description": null,
+    "id": 9,
+    "mins_cook": null,
+    "mins_prep": null,
+    "name": "Carbonara",
+    "procedure": null
+  },
+  {
+    "author_id": "15",
+    "created_at": null,
+    "default_servings": 8,
+    "description": "The best cookies you will ever come across",
+    "id": 12,
+    "mins_cook": 10,
+    "mins_prep": 10,
+    "name": "Insane Chocolate Chip Cookies",
+    "procedure": "Prepare the cookie dough, mix in the chips, bake..."
+  },
+  {
+    "author_id": null,
+    "created_at": null,
+    "default_servings": 4,
+    "description": "testing",
+    "id": 3,
+    "mins_cook": 15,
+    "mins_prep": 10,
+    "name": "Penne Carbonara",
+    "procedure": null
+  },
+  {
+    "author_id": null,
+    "created_at": null,
+    "default_servings": 4,
+    "description": "testing",
+    "id": 4,
+    "mins_cook": 15,
+    "mins_prep": 10,
+    "name": "Penne Carbonara",
+    "procedure": null
+  },
+  {
+    "author_id": "4",
+    "created_at": null,
+    "default_servings": 4,
+    "description": "A delicious and secret cake recipe.",
+    "id": 13,
+    "mins_cook": 30,
+    "mins_prep": 20,
+    "name": "Secret Cake Recipe",
+    "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
+  },
+  {
+    "author_id": "4",
+    "created_at": null,
+    "default_servings": 4,
+    "description": "A delicious and secret cake recipe.",
+    "id": 8,
+    "mins_cook": 30,
+    "mins_prep": 20,
+    "name": "Secret Cake Recipe",
+    "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
+  },
+  {
+    "author_id": "15",
+    "created_at": null,
+    "default_servings": 4,
+    "description": "A delicious and secret cake recipe.",
+    "id": 7,
+    "mins_cook": 30,
+    "mins_prep": 20,
+    "name": "Secret Cake Recipe",
+    "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
+  },
+  {
+    "author_id": "4",
+    "created_at": null,
+    "default_servings": 4,
+    "description": "A delicious and secret cake recipe.",
+    "id": 2,
+    "mins_cook": 30,
+    "mins_prep": 20,
+    "name": "Secret Cake Recipe",
+    "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
+  },
+  {
+    "author_id": "4",
+    "created_at": null,
+    "default_servings": 4,
+    "description": "A delicious and secret cake recipe.",
+    "id": 1,
+    "mins_cook": 30,
+    "mins_prep": 20,
+    "name": "Secret Cake Recipe",
+    "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
+  },
+  {
+    "author_id": "4",
+    "created_at": null,
+    "default_servings": 4,
+    "description": "A delicious and secret cake recipe",
+    "id": 6,
+    "mins_cook": 30,
+    "mins_prep": 20,
+    "name": "Secret Cake Recipe",
+    "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
+  }
+]
