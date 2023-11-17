@@ -165,7 +165,8 @@ export default function Page() {
                 render={({ field }) => (
                   <TextInput
                     style={
-                      errors[`tags.${index}.category` as keyof FormValues]
+                      //TODO need to get this logic functioning, and need to connect to backend.
+                      errors["tags"]?.[index]?.["category"]
                         ? styles.error
                         : styles.input
                     }
@@ -183,7 +184,7 @@ export default function Page() {
                 render={({ field }) => (
                   <TextInput
                     style={
-                      errors[`tags.${index}` as keyof FormValues]
+                      errors["tags"]?.[index]?.["value"]
                         ? styles.error
                         : styles.input
                     }
@@ -229,7 +230,7 @@ export default function Page() {
                 render={({ field }) => (
                   <TextInput
                     style={
-                      errors[`ingredients.${index}` as keyof FormValues]
+                      errors["ingredients"]?.[index]?.["quantity"]
                         ? styles.error
                         : styles.input
                     }
@@ -247,7 +248,7 @@ export default function Page() {
                 render={({ field }) => (
                   <TextInput
                     style={
-                      errors[`ingredients.${index}` as keyof FormValues]
+                      errors["ingredients"]?.[index]?.["units"]
                         ? styles.error
                         : styles.input
                     }
@@ -265,7 +266,7 @@ export default function Page() {
                 render={({ field }) => (
                   <TextInput
                     style={
-                      errors[`ingredients.${index}` as keyof FormValues]
+                      errors["ingredients"]?.[index]?.["value"]
                         ? styles.error
                         : styles.input
                     }
@@ -323,8 +324,14 @@ export default function Page() {
           color="red"
           onPress={() => {
             reset({
-              name: "",
-              description: "",
+                name: "",
+                description: "",
+                servings: "",
+                mins_prep: "",
+                mins_cook: "",
+                instructions: "",
+                tags: [{ category: "", value: "" }],
+                ingredients: [{ quantity: "", units: "", value: "" }],
             });
           }}
         />
@@ -333,7 +340,7 @@ export default function Page() {
           color="green"
           onPress={() => {
             console.log("on press");
-            console.log("form errors", errors);
+            console.log("form errors", JSON.stringify(errors));
             handleSubmit(onSubmit)();
           }}
         />
