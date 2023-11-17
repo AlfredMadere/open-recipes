@@ -79,7 +79,6 @@ export default function SearchScreen() {
     //     ></SearchResult>
     //   );
     // });
-
     // setResults(result);
   }
 
@@ -87,10 +86,9 @@ export default function SearchScreen() {
   //   let result = [];
 
   //   if (searchText.length > 0 && filterKey.length > 0 && filterValue.length) {
-    
-      
+
   //     result = query2.data?.recipe.map((recipe: RecipeProps) => {
-      
+
   //       return (
   //         <SearchResult
   //           key={recipe.id} // Use a combination of recipe.id and index
@@ -109,7 +107,6 @@ export default function SearchScreen() {
   //       );
   //     });
   //   }
-    
 
   //     // Remove null values from the result array
 
@@ -216,18 +213,20 @@ export default function SearchScreen() {
         {pressed &&
           searchText.length > 0 &&
           filterKey.length > 0 &&
-          filterValue.length > 0 && <ComputeResults setPress={setPressed} req={req} />}
+          filterValue.length > 0 && (
+            <ComputeResults setPress={setPressed} req={req} />
+          )}
       </ScrollView>
     </YStack>
   );
 }
 
 type runQueryProps = {
-  req: string,
-  setPress: Function,
-}
+  req: string;
+  setPress: Function;
+};
 
-function ComputeResults(props : runQueryProps) {
+function ComputeResults(props: runQueryProps) {
   //Alert.alert("we have reached the function");
   //Alert.alert("Request: " + props.req);
 
@@ -246,19 +245,16 @@ function ComputeResults(props : runQueryProps) {
     prev_cursor: 0;
   };
 
-
   async function getSearchResults() {
-    
     const response = await axios.get(props.req);
 
     console.log("response.data", response.data);
     const datares = JSON.stringify(response.data, null, 2);
-    
-   //Alert.alert("response.data: " + datares);
+
+    //Alert.alert("response.data: " + datares);
     return response.data;
   }
-  
-  
+
   const query2 = useQuery({
     queryKey: ["recipe"],
     queryFn: getSearchResults,
@@ -283,8 +279,6 @@ function ComputeResults(props : runQueryProps) {
       ></SearchResult>
     );
   });
-
-  
 
   return result;
 }
