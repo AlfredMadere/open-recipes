@@ -1,6 +1,5 @@
-import { useRouter } from "expo-router";
+import { useRouter, Link, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
-import { Link } from "expo-router";
 import {
   useForm,
   useFieldArray,
@@ -9,19 +8,23 @@ import {
 } from "react-hook-form";
 import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
 import { ScrollView } from "tamagui";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 interface FormValues {
   name: string;
   description: string;
-  servings: string;
+  default_servings: string;
   mins_prep: string;
   mins_cook: string;
-  instructions: string;
+  procedure: string;
   tags: { category: string; value: string }[];
   ingredients: { quantity: string; units: string; value: string }[];
 }
 
 export default function Page() {
+  const queryClient = useQueryClient();
+
   const {
     register,
     setValue,
@@ -35,10 +38,10 @@ export default function Page() {
     defaultValues: {
       name: "",
       description: "",
-      servings: "",
+      default_servings: "",
       mins_prep: "",
       mins_cook: "",
-      instructions: "",
+      procedure: "",
       tags: [{ category: "", value: "" }],
       ingredients: [{ quantity: "", units: "", value: "" }],
     },
@@ -48,7 +51,7 @@ export default function Page() {
   });
   // const name = watch("name");
   // console.log("name: ", name);
-
+  
   const {
     fields: fields1,
     append: append1,
@@ -68,11 +71,20 @@ export default function Page() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
-    console.log("Form Data: ", JSON.stringify(data));
+    const newData = data;
+    newData.author_id = '0';
+    newData.created_at = Date().toLocaleString();
+    console.log("Form Data: ", JSON.stringify(newData));
+    //  axios.post("https://open-recipes.onrender.com/recipes", JSON.stringify(data), {
+    //   headers: {
+    // 'Content-Type': 'application/json'
+    //   }
+    // }) 
+    //  .then(res => {console.log('Response: ', res.data)})
+    //  .catch(error => {console.error('Error: ', error)})
 
-    // const items = getValues("fieldArray2");
-    // console.log(items);
-  };
+
+  }
 
   return (
     <View style={styles.container}>
@@ -112,13 +124,13 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["servings"] ? styles.error : styles.input}
+              style={errors["default_servings"] ? styles.error : styles.input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
             />
           )}
-          name="servings"
+          name="default_servings"
           rules={{ required: true }}
         />
 
@@ -308,13 +320,13 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["instructions"] ? styles.error : styles.input}
+              style={errors["procedure"] ? styles.error : styles.input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
             />
           )}
-          name="instructions"
+          name="procedure"
           rules={{ required: true }}
         />
       </ScrollView>
@@ -326,10 +338,10 @@ export default function Page() {
             reset({
                 name: "",
                 description: "",
-                servings: "",
+                default_servings: "",
                 mins_prep: "",
                 mins_cook: "",
-                instructions: "",
+                procedure: "",
                 tags: [{ category: "", value: "" }],
                 ingredients: [{ quantity: "", units: "", value: "" }],
             });
@@ -339,8 +351,6 @@ export default function Page() {
           title="Create"
           color="green"
           onPress={() => {
-            console.log("on press");
-            console.log("form errors", JSON.stringify(errors));
             handleSubmit(onSubmit)();
           }}
         />
@@ -405,68 +415,3 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-
-// type FieldArray1Props = {
-//   methods: UseFieldArrayReturn<{
-//     name: string;
-//     description: string;
-//     servings: string;
-//     mins_prep: string;
-//     mins_cook: string;
-//     instructions: string;
-// }, never, "id">
-// }
-// function FieldArray1 ({methods} : FieldArray1Props) {
-//   return {
-//     <View>
-//     {fields1.map((field, index) => (
-//           <View key={field.id} style={styles.container}>
-//             <View style={styles.ingredient}>
-//               <Controller
-//                 control={control}
-//                 render={({ field }) => (
-//                   <TextInput
-//                     style={styles.input}
-//                     placeholder={`Key`}
-//                     placeholderTextColor={"gray"}
-//                     onChangeText={field.onChange}
-//                     value={field.value}
-//                   />
-//                 )}
-//                 name={`key[${index}].value`}
-//                 defaultValue=""
-//               />
-//               <Controller
-//                 control={methods.control}
-//                 render={({ field }) => (
-//                   <TextInput
-//                     style={styles.input}
-//                     placeholder={`Value`}
-//                     placeholderTextColor={"gray"}
-//                     onChangeText={field.onChange}
-//                     value={field.value}
-//                   />
-//                 )}
-//                 name={`value[${index}].value`}
-//                 defaultValue=""
-//               />
-
-//               <View style={styles.smallButton}>
-//                 <Button
-//                   onPress={() => {
-//                     setValue(`key[${index}].value`, "");
-//                     setValue(`value[${index}].value`, "");
-//                     remove1(index);
-//                   }}
-//                   title="Remove"
-//                   color="white"
-//                 />
-//               </View>
-//             </View>
-//           </View>}
-
-//         </View>
-//         )
-//   };
-
-// }
