@@ -8,6 +8,9 @@ import { useFieldArray, useForm } from "react-hook-form";
 type Ingredient = {
   id: number | null;
   name: string;
+  category_id: string | null;
+  type: string | null;
+  storage: string | null;
 };
 
 type Form = {
