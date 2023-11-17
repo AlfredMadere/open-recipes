@@ -352,6 +352,16 @@ export default function Page() {
           color="green"
           onPress={() => {
             handleSubmit(onSubmit)();
+            reset({
+              name: "",
+              description: "",
+              default_servings: "",
+              mins_prep: "",
+              mins_cook: "",
+              procedure: "",
+              tags: [{ category: "", value: "" }],
+              ingredients: [{ quantity: "", units: "", value: "" }],
+            });
           }}
         />
       </View>
