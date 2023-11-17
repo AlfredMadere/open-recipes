@@ -18,7 +18,7 @@ const Register = () => {
   }
 
   const query = useQuery({ queryKey: ["recipe", id], queryFn: getRecipe });
-  
+
   const { isLoading, data } = query; // Assuming 'query' is a hook or context providing recipe data
 
   if (isLoading) {
@@ -27,7 +27,6 @@ const Register = () => {
 
   const ingredients = data?.ingredients || []; // Assuming ingredients are stored in an array
   const tags = data?.tags || []; // Assuming tags are stored in an array
-
 
   type RecipeCardProps = {
     recipe: {
@@ -44,9 +43,6 @@ const Register = () => {
     };
   };
 
-
-
-  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.recipeDetails}>
@@ -57,7 +53,9 @@ const Register = () => {
         <View style={styles.info}>
           <Text style={styles.infoItem}>Prep Time: {data?.mins_prep} mins</Text>
           <Text style={styles.infoItem}>Cook Time: {data?.mins_cook} mins</Text>
-          <Text style={styles.infoItem}>Servings: {data?.default_servings}</Text>
+          <Text style={styles.infoItem}>
+            Servings: {data?.default_servings}
+          </Text>
         </View>
 
         <Text style={styles.description}>Procedure: {data?.procedure}</Text>
@@ -87,12 +85,12 @@ const Register = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     paddingHorizontal: 20,
     paddingTop: 40,
   },
   recipeDetails: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     marginBottom: 20,
@@ -100,22 +98,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   description: {
     fontSize: 18,
     marginBottom: 10,
     marginTop: 10,
-
   },
   info: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     marginBottom: 5,
   },
   infoItem: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 5,
   },
   section: {
@@ -123,7 +120,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   procedureStep: {
@@ -131,7 +128,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
-
-
 
 export default Register;

@@ -1,4 +1,6 @@
-export function removeDuplicateIds<T extends {id: number}>(objects: T[]): T[] {
+export function removeDuplicateIds<T extends { id: number }>(
+  objects: T[],
+): T[] {
   const uniqueObjects = new Map<number, T>();
 
   for (const obj of objects) {

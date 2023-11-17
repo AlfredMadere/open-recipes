@@ -25,7 +25,7 @@ const UpdateInventory = () => {
     mutationFn: (newInventory: Ingredient[]) =>
       axios.post(
         `https://open-recipes.onrender.com/users/${user_id}/ingredients`,
-        newInventory
+        newInventory,
       ),
     onSuccess: () => {
       // Handle successful update
@@ -57,7 +57,7 @@ const UpdateInventory = () => {
     queryKey: ["inventory", user_id],
     queryFn: () =>
       axios.get(
-        `https://open-recipes.onrender.com/users/${user_id}/ingredients`
+        `https://open-recipes.onrender.com/users/${user_id}/ingredients`,
       ),
   });
 
@@ -76,8 +76,20 @@ const UpdateInventory = () => {
   // use react-hook-form useFieldArray for form management.
 
   return (
-    <View style={{padding : 10, display: "flex", flexDirection: "column", gap: 10, alignItems: "center"}}>
-      <Button onPress={() => getInventoryQuery.refetch()} bordered style={{width: "50%"}} >
+    <View
+      style={{
+        padding: 10,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+        alignItems: "center",
+      }}
+    >
+      <Button
+        onPress={() => getInventoryQuery.refetch()}
+        bordered
+        style={{ width: "50%" }}
+      >
         Refresh
       </Button>
       <View style={{ display: "flex", gap: 10, flexDirection: "column" }}>
@@ -90,13 +102,22 @@ const UpdateInventory = () => {
             remove={remove}
           />
         ))}
-        <View style={{ display: "flex", alignItems: "flex-end", flexDirection: "row" }}>
+        <View
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            flexDirection: "row",
+          }}
+        >
           <Button bordered onPress={() => append({ id: null, name: "" })}>
             Add Ingredient{" "}
           </Button>
         </View>
       </View>
-      <Button onPress={handleSubmit(onSubmit)} bordered > Update Inventory</Button>
+      <Button onPress={handleSubmit(onSubmit)} bordered>
+        {" "}
+        Update Inventory
+      </Button>
     </View>
   );
 };

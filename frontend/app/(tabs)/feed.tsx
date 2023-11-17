@@ -82,7 +82,7 @@ export default function Feed() {
         <Button onPress={() => router.push("update-inventory")}>
           Update Inventory
         </Button>
-      </View> 
+      </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
       {query.isFetching && <Spinner size="large" color="$orange10" />}
       <ScrollView style={{ width: "100%" }}>

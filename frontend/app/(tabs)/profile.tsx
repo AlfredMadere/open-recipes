@@ -15,7 +15,7 @@ import {
 } from "tamagui";
 import { Text, FlatList } from "react-native";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { FlatGrid } from 'react-native-super-grid';
+import { FlatGrid } from "react-native-super-grid";
 import axios from "axios";
 import { Recipe } from "../interfaces/models";
 import { removeDuplicateIds } from "../../helpers";
@@ -23,7 +23,7 @@ import { removeDuplicateIds } from "../../helpers";
 export default function One() {
   const router = useRouter();
 
-  const username = "AlfredRocks33"; 
+  const username = "AlfredRocks33";
 
   async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
     const response = await axios.get(
@@ -74,15 +74,8 @@ export default function One() {
   );
 }
 
-
-
-
-
-
-
 //DO NOT USE THIS SYNTAX, used any to pass eslint for testing
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
 
 type RecipeCardProps = {
   recipe: {
@@ -123,4 +116,3 @@ export function RecipeCard(props: RecipeCardProps) {
     </Card>
   );
 }
-
