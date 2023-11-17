@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useRouter } from "expo-router";
 import { View, Stack, Card, XStack } from "tamagui";
 import { useForm, Controller } from "react-hook-form";

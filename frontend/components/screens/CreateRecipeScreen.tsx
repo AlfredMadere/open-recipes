@@ -15,7 +15,8 @@ export default function CreateRecipeScreen() {
     <View style={styles.container}>
       <H1>Create Recipe Page</H1>
       <Paragraph>
-       This page shoul have a bunch of form inputs on it and a submit button at the bottom
+        This page shoul have a bunch of form inputs on it and a submit button at
+        the bottom
       </Paragraph>
     </View>
   );

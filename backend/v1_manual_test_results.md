@@ -1,5 +1,27 @@
-
 We did not have enough detail in our original user flows, so here is an enhanced version of one of our original ones below. 
+
+###Use Case 1.0: Searching for a Recipe
+Use Case 1: Creating a New User
+User: Alice
+Flow:
+    Alice wants to create a new user account in the application, so she sends a POST request to /user/ with the following data:
+{
+    "first_name": "Alice",
+    "last_name": "Johnson",
+    "email": "alice@example.com",
+    "phone": 1234567890
+}
+
+The server processes the request and creates a new user account with an assigned user_id.
+The server responds with the created user data, including the user_id.
+
+{ 
+"id": 12345, 
+"first_name": "Alice", 
+"last_name": "Johnson", "email": "alice@example.com", 
+"phone": 1234567890 
+}
+
 
 ###Use Case 2.0: Using a recipe list for organization
 
@@ -32,7 +54,7 @@ The server responds with the created user data, including the user_id.
 
 He now has his user activated so that he can continue to create a recipeList. He wants this recipe list to contain all of his best baked goods in one easy-access location for himself and eventually the rest of the world. 
 
-2. He first sends a POST request to `/recipe_lists/` with the following recipe data:
+2. He now sends a POST request to `/recipe_lists/` with the following recipe data:
 
 ```json
 { 
@@ -97,26 +119,17 @@ The server responds with the created recipe data, including the id.
 ```
 
 This is now stored in the database, so Bob can access it, and eventually share it. Note that the list that Bob created is not yet associated with him because we haven't implemented sessions. This is still a useful feature.
-
-# Testing results
-
-1. The curl statement called. You can find this in the /docs site for your 
-API under each endpoint. For example, for my site the /catalogs/ endpoint 
-curl call looks like:
-
 curl -X 'POST' \
   'https://open-recipe.onrender.com/users' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -d ' { 
-  "name": " Bob Sandler", 
-  "email": "bob@example.com", 
+  -d ' {
+  "name": " Bob Sandler",
+  "email": "bob@example.com",
   "phone": "123-456-7890"
  }
 '
-
 Response:
-
 Response
  ```json
 {
@@ -125,25 +138,21 @@ Response
   "email": "bob@example.com",
   "phone": "123-456-7890"
 }```
-
 curl -X 'POST' \
   'https://open-recipe.onrender.com/recipe-lists' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -d '{ 
-  "name": "My s tier baked goods", 
+  -d '{
+  "name": "My s tier baked goods",
   "description": "A one stop shop for all for all my fans to make my bakery items"
 }'
-
  ```json
-{ 
-  "name": "My s tier baked goods", 
+{
+  "name": "My s tier baked goods",
   "description": "A one stop shop for all for all my fans to make my bakery items"
 }
 ```
-
 Response
-
 ```json
 {
   "id": 1,
@@ -151,7 +160,6 @@ Response
   "description": "A one stop shop for all for all my fans to make my bakery items"
 }
 ```
-
 curl -X 'POST' \
   'https://open-recipe.onrender.com/recipes' \
   -H 'accept: application/json' \
@@ -165,7 +173,6 @@ curl -X 'POST' \
   "procedure": "Step 1: Mix ingredients... Step 2: Bake...",
   "author_id": 4
 }'
-
 {
   "id": 1,
   "name": "Secret Cake Recipe",
@@ -177,11 +184,23 @@ curl -X 'POST' \
   "author_id": "4",
   "procedure": "Step 1: Mix ingredients... Step 2: Bake..."
 }
-
-
 curl -X 'POST' \
   'https://open-recipe.onrender.com/recipes/1/recipe-lists/1' \
   -H 'accept: application/json' \
   -d ''
-
 "OK"
+
+
+##Use Case 3: Retrieving Recipe Ingredients
+User: Carol
+Flow:
+    Carol wants to view the ingredients required for the "Secret Cake Recipe," so she sends a GET request to /recipe/98765/ingredient/ (assuming "Secret Cake Recipe" has recipe_id 98765).
+    The server processes the request and retrieves a list of ingredients for the recipe.
+    The server responds with the ingredient data for the recipe, including their names and quantities.
+ 
+[ { "ingredient_id": 111, 
+ "name": "Flour", 
+ "quantity": "2 cups" }, { 
+ "ingredient_id": 222,
+  "name": "Sugar", "quantity": "1 cup" }, { 
+ "ingredient_id": 333, "name": "Eggs", "quantity": "3" } ]
