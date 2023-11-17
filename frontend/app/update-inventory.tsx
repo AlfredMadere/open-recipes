@@ -37,9 +37,10 @@ const UpdateInventory = () => {
     },
   });
 
-  const onSubmit = (data: Form) => {
+  const onSubmit = async (data: Form) => {
     console.log("Form Data: ", data);
-    // updateInventoryMutation.mutate(data.ingredients);
+    await updateInventoryMutation.mutate(data.ingredients);
+    await getInventoryQuery.refetch();
   };
   const { control, handleSubmit, reset } = useForm<Form>({
     defaultValues: {
@@ -55,10 +56,19 @@ const UpdateInventory = () => {
 
   const getInventoryQuery = useQuery({
     queryKey: ["inventory", user_id],
-    queryFn: () =>
-      axios.get(
-        `https://open-recipes.onrender.com/users/${user_id}/ingredients`,
-      ),
+    queryFn: async () => {
+      try {
+        console.log("queryFn is called"); // Add this line
+        const result = await axios.get(
+          `https://open-recipes.onrender.com/users/2/ingredients/`,
+        );
+        console.log("result.data", result.data);
+        return result;
+      } catch (error) {
+        console.error("Error fetching inventory", error);
+        return [];
+      }
+    },
   });
 
   useEffect(() => {
@@ -86,7 +96,10 @@ const UpdateInventory = () => {
       }}
     >
       <Button
-        onPress={() => getInventoryQuery.refetch()}
+        onPress={() => {
+          console.log("attempting refetch");
+          getInventoryQuery.refetch();
+        }}
         bordered
         style={{ width: "50%" }}
       >
@@ -109,7 +122,18 @@ const UpdateInventory = () => {
             flexDirection: "row",
           }}
         >
-          <Button bordered onPress={() => append({ id: null, name: "" })}>
+          <Button
+            bordered
+            onPress={() =>
+              append({
+                id: null,
+                name: "",
+                type: null,
+                storage: null,
+                category_id: null,
+              })
+            }
+          >
             Add Ingredient{" "}
           </Button>
         </View>
