@@ -4,28 +4,26 @@ import {
   Button,
   Input,
   SizeTokens,
-  TextArea,
   XStack,
   YStack,
   View,
   ScrollView,
-  fullscreenStyle,
 } from "tamagui";
 import { Alert } from "react-native";
 import SearchResult from "../SearchResult/SearchResult";
 import React, { useState } from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+//import { useRouter } from "expo-router";
 import axios from "axios";
-import { Recipe } from "../../app/interfaces/models";
 
 export default function SearchScreen() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  //const router = useRouter();
+  //const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState("");
   const [filterKey, setFilterKey] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [results, setResults] = useState([]);
+  const [pressed, setPressed] = useState(false);
 
   type onPressButtonProps = {
     key: string;
@@ -59,37 +57,73 @@ export default function SearchScreen() {
     setFilterValue(props.value);
   };
 
-  function onPressGoButton() {
-    let result = [];
-
-    if (searchText.length > 0 && filterKey.length > 0 && filterValue.length) {
-      query2.refetch();
-      //I was using the v4 API, if you read the migrating to v5 use query docs it says they now only support the object format
-      //This query will not run until you call query2.refetch()
-
-      result = query2.data?.recipe.map((recipe: RecipeProps) => {
-        Alert.alert("HEY7");
-        return (
-          <SearchResult
-            key={recipe.id}
-            name={recipe.name}
-            id={recipe.id}
-            mins_prep={recipe.mins_cook}
-            mins_cook={recipe.mins_cook}
-            description={recipe.description}
-            default_servings={recipe.default_servings}
-            created_at={""}
-            author_id={""}
-            procedure={""}
-            next_cursor={recipe.next_cursor}
-            prev_cursor={recipe.next_cursor}
-          ></SearchResult>
-        );
-      });
-    }
-
-    setResults(result);
+  function onUseInventory() {
+    // let result = [];
+    // query3.refetch();
+    // result = query2.data?.recipe.map((recipe: RecipeProps) => {
+    //   Alert.alert("HEY7");
+    //   return (
+    //     <SearchResult
+    //       key={recipe.id}
+    //       name={recipe.name}
+    //       id={recipe.id}
+    //       mins_prep={recipe.mins_cook}
+    //       mins_cook={recipe.mins_cook}
+    //       description={recipe.description}
+    //       default_servings={recipe.default_servings}
+    //       created_at={""}
+    //       author_id={""}
+    //       procedure={""}
+    //       next_cursor={recipe.next_cursor}
+    //       prev_cursor={recipe.next_cursor}
+    //     ></SearchResult>
+    //   );
+    // });
+    // setResults(result);
   }
+
+  // function onPressGoButton() {
+  //   let result = [];
+
+  //   if (searchText.length > 0 && filterKey.length > 0 && filterValue.length) {
+
+  //     result = query2.data?.recipe.map((recipe: RecipeProps) => {
+
+  //       return (
+  //         <SearchResult
+  //           key={recipe.id} // Use a combination of recipe.id and index
+  //           name={recipe.name}
+  //           id={recipe.id}
+  //           mins_prep={recipe.mins_cook}
+  //           mins_cook={recipe.mins_cook}
+  //           description={recipe.description}
+  //           default_servings={recipe.default_servings}
+  //           created_at={""}
+  //           author_id={""}
+  //           procedure={""}
+  //           next_cursor={recipe.next_cursor}
+  //           prev_cursor={recipe.next_cursor}
+  //         ></SearchResult>
+  //       );
+  //     });
+  //   }
+
+  //     // Remove null values from the result array
+
+  //   setResults(result);
+  // }
+  async function getInventoryResults() {
+    const response = await axios.get(
+      "https://open-recipes.onrender.com/recipes?cursor=0&use_inventory_of=1",
+    );
+    return response.data;
+  }
+
+  const query3 = useQuery({
+    queryKey: ["inventory_results"],
+    queryFn: getInventoryResults,
+    enabled: false,
+  });
 
   const req =
     "https://open-recipes.onrender.com/recipes?name=" +
@@ -99,26 +133,25 @@ export default function SearchScreen() {
     "&tag_value=" +
     filterValue;
 
-  async function getSearchResults() {
-    const response = await axios.get(req);
+  // async function getSearchResults() {
+  //   const response = await axios.get(req);
 
-    console.log("response.data", response.data);
-    const datares = JSON.stringify(response.data, null, 2);
-    Alert.alert("response.data: " + datares);
-    return response.data;
-  }
+  //   console.log("response.data", response.data);
+  //   const datares = JSON.stringify(response.data, null, 2);
+  //   Alert.alert("response.data: " + datares);
+  //   return response.data;
+  // }
 
-  const query2 = useQuery({
-    queryKey: ["recipe"],
-    queryFn: getSearchResults,
-    enabled: false,
-  });
+  // const query2 = useQuery({
+  //   queryKey: ["recipe"],
+  //   queryFn: getSearchResults,
+  //   enabled: false,
+  // });
 
   async function getFilters() {
     const response = await axios.get(
       "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10",
     );
-    const responseDataString = JSON.stringify(response.data, null, 2);
 
     return response.data;
   }
@@ -128,18 +161,18 @@ export default function SearchScreen() {
     queryFn: getFilters,
   });
 
-  const filters = query1.data?.tags.map((tag: tagProps) => {
-    return (
-      <Button
-        themeInverse
-        size="$3"
-        key={tag.id}
-        onPress={() => onPressButton(tag)}
-      >
-        {tag.value}
-      </Button>
-    );
-  });
+  // const filters = query1.data?.tags.map((tag: tagProps) => {
+  //   return (
+  //     <Button
+  //       themeInverse
+  //       size="$3"
+  //       key={tag.id}
+  //       onPress={() => onPressButton(tag)}
+  //     >
+  //       {tag.value}
+  //     </Button>
+  //   );
+  // });
 
   return (
     <YStack
@@ -154,12 +187,100 @@ export default function SearchScreen() {
         size="$4"
         searchText={searchText}
         setSearchText={setSearchText}
-        onPressGoButton={onPressGoButton}
+        onPressGoButton={setPressed}
       />
-      <XStack space="$2">{filters}</XStack>
-      <ScrollView>{results}</ScrollView>
+      <ScrollView horizontal={true}>
+        <XStack space="$2">
+          {query1.data?.tags.map((tag: tagProps) => {
+            return (
+              <Button
+                themeInverse
+                size="$3"
+                key={tag.id}
+                onPress={() => onPressButton(tag)}
+              >
+                {tag.value}
+              </Button>
+            );
+          })}
+          <Button themeInverse size="$3" onPress={() => onUseInventory()}>
+            Use Inventory!
+          </Button>
+        </XStack>
+      </ScrollView>
+
+      <ScrollView>
+        {pressed &&
+          searchText.length > 0 &&
+          filterKey.length > 0 &&
+          filterValue.length > 0 && (
+            <ComputeResults setPress={setPressed} req={req} />
+          )}
+      </ScrollView>
     </YStack>
   );
+}
+
+type runQueryProps = {
+  req: string;
+  setPress: Function;
+};
+
+function ComputeResults(props: runQueryProps) {
+  //Alert.alert("we have reached the function");
+  //Alert.alert("Request: " + props.req);
+
+  type RecipeProps = {
+    id: number;
+    name: string;
+    mins_prep: number;
+    mins_cook: number;
+    description: string;
+    default_servings: number;
+    created_at: string;
+    author_id: string;
+    procedure: string;
+
+    next_cursor: 0;
+    prev_cursor: 0;
+  };
+
+  async function getSearchResults() {
+    const response = await axios.get(props.req);
+
+    console.log("response.data", response.data);
+    const datares = JSON.stringify(response.data, null, 2);
+
+    //Alert.alert("response.data: " + datares);
+    return response.data;
+  }
+
+  const query2 = useQuery({
+    queryKey: ["recipe"],
+    queryFn: getSearchResults,
+  });
+  let result = [];
+
+  result = query2.data?.recipe.map((recipe: RecipeProps) => {
+    return (
+      <SearchResult
+        key={recipe.id} // Use a combination of recipe.id and index
+        name={recipe.name}
+        id={recipe.id}
+        mins_prep={recipe.mins_cook}
+        mins_cook={recipe.mins_cook}
+        description={recipe.description}
+        default_servings={recipe.default_servings}
+        created_at={""}
+        author_id={""}
+        procedure={""}
+        next_cursor={recipe.next_cursor}
+        prev_cursor={recipe.next_cursor}
+      ></SearchResult>
+    );
+  });
+
+  return result;
 }
 
 type InputTextProps = {
@@ -181,7 +302,7 @@ function InputText(props: InputTextProps) {
           onChangeText={(value) => props.setSearchText(value)}
         />
 
-        <Button onPress={() => props.onPressGoButton()} size={props.size}>
+        <Button onPress={() => props.onPressGoButton(true)} size={props.size}>
           Go
         </Button>
       </XStack>

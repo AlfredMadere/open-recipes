@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import List, Union
 
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Form, Query, Request
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
 from fastapi import Depends, FastAPI
@@ -178,6 +178,25 @@ class SearchResults(BaseModel):
 #         id, stars, author_id, content, recipe_id = result.fetchone()
 #         return Review(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
 
+
+@app.post('/test-post')
+async def test_post(request: Request):
+    # Access query parameters from the URL
+    query_params = dict(request.query_params)
+
+    # Access data from the request body (assuming it's JSON)
+    try:
+        data = await request.json()
+    except ValueError:
+        data = None  # Set data to None if no JSON data is sent
+
+    # Prepare the response data
+    response_data = {
+        'request_data': data,
+        'query_parameters': query_params,
+    }
+
+    return response_data
 
 
 
