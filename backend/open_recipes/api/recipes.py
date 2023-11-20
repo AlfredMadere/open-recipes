@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from typing import List, Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException 
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
 from fastapi import Depends, FastAPI
@@ -10,8 +10,9 @@ from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, Po
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
 import sqlalchemy
+from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError, DataError, SQLAlchemyError, DBAPIError
 import uvicorn
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 router = APIRouter(
   prefix="/recipes",
@@ -119,33 +120,66 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
 
 #SMOKE TESTED
 #FIXME: increment created at in database
-@router.post('', response_model=None, status_code=201, responses={'201': {'model': CreateRecipeRequest}})
-def post_recipes(body: CreateRecipeRequest,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Recipe]:
-    """
-    Create a new recipe
-    """
+@router.post('',status_code=201)
+def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends(get_engine)]):
+#     """
+#     Create a new recipe
+#     """ 
     with engine.begin() as conn:
+        # try:
+        for i, tag_dict in enumerate(body.tags):
+            try:
+                tag = Tag.parse_obj(tag_dict) 
+                body.tags[i] = tag  # Attempt to parse the dictionary as a Tag
+            except ValidationError:
+                raise TypeError(f"Expected 'tag_dict' to have the same attributes as 'Tag', but it doesn't")
+    
+            #verify that its of type Tag, throw type error if not
+            result = conn.execute(text("""INSERT INTO recipe_tag (key, value) VALUES (:key, :value) 
+                                ON CONFLICT (key, value) DO NOTHING"""),{
+                                    "key": tag.key,
+                                    "value":  tag.value,
+                                })
+            
+        result = conn.execute(text("SELECT id from recipe_tag where key = ANY(:keys) and value = ANY(:values)"),{
+            "keys" : [tag.key for tag in body.tags],
+            "values" : [tag.value for tag in body.tags],
+        }).fetchall()
+
+        tag_ids = [id[0] for id in result]
+
         result = conn.execute(text(f"""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id, procedure)
-                                   VALUES (
-                                   :name,
-                                   :mins_prep,
-                                   :mins_cook,
-                                   :description,
-                                   :default_servings,
-                                   :author_id,
-                                   :procedure)
-                                   RETURNING id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure"""
-                                   
+                                VALUES (
+                                :name,
+                                :mins_prep,
+                                :mins_cook,
+                                :description,
+                                :default_servings,
+                                :author_id,
+                                :procedure)
+                                RETURNING id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure"""
+                                
             ), {"name":body.name,
-             "author_id":body.author_id,
-             "mins_prep":body.mins_prep,
-             "mins_cook":body.mins_cook
-             ,"description":body.description,
-             "default_servings":body.default_servings,
-             "procedure":body.procedure})
+            "author_id":body.author_id,
+            "mins_prep":body.mins_prep,
+            "mins_cook":body.mins_cook
+            ,"description":body.description,
+            "default_servings":body.default_servings,
+            "procedure":body.procedure})
         id,name,mins_prep,mins_cook,description,default_servings,author_id,procedure = result.fetchone()
+        
+        for tag_id in tag_ids:
+            conn.execute(text("""INSERT INTO recipe_x_tag (recipe_id, tag_id) VALUES (:recipe_id, :tag_id)"""),{
+                "recipe_id" : id,
+                "tag_id" : tag_id
+            })
         recipe = Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure)
-        return recipe
+        # except SQLAlchemyError as e:
+        #     raise HTTPException(status_code=400, detail="Recipe was not created due to a database error.")
+        # except Exception as e:
+        #     raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+        
+        return {}
 
 #SMOKE TESTED
 @router.get('/{id}', response_model=Recipe)

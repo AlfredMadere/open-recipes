@@ -4,8 +4,9 @@
 
 from __future__ import annotations
 
-from typing import Optional,Literal,Tuple
+from typing import Optional,Literal,Tuple,List,Any
 from pydantic import BaseModel
+
 
 
 #TODO: define all request types 
@@ -46,6 +47,8 @@ class CreateRecipeRequest(BaseModel):
     procedure: Optional[str] = None
     created_at: Optional[str] = None
     author_id: Optional[int] = None 
+    tags: Optional[List[Any]] = None  # List of CreateTagRequest
+    ingredients: Optional[List[Any]] = None  # List of CreateIngredientRequest
 
 class Recipe(BaseModel):
     id: Optional[int] = None
@@ -205,6 +208,13 @@ class Ingredient(BaseModel):
     category_id: Optional[int] = None
     type: Optional[str] = None
     storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
+
+class CreateIngredientRequest(BaseModel):
+    name: Optional[str] = None
+    category_id: Optional[int] = None
+    type: Optional[str] = None
+    storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
+    
 
 class Tag(BaseModel):
     id: Optional[int] = None

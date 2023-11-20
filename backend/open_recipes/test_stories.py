@@ -446,3 +446,28 @@ def test_flow_2():
     assert response.status_code == 200
     assert len(response.json()['recipes']) == 1
     assert response.json()['recipes'][0]['name'] == 'Spaghetti Carbonara'
+
+def test_create_recipe():
+
+    response = client.post("/recipes", json={'name': 'Spaghetti Carbonara', 'instructions': 'Cook spaghetti, fry bacon, mix with eggs and cheese', "mins_prep": 20, "mins_cook": 30,"tags":[{"key":"Cuisine","value":"Italian"}]})
+    assert response.status_code == 201
+
+    # get the recipe id from the response
+    recipe_id = response.json()['id']
+
+    # Send a GET request to verify the recipe was created
+    response = client.get(f'/recipes/{recipe_id}')
+    assert response.status_code == 200
+    assert response.json()['name'] == 'Spaghetti Carbonara'
+    assert response.json()['instructions'] == 'Cook spaghetti, fry bacon, mix with eggs and cheese'
+    assert response.json()['mins_prep'] == 20
+    assert response.json()['mins_cook'] == 30
+    assert response.json()['tags'][0]['key'] == 'Cuisine'
+    assert response.json()['tags'][0]['value'] == 'Italian'
+
+    # check tags
+    response = client.get(f'/recipes/{recipe_id}/tags')
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+    assert response.json()[0]['key'] == 'Cuisine'
+    assert response.json()[0]['value'] == 'Italian'
