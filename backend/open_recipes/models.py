@@ -47,8 +47,8 @@ class CreateRecipeRequest(BaseModel):
     procedure: Optional[str] = None
     created_at: Optional[str] = None
     author_id: Optional[int] = None 
-    tags: Optional[List[Any]] = None  # List of CreateTagRequest
-    ingredients: Optional[List[Any]] = None  # List of CreateIngredientRequest
+    tags: Optional[List[Any]] = []   # List of CreateTagRequest
+    ingredients: Optional[List[Any]] = []  # List of CreateIngredientRequest
 
 class Recipe(BaseModel):
     id: Optional[int] = None
