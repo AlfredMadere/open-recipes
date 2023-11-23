@@ -214,6 +214,10 @@ class CreateIngredientRequest(BaseModel):
     category_id: Optional[int] = None
     type: Optional[str] = None
     storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
+
+class CreateIngredientWithAmount(CreateIngredientRequest):
+    quantity: Optional[int] = None
+    unit: Optional[str] = None
     
 
 class Tag(BaseModel):

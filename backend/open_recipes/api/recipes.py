@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
 from fastapi import Depends, FastAPI
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest, CreateIngredientRequest
+from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest, CreateIngredientRequest, CreateIngredientWithAmount
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
 import sqlalchemy
@@ -126,7 +126,7 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
 #     Create a new recipe
 #     """ 
 
-    try: 
+    # try: 
         with engine.begin() as conn:
             # try:
             for i, tag_dict in enumerate(body.tags):
@@ -174,7 +174,7 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
             
             for i, ingredient_dict in enumerate(body.ingredients):
                 try:
-                    ingredient = CreateIngredientRequest.parse_obj(ingredient_dict) 
+                    ingredient = CreateIngredientWithAmount.parse_obj(ingredient_dict) 
                     body.ingredients[i] = ingredient  # Attempt to parse the dictionary as a Tag
                 except ValidationError:
 
@@ -191,16 +191,19 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
             
             #Get ids of all ingrients to associate with recipe
 
-            ingredient_ids_result = conn.execute(text("SELECT id from ingredient where name = ANY(:names)"),{
+            ingredient_ids_result = conn.execute(text("SELECT id, name from ingredient where name = ANY(:names)"),{
                 "names" : [ingredient.name for ingredient in body.ingredients],
             }).fetchall()
+            print("ingredients result", ingredient_ids_result)
+            ingredients = [{"id": element[0], "name": element[1]} for element in ingredient_ids_result]
+            print("ingredients", ingredients)
+            sorted_ingredients_w_id = sorted(ingredients, key=lambda x: x['name'])
+            sorted_ingredients_w_quantity = sorted(body.ingredients, key=lambda x: x.name)
 
-            ingredient_ids = [id[0] for id in ingredient_ids_result]
+            for i, ingredient in enumerate(sorted_ingredients_w_id):
+                print(f"sorted ingredients ingredient: {sorted_ingredients_w_quantity[i]}")
+                conn.execute(text("""INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES (:recipe_id, :ingredient_id, :quantity, :unit)"""), {"recipe_id": id, "ingredient_id": ingredient["id"], "quantity": sorted_ingredients_w_quantity[i].quantity, "unit": sorted_ingredients_w_quantity[i].unit})
 
-            for ingredient_id in ingredient_ids:
-                conn.execute(text("""INSERT INTO recipe_x_ingredient (recipe_id, ingredient_id) VALUES (:recipe_id, :ingredient_id)"""), {"recipe_id", id, "ingredient_id", ingredient_id})
-
-                        
             for tag_id in tag_ids:
                 conn.execute(text("""INSERT INTO recipe_x_tag (recipe_id, tag_id) VALUES (:recipe_id, :tag_id)"""),{
                     "recipe_id" : id,
@@ -209,12 +212,15 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
 
             recipe = Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure)
             return recipe
-    except TypeError as e:
-        raise HTTPException(status_code=400, detail="Type error, probably your fault")
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=400, detail="Recipe was not created due to a database error.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+    # except TypeError as e:
+    #     print("There was a type error:", e)
+    #     raise HTTPException(status_code=400, detail="Type error, probably your fault")
+    # except SQLAlchemyError as e:
+    #     print("There was a database error:", e)
+    #     raise HTTPException(status_code=400, detail="Recipe was not created due to a database error.")
+    # except Exception as e:
+    #     print("There was an unexpected error:", e)
+    #     raise HTTPException(status_code=500, detail="An unexpected error occurred.")
         
 
 #SMOKE TESTED
