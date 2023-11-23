@@ -55,7 +55,8 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
             recipe.c.author_id,
             recipe.c.default_servings,
             recipe.c.procedure
-        )
+        
+        ).distinct()
         .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
         .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
         
@@ -106,6 +107,15 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
 
     recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in rows]
 
+    #fix the query so it never returns duplicates in the first place
+#     unique_recipes = {}
+#     for recipe in recipes_result:
+#         if recipe.id not in unique_recipes:
+#             unique_recipes[recipe.id] = recipe
+
+# #    Now, unique_recipes contains only unique recipes by id
+#     deduped_recipes_result = list(unique_recipes.values())
+
     next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
     prev_cursor = cursor - page_size if cursor > 0 else None
     
@@ -129,7 +139,7 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
     # try: 
         with engine.begin() as conn:
             # try:
-            
+
             for i, tag_dict in enumerate(body.tags):
                 try:
                     tag = Tag.parse_obj(tag_dict) 
