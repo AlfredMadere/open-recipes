@@ -10,6 +10,7 @@ from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, Po
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
 import sqlalchemy
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError, DataError, SQLAlchemyError, DBAPIError
 import uvicorn
 from pydantic import BaseModel, ValidationError
@@ -62,8 +63,14 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
         
     )
 
+    name_array = name.split(" ")
+
     if name is not None:
-        stmt = stmt.where(recipe.c.name.ilike(f"%{name}%"))
+        conditions = []
+        for i in name_array:
+            conditions.append(recipe.c.name.ilike(f"%{name}%"))
+        if conditions:
+            stmt = stmt.where(or_(*conditions))
     if max_time is not None:
         stmt = stmt.where(recipe.c.mins_cook + recipe.c.mins_prep <= max_time)
     if tag_key is not None:
