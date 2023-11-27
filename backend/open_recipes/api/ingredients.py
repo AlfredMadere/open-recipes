@@ -5,7 +5,7 @@ from typing import List, Union
 from fastapi import FastAPI
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
-from fastapi import Depends, FastAPI
+from fastapi import Depends
 from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
@@ -19,7 +19,7 @@ router = APIRouter(
 
 )
 
-
+#returns list of all available ingredients
 @router.get('', response_model=List[Ingredient])
 def get_ingredients(engine : Annotated[Engine, Depends(get_engine)]) -> List[Ingredient]:
     """
@@ -45,9 +45,9 @@ def get_ingredients(engine : Annotated[Engine, Depends(get_engine)]) -> List[Ing
     #         ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
     return ingredients
 
-
+#returns single ingredient with given ingredient_id
 @router.get('/{id}', response_model=Ingredient)
-def get_ingredient(id : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
+def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
     """
     Get an ingredient by id
     """
@@ -80,6 +80,7 @@ def get_ingredient(id : int | None,engine : Annotated[Engine, Depends(get_engine
 #                             WHERE id = :id""",{"id":id}))
 #         return "OK" 
  
+ #creates a new ingredient
 @router.post('', response_model=None, status_code=201, responses={'201': {'model': Ingredient}})
 def post_ingredients(body: Ingredient, engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Ingredient]:
     """
@@ -92,7 +93,7 @@ def post_ingredients(body: Ingredient, engine : Annotated[Engine, Depends(get_en
                                    """
                                     ), {"name":body.name, "type":body.type, "storage":body.storage, "category_id":body.category_id})
         id, name, type, storage, category_id = result.fetchone()
-        print(id, name, storage, type, category_id)
+        #print(id, name, storage, type, category_id)
 
         return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id)
     

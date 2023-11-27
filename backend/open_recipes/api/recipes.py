@@ -5,8 +5,13 @@ from typing import List, Union
 from fastapi import FastAPI, HTTPException
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
+<<<<<<< HEAD
 from fastapi import Depends, FastAPI
 from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest, CreateIngredientRequest, CreateIngredientWithAmount
+=======
+from fastapi import Depends
+from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
+>>>>>>> 3c63e5b (addressed peer review comments by changing method names and commenting out print statements and added none check in users)
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
 import sqlalchemy
@@ -26,14 +31,15 @@ class SearchResults(BaseModel):
     prev_cursor: Optional[int]
 
 
+#gets all recipes, is our search functionality
 @router.get('', response_model=SearchResults)
 def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | None = None, max_time : int | None = None, cursor: int = 0, tag_key: str | None = None, tag_value: str | None = None, use_inventory_of: int | None = None) -> SearchResults:
     """
     Get all recipes
     """
 
-    print("Name:", name)  # Debug: Print the value of name
-    print("Max Time:", max_time)  # Debug: Prin
+    #print("Name:", name)  # Debug: Print the value of name
+    #print("Max Time:", max_time)  # Debug: Prin
     #
 
     metadata_obj = sqlalchemy.MetaData()
@@ -130,6 +136,7 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
 
 #SMOKE TESTED
 #FIXME: increment created at in database
+<<<<<<< HEAD
 @router.post('',status_code=201)
 def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends(get_engine)]):
 #     """
@@ -233,10 +240,41 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
     #     print("There was an unexpected error:", e)
     #     raise HTTPException(status_code=500, detail="An unexpected error occurred.")
         
+=======
+#creates a new recipe
+@router.post('', response_model=None, status_code=201, responses={'201': {'model': CreateRecipeRequest}})
+def post_recipes(body: CreateRecipeRequest,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Recipe]:
+    """
+    Create a new recipe
+    """
+    with engine.begin() as conn:
+        result = conn.execute(text(f"""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id, procedure)
+                                   VALUES (
+                                   :name,
+                                   :mins_prep,
+                                   :mins_cook,
+                                   :description,
+                                   :default_servings,
+                                   :author_id,
+                                   :procedure)
+                                   RETURNING id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure"""
+                                   
+            ), {"name":body.name,
+             "author_id":body.author_id,
+             "mins_prep":body.mins_prep,
+             "mins_cook":body.mins_cook
+             ,"description":body.description,
+             "default_servings":body.default_servings,
+             "procedure":body.procedure})
+        id,name,mins_prep,mins_cook,description,default_servings,author_id,procedure = result.fetchone()
+        recipe = Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure)
+        return recipe
+>>>>>>> 3c63e5b (addressed peer review comments by changing method names and commenting out print statements and added none check in users)
 
 #SMOKE TESTED
-@router.get('/{id}', response_model=Recipe)
-def get_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
+#returns recipe with given id
+@router.get('/{recipe_id}', response_model=Recipe)
+def get_recipe_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
     """
     Get a recipe by id
     """
@@ -253,18 +291,21 @@ def get_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Recip
 # def delete_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
 #     pass
 
+#adds a recipe to a given recipe_list when both exist already
 @router.post('/{recipe_id}/recipe-lists/{recipe_list_id}', status_code=201, response_model=None)
 def add_recipe_to_recipe_list(recipe_id: int, recipe_list_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
     with engine.begin() as conn:
         conn.execute(text(f"INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES (:recipe_id, :recipe_list_id)"),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
         return "OK"
 
+#creates a tag for a recipe
 @router.post('/{recipe_id}/tags/{tag_id}', status_code=201, response_model=None)
 def add_recipe_tag(recipe_id: int, tag_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
     with engine.begin() as conn:
         conn.execute(text(f"INSERT INTO recipe_x_tag (recipe_id, tag_id) VALUES (:recipe_id, :tag_id)"),{"recipe_id":recipe_id,"tag_id":tag_id})
         return "OK"
 
+#returns all recipe tags in a list
 @router.get('/{recipe_id}/tags', response_model=List[Tag])
 def get_recipe_tags(recipe_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
     with engine.begin() as conn:
@@ -275,6 +316,7 @@ def get_recipe_tags(recipe_id: int,engine : Annotated[Engine, Depends(get_engine
         rows = result.fetchall()
         return [Tag(id=id, key=key, value=value) for id, key, value in rows]
 
+#associates ingredients with a given recipe
 @router.post('/{recipe_id}/ingredients/{ingredient_id}', status_code=201, response_model=None)
 def add_ingredient_to_recipe(recipe_id: int, ingredient_id: int, engine : Annotated[Engine, Depends(get_engine)]) -> None:
     with engine.begin() as conn:
@@ -282,6 +324,7 @@ def add_ingredient_to_recipe(recipe_id: int, ingredient_id: int, engine : Annota
         conn.execute(text(f"INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (:recipe_id, :ingredient_id, :quantity)"),{"recipe_id":recipe_id,"ingredient_id":ingredient_id, "quantity":1})
         return "OK"
 
+#returns a list of all ingredients with a given recipe
 @router.get('/{recipe_id}/ingredients', response_model=List[Ingredient])
 def get_recipe_ingredients(recipe_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Ingredient]:
     with engine.begin() as conn:
@@ -292,12 +335,13 @@ def get_recipe_ingredients(recipe_id: int,engine : Annotated[Engine, Depends(get
         rows = result.fetchall()
         return [Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) for id, name, type, storage, category_id in rows]
 
-@router.get('/reviews', response_model=List[Review])
-def get_reviews(engine : Annotated[Engine, Depends(get_engine)]) -> List[Review]:
-    """
-    Get all reviews
-    """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"SELECT id, stars, author_id, content, recipe_id, FROM reviews ORDER BY created_at"))
-        id, name, email, phone = result.fetchone()
-        return User(id=id, name=name, email=email, phone=phone)
+
+# @router.get('/reviews', response_model=List[Review])
+# def get_reviews(engine : Annotated[Engine, Depends(get_engine)]) -> List[Review]:
+#    """
+#    Get all reviews
+#    """
+#    with engine.begin() as conn:
+#        result = conn.execute(text(f"SELECT id, stars, author_id, content, recipe_id, FROM reviews ORDER BY created_at"))
+#        id, name, email, phone = result.fetchone()
+#        return User(id=id, name=name, email=email, phone=phone)
