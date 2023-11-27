@@ -5,13 +5,8 @@ from typing import List, Union
 from fastapi import FastAPI, HTTPException
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
-<<<<<<< HEAD
 from fastapi import Depends, FastAPI
 from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest, CreateIngredientRequest, CreateIngredientWithAmount
-=======
-from fastapi import Depends
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
->>>>>>> 3c63e5b (addressed peer review comments by changing method names and commenting out print statements and added none check in users)
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
 import sqlalchemy
@@ -136,7 +131,6 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
 
 #SMOKE TESTED
 #FIXME: increment created at in database
-<<<<<<< HEAD
 @router.post('',status_code=201)
 def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends(get_engine)]):
 #     """
@@ -240,36 +234,6 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
     #     print("There was an unexpected error:", e)
     #     raise HTTPException(status_code=500, detail="An unexpected error occurred.")
         
-=======
-#creates a new recipe
-@router.post('', response_model=None, status_code=201, responses={'201': {'model': CreateRecipeRequest}})
-def post_recipes(body: CreateRecipeRequest,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Recipe]:
-    """
-    Create a new recipe
-    """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id, procedure)
-                                   VALUES (
-                                   :name,
-                                   :mins_prep,
-                                   :mins_cook,
-                                   :description,
-                                   :default_servings,
-                                   :author_id,
-                                   :procedure)
-                                   RETURNING id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure"""
-                                   
-            ), {"name":body.name,
-             "author_id":body.author_id,
-             "mins_prep":body.mins_prep,
-             "mins_cook":body.mins_cook
-             ,"description":body.description,
-             "default_servings":body.default_servings,
-             "procedure":body.procedure})
-        id,name,mins_prep,mins_cook,description,default_servings,author_id,procedure = result.fetchone()
-        recipe = Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure)
-        return recipe
->>>>>>> 3c63e5b (addressed peer review comments by changing method names and commenting out print statements and added none check in users)
 
 #SMOKE TESTED
 #returns recipe with given id

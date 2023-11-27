@@ -1,5 +1,5 @@
 {
-  "name": "TEST COOl",
+  "name": "string",
   "mins_prep": 0,
   "mins_cook": 0,
   "description": "string",
@@ -7,12 +7,11 @@
   "procedure": "string",
   "created_at": "string",
   "author_id": 0,
-  "tags": [
-    { 
-     "key": "bob",
-     "value": "joe"
-    }
-    
-  ],
-  "ingredients": []
+  "tags": [],
+  "ingredients": [
+{
+"name": "coole ingredname",
+"storage": "FRIDGE"
+}
+]
 }
