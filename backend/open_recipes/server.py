@@ -6,11 +6,10 @@ from __future__ import annotations
 
 from typing import List, Union
 
-
 from fastapi import FastAPI, Form, Query, Request
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
-from fastapi import Depends, FastAPI
+from fastapi import Depends
 from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
@@ -39,9 +38,6 @@ app.include_router(tag_router)
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
-    
-
 
 #SMOKE TESTED
 @app.get('/recipe-lists', response_model=List[RecipeList])
@@ -73,7 +69,7 @@ def post_recipe_lists(body: CreateRecipeListRequest,engine : Annotated[Engine, D
                                     ),{"name":body.name,"description":body.description})
         
         id, name, description= result.fetchone()
-        print(id, name, description)
+        #print(id, name, description)
         return RecipeList(id=id, name=name, description=description)
 
 @app.post('/recipe-lists/{recipe_list_id}/recipe/{recipe_id}',status_code=201, response_model=Recipe)
@@ -106,7 +102,7 @@ def get_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> 
                                         WHERE rl.recipe_list_id = :list_id"""),{"list_id": id})
         rows = result.fetchall()
         recipes = [Recipe(id=row.id, name=row.name, description=row.description, mins_prep=row.mins_prep, mins_cook=row.mins_cook, default_servings=row.default_servings, author_id=row.author_id, procedure=row.procedure) for row in rows]
-        print(recipes)
+        #print(recipes)
         return RecipeListResponse(id=id, name=name, description= description, recipes=recipes)
 
 # @app.post("/recipe-lists/{id}")

@@ -1,12 +1,10 @@
 from fastapi import APIRouter
 
 from typing import List, Union
-
-
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
-from fastapi import Depends, FastAPI
+from fastapi import Depends
 from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
@@ -33,14 +31,23 @@ def get_users(engine : Annotated[Engine, Depends(get_engine)]) -> List[User]:
 
 
 @router.get('/{user_id}',response_model=User)
-def get_user(user_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[User]:
+def get_user_by_id(user_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> User:
     """
     Get one user
     """
     with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" WHERE id = :user_id"""),{"user_id":user_id})
-        id, name, email, phone = result.fetchone()
-        return User(id=id, name=name, email=email, phone=phone)
+        try:
+            result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" WHERE id = :user_id"""),{"user_id":user_id})
+            row = result.fetchone()
+            if row == None:
+                raise Exception("No user found with that given id")
+            id, name, email, phone = row
+            return User(id=id, name=name, email=email, phone=phone)
+        except Exception as e:
+            if e.args[0]:
+                raise HTTPException(status_code = 400, detail = e.args[0])
+            else:
+                raise HTTPException(status_code = 500, detail = "Unknown Error Occurred")
 
 #SMOKE TESTED
 @router.post('', response_model=None,status_code=201, responses={'201': {'model': User}})
