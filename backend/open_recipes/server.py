@@ -5,8 +5,10 @@
 from __future__ import annotations
 
 from typing import List, Union
+from sqlalchemy import exc
 
-from fastapi import FastAPI, Form, Query, Request
+
+from fastapi import FastAPI, Form, HTTPException, Query, Request
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
 from fastapi import Depends
@@ -61,31 +63,42 @@ def post_recipe_lists(body: CreateRecipeListRequest,engine : Annotated[Engine, D
     """
     Create a new recipe list
     """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO recipe_list (name, description)
-                                    VALUES (:name, :description)
-                                    RETURNING id, name, description 
-                                   """
-                                    ),{"name":body.name,"description":body.description})
-        
-        id, name, description= result.fetchone()
-        #print(id, name, description)
-        return RecipeList(id=id, name=name, description=description)
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""INSERT INTO recipe_list (name, description)
+                                        VALUES (:name, :description)
+                                        RETURNING id, name, description 
+                                    """
+                                        ),{"name":body.name,"description":body.description})
+            
+            id, name, description= result.fetchone()
+            print(id, name, description)
+            return RecipeList(id=id, name=name, description=description)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post('/recipe-lists/{recipe_list_id}/recipe/{recipe_id}',status_code=201, response_model=Recipe)
 def post_recipe_to_list(recipe_id: int, recipe_list_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
     """
     Add a recipe to a recipe list
     """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id)
-                                    VALUES (:recipe_id, :recipe_list_id)
-                                    RETURNING recipe_id, recipe_list_id 
-                                   """
-                                    ),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
-        
-        recipe_id, recipe_list_id = result.fetchone()
-        return Recipe(recipe_id=recipe_id, recipe_list_id=recipe_list_id)
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id)
+                                        VALUES (:recipe_id, :recipe_list_id)
+                                        RETURNING recipe_id, recipe_list_id 
+                                    """
+                                        ),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
+            
+            recipe_id, recipe_list_id = result.fetchone()
+            return Recipe(recipe_id=recipe_id, recipe_list_id=recipe_list_id)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 #SMOKE TESTED
 @app.get('/recipe-lists/{id}', response_model=RecipeListResponse)

@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from typing import List, Union
+from sqlalchemy import exc
 
 from fastapi import FastAPI
 from typing import Annotated, Optional
@@ -27,51 +28,67 @@ metadata_obj = sqlalchemy.MetaData()
 #returns list of all available tags
 @router.get("", response_model=None)
 def get_tags(engine : Annotated[Engine, Depends(get_engine)], cursor: int = 0, key: str | None = None, value: str | None = None, page_size: int = 10) -> Union[None, Tag]:
-    recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
-    stmt = (
-            sqlalchemy.select(
-                recipe_tag.c.id,
-                recipe_tag.c.key,
-                recipe_tag.c.value
+    try:
+        recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
+        stmt = (
+                sqlalchemy.select(
+                    recipe_tag.c.id,
+                    recipe_tag.c.key,
+                    recipe_tag.c.value
+                )
             )
+        if key is not None:
+            stmt = stmt.where(recipe_tag.c.key == key)
+        if value is not None:
+            stmt = stmt.where(recipe_tag.c.value == value)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(stmt)
+            rows = result.fetchall()
+
+        tags_result = [Tag(id=id, key=key, value=value) for id, key, value in rows]
+
+        next_cursor = None if len(tags_result) <= page_size else cursor + page_size
+        prev_cursor = cursor - page_size if cursor > 0 else None
+        
+        search_result = SearchResults(
+            prev_cursor= prev_cursor,
+            next_cursor= next_cursor,
+            tags= tags_result 
         )
-    if key is not None:
-        stmt = stmt.where(recipe_tag.c.key == key)
-    if value is not None:
-        stmt = stmt.where(recipe_tag.c.value == value)
-
-    with engine.connect() as conn:
-        result = conn.execute(stmt)
-        rows = result.fetchall()
-
-    tags_result = [Tag(id=id, key=key, value=value) for id, key, value in rows]
-
-    next_cursor = None if len(tags_result) <= page_size else cursor + page_size
-    prev_cursor = cursor - page_size if cursor > 0 else None
-    
-    search_result = SearchResults(
-        prev_cursor= prev_cursor,
-        next_cursor= next_cursor,
-        tags= tags_result 
-    )
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     return search_result
 
 
 #creates a new tag option
 @router.post("", response_model=None,status_code=201, responses={'201': {'model': Tag}})
-def post_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Tag]:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO recipe_tag (key, value) VALUES (:key, :value) RETURNING id, key, value"""),{"key":tag.key,"value":tag.value})
-        id, key, value = result.fetchone()
-        return Tag(id=id, key=key, value=value)
+def create_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Tag]:
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""INSERT INTO recipe_tag (key, value) VALUES (:key, :value) RETURNING id, key, value"""),{"key":tag.key,"value":tag.value})
+            id, key, value = result.fetchone()
+            return Tag(id=id, key=key, value=value)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-#returns tag given an id
-@router.get('/{tag_id}', response_model=List[Tag])
-def get_tag_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
-    with engine.begin() as conn:
-        
 
-        result = conn.execute(text(f"""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":id})
-        id, key, value = result.fetchone()
-        return Tag(id=id, key=key, value=value)
+@router.get('/{id}', response_model=List[Tag])
+def get_tags(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":id})
+            id, key, value = result.fetchone()
+            return Tag(id=id, key=key, value=value)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error " +  e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from typing import List, Union
-from fastapi import FastAPI, HTTPException
+
+from sqlalchemy import exc
+from fastapi import FastAPI
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
 from fastapi import Depends
@@ -23,10 +25,15 @@ def get_users(engine : Annotated[Engine, Depends(get_engine)]) -> List[User]:
     """
     Get all users
     """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" ORDER BY id"""))
-        rows= result.fetchall()
-        return [User(id=id, name=name, email=email, phone=phone) for id, name, email, phone in rows]
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" ORDER BY id"""))
+            rows= result.fetchall()
+            return [User(id=id, name=name, email=email, phone=phone) for id, name, email, phone in rows]
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 
@@ -48,6 +55,15 @@ def get_user_by_id(user_id: int,engine : Annotated[Engine, Depends(get_engine)])
                 raise HTTPException(status_code = 400, detail = e.args[0])
             else:
                 raise HTTPException(status_code = 500, detail = "Unknown Error Occurred")
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" WHERE id = :user_id"""),{"user_id":user_id})
+            id, name, email, phone = result.fetchone()
+            return User(id=id, name=name, email=email, phone=phone)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 #SMOKE TESTED
 @router.post('', response_model=None,status_code=201, responses={'201': {'model': User}})
@@ -55,43 +71,53 @@ def post_users(body: CreateUserRequest,engine : Annotated[Engine, Depends(get_en
     """
     Create a new user
     """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO "user" (name, email, phone)
-                                    VALUES (:name, :email, :phone)
-                                    RETURNING id, name, email, phone
-                                   """
-                                    ),{"name":body.name,"phone":body.phone,"email":body.email})
-        
-        id, name, email, phone = result.fetchone()
-        return User(id=id, name=name, email=email, phone=phone)
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""INSERT INTO "user" (name, email, phone)
+                                        VALUES (:name, :email, :phone)
+                                        RETURNING id, name, email, phone
+                                    """
+                                        ),{"name":body.name,"phone":body.phone,"email":body.email})
+            
+            id, name, email, phone = result.fetchone()
+            return User(id=id, name=name, email=email, phone=phone)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-# @router.post("/{id}")
-# def update_user(id: int, user : User,engine : Annotated[Engine, Depends(get_engine)]) -> User:
+# @router.post("/{user_id}")
+# def update_user(user_id: int, user : User,engine : Annotated[Engine, Depends(get_engine)]) -> User:
 
 #     with engine.begin() as conn:
-#         result = conn.execute(text(f"UPDATE users SET name = :name, email = :email, phone = :phone WHERE id = :id",{"name":user.name,"phone":user.phone,"email":user.email,"id":id}))
+#         result = conn.execute(text(f"UPDATE users SET name = :name, email = :email, phone = :phone WHERE id = :id",{"name":user.name,"phone":user.phone,"email":user.email,"id":user_id}))
 #         id, name, email, phone = result.fetchone()
 #         return User(id=id, name=name, email=email, phone=phone)
 
-# @router.delete("/{id}")
-# def delete_user(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
+# @router.delete("/{user_id}")
+# def delete_user(user_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
 #     with engine.begin() as conn:
-#         result = conn.execute(text(f"""DELETE FROM "user" WHERE id = :id"""),{"id":id})
+#         result = conn.execute(text(f"""DELETE FROM "user" WHERE id = :id"""),{"id":user_id})
 #         id, name, email, phone = result.fetchone()
 #         return User(id=id, name=name, email=email, phone=phone)
 
 @router.get("/{user_id}/ingredients/", response_model=None,status_code=200)
 def get_users_inventory(user_id: int,engine : Annotated[Engine, Depends(get_engine)]  ) -> list[Ingredient]:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""
-        SELECT id, name, type, storage, category_id
-        FROM ingredient
-        JOIN user_x_ingredient ON ingredient.id = user_x_ingredient.ingredient_id
-        WHERE user_x_ingredient.user_id = :user_id
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""
+            SELECT id, name, type, storage, category_id
+            FROM ingredient
+            JOIN user_x_ingredient ON ingredient.id = user_x_ingredient.ingredient_id
+            WHERE user_x_ingredient.user_id = :user_id
 
-"""),{"user_id":user_id})
-        rows = result.fetchall()
-        return [Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) for id, name, type, storage, category_id in rows]
+    """),{"user_id":user_id})
+            rows = result.fetchall()
+            return [Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) for id, name, type, storage, category_id in rows]
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/{user_id}/ingredients", response_model=None,status_code=201)
 def update_users_inventory(body: list[Ingredient], user_id: int, engine: Annotated[Engine, Depends(get_engine)]) -> str:
@@ -101,32 +127,42 @@ def update_users_inventory(body: list[Ingredient], user_id: int, engine: Annotat
     #for the ones without ids, search the database to see if there are any ingredients with that name and assign id if you find one, if you don't find an ingredient with that name, create one
     #You should now have an array of ingredients all with ids and with no duplicates
     #make entries in the user_x_ingredient table for each ingredient in the array
-    with engine.begin() as conn:
-        conn.execute(text("DELETE FROM user_x_ingredient WHERE user_id = :user_id"), {'user_id': user_id})
-        ingredient_dicts = [{attr: getattr(ingredient, attr) for attr in ['name', 'type', 'storage', 'category_id']} for ingredient in body]
-        unique_ingredients = {ingredient_dict['name']: ingredient_dict for ingredient_dict in ingredient_dicts}
-        values_clause = ", ".join(f"('{ingredient['name']}', " +
-                                  f"{'NULL' if ingredient['type'] is None else repr(ingredient['type'])}, " +
-                                  f"{'NULL' if ingredient['storage'] is None else repr(ingredient['storage'])}, " +
-                                  f"{'NULL' if ingredient['category_id'] is None else ingredient['category_id']})"
-                                  for ingredient in unique_ingredients.values())        
-        upsert_query = f"""
-            INSERT INTO ingredient (name, type, storage, category_id) VALUES {values_clause}
-            ON CONFLICT (name) DO NOTHING
-        """
-        conn.execute(text(upsert_query))
-        ingredient_names = list(unique_ingredients.keys())  # Use a list instead of tuple
-        ingredient_ids = conn.execute(text("SELECT id FROM ingredient WHERE name = ANY(:names)"), {'names': ingredient_names}).fetchall()
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("DELETE FROM user_x_ingredient WHERE user_id = :user_id"), {'user_id': user_id})
+            ingredient_dicts = [{attr: getattr(ingredient, attr) for attr in ['name', 'type', 'storage', 'category_id']} for ingredient in body]
+            unique_ingredients = {ingredient_dict['name']: ingredient_dict for ingredient_dict in ingredient_dicts}
+            values_clause = ", ".join(f"('{ingredient['name']}', " +
+                                    f"{'NULL' if ingredient['type'] is None else repr(ingredient['type'])}, " +
+                                    f"{'NULL' if ingredient['storage'] is None else repr(ingredient['storage'])}, " +
+                                    f"{'NULL' if ingredient['category_id'] is None else ingredient['category_id']})"
+                                    for ingredient in unique_ingredients.values())        
+            upsert_query = f"""
+                INSERT INTO ingredient (name, type, storage, category_id) VALUES {values_clause}
+                ON CONFLICT (name) DO NOTHING
+            """
+            conn.execute(text(upsert_query))
+            ingredient_names = list(unique_ingredients.keys())  # Use a list instead of tuple
+            ingredient_ids = conn.execute(text("SELECT id FROM ingredient WHERE name = ANY(:names)"), {'names': ingredient_names}).fetchall()
 
-        # Bulk insert into user_x_ingredient
-        user_ingredients_data = [{'user_id': user_id, 'ingredient_id': id_[0]} for id_ in ingredient_ids]
-        conn.execute(text("INSERT INTO user_x_ingredient (user_id, ingredient_id) VALUES (:user_id, :ingredient_id)"), user_ingredients_data)
+            # Bulk insert into user_x_ingredient
+            user_ingredients_data = [{'user_id': user_id, 'ingredient_id': id_[0]} for id_ in ingredient_ids]
+            conn.execute(text("INSERT INTO user_x_ingredient (user_id, ingredient_id) VALUES (:user_id, :ingredient_id)"), user_ingredients_data)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-
-        return "OK"
+    return "OK"
 
 @router.post("/{user_id}/ingredients/{ingredient_id}", response_model=None,status_code=201)
 def add_ingredient_to_user_inventory(user_id: int, ingredient_id: int, engine: Annotated[Engine, Depends(get_engine)]) -> str:
-    with engine.begin() as conn:
-        conn.execute(text(f"INSERT INTO user_x_ingredient (user_id, ingredient_id) VALUES (:user_id, :ingredient_id)"),{"user_id":user_id,"ingredient_id":ingredient_id})
-        return "OK"
+    try:
+        with engine.begin() as conn:
+            conn.execute(text(f"INSERT INTO user_x_ingredient (user_id, ingredient_id) VALUES (:user_id, :ingredient_id)"),{"user_id":user_id,"ingredient_id":ingredient_id})
+            return "OK"
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    

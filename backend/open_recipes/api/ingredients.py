@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from sqlalchemy import exc
 
 from typing import List, Union
 
@@ -26,12 +27,18 @@ def get_ingredients(engine : Annotated[Engine, Depends(get_engine)]) -> List[Ing
     Get all ingredients
     """
     # if user_id is None:
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
-                                FROM ingredient
-                                ORDER BY id"""))
-        rows = result.fetchall()
-        ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
+                                    FROM ingredient
+                                    ORDER BY id"""))
+            rows = result.fetchall()
+            ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error " + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
     # else:
     #     pass
     #     with engine.begin() as conn:
@@ -51,13 +58,18 @@ def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_
     """
     Get an ingredient by id
     """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
-                                   FROM ingredient
-                                   WHERE id = :id"""))
-        id, name, storage, type, category_id = result.fetchone()
-        return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
-
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
+                                    FROM ingredient
+                                    WHERE id = :id"""))
+            id, name, storage, type, category_id = result.fetchone()
+            return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error " + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 # @router.post("/{id}")
 # def update_ingredient(id: int | None, ingredient : Ingredient ,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
 #     """
@@ -86,15 +98,20 @@ def post_ingredients(body: Ingredient, engine : Annotated[Engine, Depends(get_en
     """
     Create a new ingredient
     """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO ingredient (name, type, storage, category_id)
-                                    VALUES (:name, :type, :storage, :category_id)
-                                    RETURNING id, name, type, storage, category_id
-                                   """
-                                    ), {"name":body.name, "type":body.type, "storage":body.storage, "category_id":body.category_id})
-        id, name, type, storage, category_id = result.fetchone()
-        #print(id, name, storage, type, category_id)
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(f"""INSERT INTO ingredient (name, type, storage, category_id)
+                                        VALUES (:name, :type, :storage, :category_id)
+                                        RETURNING id, name, type, storage, category_id
+                                    """
+                                        ), {"name":body.name, "type":body.type, "storage":body.storage, "category_id":body.category_id})
+            id, name, type, storage, category_id = result.fetchone()
+            print(id, name, storage, type, category_id)
 
-        return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id)
-    
+            return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error " + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        
     
