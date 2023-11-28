@@ -20,7 +20,7 @@ class User(BaseModel):
     name: str 
     email: str 
     phone: Optional[str] = None
-    dissabled: Optional[bool] = None
+    disabled: Optional[bool] = None
 
 class UserInDB(User):
     hashed_password: str
