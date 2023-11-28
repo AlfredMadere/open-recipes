@@ -49,8 +49,6 @@ from api.recipe_lists import router as recipe_list_router
 # class UserInDB(User):
 #     hashed_password: str
 
-
-
 app = FastAPI(
     title='Recipe Service API',
     version='1.0.0',
