@@ -16,21 +16,22 @@ class CreateUserRequest(BaseModel):
     phone: Optional[str] = None
 
 class User(BaseModel):
-    id: Optional[int] = None
+    id: int
+    name: str 
+    email: str 
+    phone: Optional[str] = None
+    dissabled: Optional[bool] = None
+
+class UserInDB(User):
+    hashed_password: str
+
+
+class SignUpRequest(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
+    password: Optional[str] = None
 
-    @classmethod
-    def get_by_id(cls, engine, id):
-        with engine.connect() as conn:
-            result = conn.execute(
-                f"""
-                SELECT * FROM users WHERE id = {id}
-                """
-            )
-            user = result.first()
-            return cls(*user)
 
 class RecepieTag(BaseModel):
     id: Optional[int] = None
