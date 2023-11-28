@@ -11,6 +11,8 @@ from sqlalchemy import exc
 from fastapi import FastAPI, Form, HTTPException, Query, Request
 from typing import Annotated, Optional
 from sqlalchemy.engine import Engine
+from fastapi import Depends, FastAPI, HTTPException, status
+
 from fastapi import Depends
 from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
 from open_recipes.database import get_engine 
@@ -21,7 +23,31 @@ from pydantic import BaseModel
 from open_recipes.api.users import router as user_router
 from open_recipes.api.recipes import router as recipe_router 
 from open_recipes.api.ingredients import router as ingredient_router
-from open_recipes.api.tags import router as tag_router 
+from open_recipes.api.tags import router as tag_router
+from fastapi.security import OAuth2PasswordBearer
+from datetime import datetime, timedelta
+from typing import Optional
+from models import User, UserInDB, SignUpRequest
+from passlib.context import CryptContext
+from jose import JWTError, jwt
+from api.auth import oauth2_scheme, create_access_token, get_current_active_user
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from api.auth import router as auth_router
+from api.recipe_lists import router as recipe_list_router
+
+
+
+
+
+# class User(BaseModel):
+#     username: str
+#     email: str | None = None
+#     full_name: str | None = None
+#     disabled: bool | None = None
+
+
+# class UserInDB(User):
+#     hashed_password: str
 
 
 
@@ -35,107 +61,24 @@ app.include_router(user_router)
 app.include_router(recipe_router)
 app.include_router(ingredient_router)
 app.include_router(tag_router)
+app.include_router(
+    auth_router,
+)
+app.include_router(
+    recipe_list_router
+)
+
+
+
 
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+def read_root(token: Annotated[str, Depends(oauth2_scheme)]):
+    return {"Hello": "World",
+            "token": token
+            }
 
 #SMOKE TESTED
-@app.get('/recipe-lists', response_model=List[RecipeList])
-def get_recipe_lists(engine : Annotated[Engine, Depends(get_engine)]) -> List[RecipeList]:
-    """
-    Get all recipe lists
-    """
-    recipeListAll = []
-    with engine.begin() as conn:
-        result = conn.execute(text(f"SELECT id, name, description FROM recipe_list ORDER BY id"))
-        rows = result.fetchall()
-        for row in rows: 
-            id, name, description = row
-            recipe = RecipeList(id=id, name=name, description=description)
-            recipeListAll.append(recipe)
-        return recipeListAll
-@app.post(
-    '/recipe-lists', response_model=None, status_code=201, responses={'201': {'model': RecipeList}}
-)
-def post_recipe_lists(body: CreateRecipeListRequest,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, RecipeList]:
-    """
-    Create a new recipe list
-    """
-    try:
-        with engine.begin() as conn:
-            result = conn.execute(text(f"""INSERT INTO recipe_list (name, description)
-                                        VALUES (:name, :description)
-                                        RETURNING id, name, description 
-                                    """
-                                        ),{"name":body.name,"description":body.description})
-            
-            id, name, description= result.fetchone()
-            print(id, name, description)
-            return RecipeList(id=id, name=name, description=description)
-    except exc.SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Database error "  + e._message())
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post('/recipe-lists/{recipe_list_id}/recipe/{recipe_id}',status_code=201, response_model=Recipe)
-def post_recipe_to_list(recipe_id: int, recipe_list_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
-    """
-    Add a recipe to a recipe list
-    """
-    try:
-        with engine.begin() as conn:
-            result = conn.execute(text(f"""INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id)
-                                        VALUES (:recipe_id, :recipe_list_id)
-                                        RETURNING recipe_id, recipe_list_id 
-                                    """
-                                        ),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
-            
-            recipe_id, recipe_list_id = result.fetchone()
-            return Recipe(recipe_id=recipe_id, recipe_list_id=recipe_list_id)
-    except exc.SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Database error "  + e._message())
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-#SMOKE TESTED
-@app.get('/recipe-lists/{id}', response_model=RecipeListResponse)
-def get_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> RecipeList:
-    """
-    Get a recipe list by id
-    """
-    with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, name, description FROM recipe_list WHERE id = :recipe_id"""),{"recipe_id": id})
-        id, name, description = result.fetchone()
-        result = conn.execute(text(f"""SELECT id, name, description, mins_prep, mins_cook, default_servings, author_id, procedure
-                                        FROM recipe
-                                        JOIN recipe_x_recipe_list AS rl ON rl.recipe_id = recipe.id
-                                        WHERE rl.recipe_list_id = :list_id"""),{"list_id": id})
-        rows = result.fetchall()
-        recipes = [Recipe(id=row.id, name=row.name, description=row.description, mins_prep=row.mins_prep, mins_cook=row.mins_cook, default_servings=row.default_servings, author_id=row.author_id, procedure=row.procedure) for row in rows]
-        #print(recipes)
-        return RecipeListResponse(id=id, name=name, description= description, recipes=recipes)
-
-# @app.post("/recipe-lists/{id}")
-# def update_recipe_list(id: int, recipe_list : RecipeList, engine : Annotated[Engine, Depends(get_engine)]) -> RecipeList:
-#     with engine.begin() as conn:
-#         result = conn.execute(text(f"""UPDATE recipe_list 
-#                                    SET name = :name, description = :description
-#                                    WHERE id = :id""",{"name":recipe_list.name, "description":recipe_list.description, "id":id}))
-#         id, name, description = result.fetchone()
-#         return RecipeList(id=id, name=name, description=description)
-
-# @app.delete("/recipe-lists/{id}")
-# def delete_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
-#     with engine.begin() as conn:
-#         result = conn.execute(text(f"""DELETE FROM recipe_list 
-#                                    WHER
-#                                    default_servings, procedure FROM "recipe" """))
-#         id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure = result.fetchone()
-#         return Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure)
- 
 
 
 class SearchResults(BaseModel):

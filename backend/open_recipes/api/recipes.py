@@ -14,6 +14,7 @@ import sqlalchemy
 from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError, DataError, SQLAlchemyError, DBAPIError
 import uvicorn
 from pydantic import BaseModel, ValidationError
+from api.auth import get_current_user, TokenData
 
 router = APIRouter(
   prefix="/recipes",
@@ -29,7 +30,7 @@ class SearchResults(BaseModel):
 
 #gets all recipes, is our search functionality
 @router.get('', response_model=SearchResults)
-def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | None = None, max_time : int | None = None, cursor: int = 0, tag_key: str | None = None, tag_value: str | None = None, use_inventory_of: int | None = None) -> SearchResults:
+def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | None = None, max_time : int | None = None, cursor: int = 0, tag_key: str | None = None, tag_value: str | None = None, use_inventory_of: int | None = None, current_user: TokenData = Depends(get_current_user),) -> SearchResults:
     """
     Get all recipes
     """
@@ -38,6 +39,18 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
     #print("Max Time:", max_time)  # Debug: Prin
     #
     try:
+        metadata_obj = sqlalchemy.MetaData()
+        recipe = sqlalchemy.Table("recipe", metadata_obj, autoload_with=engine)
+        recipe_x_tag = sqlalchemy.Table("recipe_x_tag", metadata_obj, autoload_with=engine)
+        recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
+        recipe_ingredients= sqlalchemy.Table("recipe_ingredients", metadata_obj, autoload_with=engine)
+        user_x_ingredient= sqlalchemy.Table("user_x_ingredient", metadata_obj, autoload_with=engine)
+        page_size = 10
+
+        if (use_inventory_of):
+            use_inventory_of = current_user.id
+    
+
         metadata_obj = sqlalchemy.MetaData()
         recipe = sqlalchemy.Table("recipe", metadata_obj, autoload_with=engine)
         recipe_x_tag = sqlalchemy.Table("recipe_x_tag", metadata_obj, autoload_with=engine)
@@ -88,44 +101,75 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
                         recipe.c.author_id,
                         recipe.c.default_servings,
                         recipe.c.procedure
-                    )
-                    .having(
-                        func.count(distinct(recipe_ingredients.c.ingredient_id)) == 
-                        func.count(distinct(case((user_x_ingredient.c.ingredient_id != None, recipe_ingredients.c.ingredient_id),)))
-                    )
+                    
+                    ).distinct()
+                    .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
+                    .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
+                    
+                )
+
+            if name is not None:
+                stmt = stmt.where(recipe.c.name.ilike(f"%{name}%"))
+            if max_time is not None:
+                stmt = stmt.where(recipe.c.mins_cook + recipe.c.mins_prep <= max_time)
+            if tag_key is not None:
+                stmt = stmt.where(recipe_tag.c.key == tag_key)
+            if tag_value is not None:
+                stmt = stmt.where(recipe_tag.c.value == tag_value)
+            if use_inventory_of is not None:
+                stmt = (stmt
+                        .join(recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id)
+                        .outerjoin(user_x_ingredient, 
+                                (recipe_ingredients.c.ingredient_id == user_x_ingredient.c.ingredient_id) & 
+                                (user_x_ingredient.c.user_id == use_inventory_of))
+                        .group_by(
+                            recipe.c.id,
+                            recipe.c.name,
+                            recipe.c.mins_prep,
+                            recipe.c.category_id,
+                            recipe.c.mins_cook,
+                            recipe.c.description,
+                            recipe.c.author_id,
+                            recipe.c.default_servings,
+                            recipe.c.procedure
+                        )
+                        .having(
+                            func.count(distinct(recipe_ingredients.c.ingredient_id)) == 
+                            func.count(distinct(case((user_x_ingredient.c.ingredient_id != None, recipe_ingredients.c.ingredient_id),)))
+                        )
+                )
+
+            stmt = (stmt.limit(page_size + 1)
+                .offset(cursor)
+                .order_by(recipe.c.name)
             )
 
-        stmt = (stmt.limit(page_size + 1)
-            .offset(cursor)
-            .order_by(recipe.c.name)
-        )
 
+            print('statement', stmt)
+            
+            with engine.connect() as conn:
+                result = conn.execute(stmt)
+                rows = result.fetchall()
 
-        print('statement', stmt)
-        
-        with engine.connect() as conn:
-            result = conn.execute(stmt)
-            rows = result.fetchall()
+            recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in rows]
 
-        recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in rows]
+            #fix the query so it never returns duplicates in the first place
+        #     unique_recipes = {}
+        #     for recipe in recipes_result:
+        #         if recipe.id not in unique_recipes:
+        #             unique_recipes[recipe.id] = recipe
 
-        #fix the query so it never returns duplicates in the first place
-    #     unique_recipes = {}
-    #     for recipe in recipes_result:
-    #         if recipe.id not in unique_recipes:
-    #             unique_recipes[recipe.id] = recipe
+        # #    Now, unique_recipes contains only unique recipes by id
+        #     deduped_recipes_result = list(unique_recipes.values())
 
-    # #    Now, unique_recipes contains only unique recipes by id
-    #     deduped_recipes_result = list(unique_recipes.values())
-
-        next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
-        prev_cursor = cursor - page_size if cursor > 0 else None
-        
-        search_result = SearchResults(
-            prev_cursor= prev_cursor,
-            next_cursor= next_cursor,
-            recipe= recipes_result 
-        )
+            next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
+            prev_cursor = cursor - page_size if cursor > 0 else None
+            
+            search_result = SearchResults(
+                prev_cursor= prev_cursor,
+                next_cursor= next_cursor,
+                recipe= recipes_result 
+            )
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error " + e._message())
     except Exception as e:
