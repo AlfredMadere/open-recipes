@@ -81,8 +81,8 @@ def create_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_eng
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get('/{id}', response_model=List[Tag])
-def get_tags(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
+@router.get('/{tag_id}', response_model=List[Tag])
+def get_tag_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
     try:
         with engine.begin() as conn:
             result = conn.execute(text(f"""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":id})

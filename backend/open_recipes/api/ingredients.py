@@ -17,8 +17,6 @@ from pydantic import BaseModel
 
 router = APIRouter(
   prefix="/ingredients",
-
-
 )
 
 #returns list of all available ingredients
@@ -57,7 +55,7 @@ def get_ingredients(engine : Annotated[Engine, Depends(get_engine)], current_use
     return ingredients
 
 #returns single ingredient with given ingredient_id
-@router.get('/{id}', response_model=Ingredient)
+@router.get('/{ingredient_id}', response_model=Ingredient)
 def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
     """
     Get an ingredient by id
@@ -98,7 +96,7 @@ def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_
  
  #creates a new ingredient
 @router.post('', response_model=None, status_code=201, responses={'201': {'model': Ingredient}})
-def post_ingredients(body: Ingredient, engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Ingredient]:
+def create_ingredients(body: Ingredient, engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Ingredient]:
     """
     Create a new ingredient
     """

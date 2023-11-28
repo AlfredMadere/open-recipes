@@ -17,8 +17,6 @@ from pydantic import BaseModel
 
 router = APIRouter(
   prefix="/users",
-
-
 )
 
 @router.get("")
@@ -68,7 +66,7 @@ def get_user_by_id(user_id: int,engine : Annotated[Engine, Depends(get_engine)])
 
 #SMOKE TESTED
 @router.post('', response_model=None,status_code=201, responses={'201': {'model': User}})
-def post_users(body: CreateUserRequest,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, User]:
+def create_users(body: CreateUserRequest,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, User]:
     """
     Create a new user
     """

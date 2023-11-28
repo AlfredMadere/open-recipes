@@ -18,8 +18,6 @@ from api.auth import get_current_user, TokenData
 
 router = APIRouter(
   prefix="/recipes",
-
-
 )
 
 class SearchResults(BaseModel):
