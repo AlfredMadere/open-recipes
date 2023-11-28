@@ -11,7 +11,6 @@ from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, Po
 from open_recipes.database import get_engine 
 from sqlalchemy import text, func, distinct, case
 import sqlalchemy
-from .auth import get_current_user, TokenData
 import uvicorn
 from pydantic import BaseModel
 
@@ -23,19 +22,16 @@ router = APIRouter(
 
 #returns list of all available ingredients
 @router.get('', response_model=List[Ingredient])
-def get_ingredients(engine : Annotated[Engine, Depends(get_engine)], current_user: TokenData = Depends(get_current_user), ) -> List[Ingredient]:
+def get_ingredients(engine : Annotated[Engine, Depends(get_engine)]) -> List[Ingredient]:
     """
     Get all ingredients
     """
     # if user_id is None:
-    user_id = current_user.id
     try:
         with engine.begin() as conn:
             result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
                                     FROM ingredient
-                                JOIN user_x_ingredient ON ingredient.id = user_x_ingredient.ingredient_id
-                                WHERE user_x_ingredient.user_id = :user
-                                    ORDER BY id"""), {"user": user_id})
+                                    ORDER BY id"""))
             rows = result.fetchall()
             ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
     except exc.SQLAlchemyError as e:

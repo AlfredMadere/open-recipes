@@ -12,7 +12,6 @@ from open_recipes.database import get_engine
 from sqlalchemy import text, func, distinct, case
 import sqlalchemy
 import uvicorn
-from .auth import get_current_active_user
 from pydantic import BaseModel
 
 router = APIRouter(
@@ -167,10 +166,3 @@ def add_ingredient_to_user_inventory(user_id: int, ingredient_id: int, engine: A
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-
-
-@router.get("/me/", response_model=User)
-async def read_users_me(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
-    return current_user
