@@ -14,7 +14,7 @@ import axios from "axios";
 interface FormValues {
   name: string;
   description: string;
-  default_servings: string;
+  default_servings: number;
   mins_prep: string;
   mins_cook: string;
   procedure: string;
@@ -38,7 +38,7 @@ export default function Page() {
     defaultValues: {
       name: "",
       description: "",
-      default_servings: "",
+      default_servings: undefined,
       mins_prep: "",
       mins_cook: "",
       procedure: "",
@@ -68,9 +68,31 @@ export default function Page() {
     control, // control props comes from useForm (optional: if you are using FormContext)
     name: "ingredients", // unique name for your Field Array
   });
+  async function postData(data) {
+    axios.post(
+      "https://open-recipes.onrender.com/test-post",
+      data,
+    )
+    .then(function (response) {
+     // console.log(response);
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+  }
 
+const requireIntegerInput = (newValue, onChange) => {
+  // Use parseInt to convert the string to an integer
+  const integerValue = parseInt(newValue, 10);
+
+  // Check if the parsed value is a valid integer
+  if (!isNaN(integerValue) || newValue === "") {
+    onChange(integerValue);
+  }
+};
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
+    postData(data)
     const newData = data;
     newData.author_id = '0';
     newData.created_at = Date().toLocaleString();
@@ -126,8 +148,9 @@ export default function Page() {
             <TextInput
               style={errors["default_servings"] ? styles.error : styles.input}
               onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
+              onChangeText={(newValue) => requireIntegerInput (newValue, onChange)}        
               value={value}
+              keyboardType="numeric"
             />
           )}
           name="default_servings"
@@ -338,7 +361,7 @@ export default function Page() {
             reset({
                 name: "",
                 description: "",
-                default_servings: "",
+                default_servings: undefined,
                 mins_prep: "",
                 mins_cook: "",
                 procedure: "",
@@ -352,16 +375,6 @@ export default function Page() {
           color="green"
           onPress={() => {
             handleSubmit(onSubmit)();
-            reset({
-              name: "",
-              description: "",
-              default_servings: "",
-              mins_prep: "",
-              mins_cook: "",
-              procedure: "",
-              tags: [{ category: "", value: "" }],
-              ingredients: [{ quantity: "", units: "", value: "" }],
-            });
           }}
         />
       </View>
