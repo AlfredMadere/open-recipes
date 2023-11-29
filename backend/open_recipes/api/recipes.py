@@ -11,6 +11,7 @@ from open_recipes.api.auth import TokenData, get_current_user
 from open_recipes.database import get_engine
 from open_recipes.models import (CreateIngredientWithAmount,
                                  CreateRecipeRequest, Ingredient, Recipe, Tag)
+from open_recipes.database import recipe, recipe_x_tag, recipe_tag, recipe_ingredients, user_x_ingredient
 
 router = APIRouter(
   prefix="/recipes",
@@ -32,28 +33,20 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
     #print("Max Time:", max_time)  # Debug: Prin
     #
     try:
-        metadata_obj = sqlalchemy.MetaData()
-        recipe = sqlalchemy.Table("recipe", metadata_obj, autoload_with=engine)
-        recipe_x_tag = sqlalchemy.Table("recipe_x_tag", metadata_obj, autoload_with=engine)
-        recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
-        recipe_ingredients= sqlalchemy.Table("recipe_ingredients", metadata_obj, autoload_with=engine)
-        user_x_ingredient= sqlalchemy.Table("user_x_ingredient", metadata_obj, autoload_with=engine)
+       
         page_size = 10
 
         if (use_inventory_of):
             use_inventory_of = current_user.id
-    
-    
 
 
-
-        metadata_obj = sqlalchemy.MetaData()
-        recipe = sqlalchemy.Table("recipe", metadata_obj, autoload_with=engine)
-        recipe_x_tag = sqlalchemy.Table("recipe_x_tag", metadata_obj, autoload_with=engine)
-        recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
-        recipe_ingredients= sqlalchemy.Table("recipe_ingredients", metadata_obj, autoload_with=engine)
-        user_x_ingredient= sqlalchemy.Table("user_x_ingredient", metadata_obj, autoload_with=engine)
-        page_size = 10
+        # metadata_obj = sqlalchemy.MetaData()
+        # recipe = sqlalchemy.Table("recipe", metadata_obj, autoload_with=engine)
+        # recipe_x_tag = sqlalchemy.Table("recipe_x_tag", metadata_obj, autoload_with=engine)
+        # recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
+        # recipe_ingredients= sqlalchemy.Table("recipe_ingredients", metadata_obj, autoload_with=engine)
+        # user_x_ingredient= sqlalchemy.Table("user_x_ingredient", metadata_obj, autoload_with=engine)
+        # page_size = 10
 
         stmt = (
             sqlalchemy.select(
