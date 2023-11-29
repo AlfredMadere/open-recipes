@@ -48,6 +48,7 @@ class CreateRecipeRequest(BaseModel):
     procedure: Optional[str] = None
     created_at: Optional[str] = None
     author_id: Optional[int] = None 
+    calories: Optional[int] = None
     tags: Optional[List[Any]] = []   # List of CreateTagRequest
     ingredients: Optional[List[Any]] = []  # List of CreateIngredientRequest
 
@@ -61,6 +62,7 @@ class Recipe(BaseModel):
     created_at: Optional[str] = None
     author_id: Optional[str] = None
     procedure: Optional[str] = None
+    calories: Optional[int] = None
 
     def get_author(self, engine):
         with engine.connect() as conn:

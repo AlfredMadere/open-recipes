@@ -67,7 +67,8 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
                 recipe.c.description,
                 recipe.c.author_id,
                 recipe.c.default_servings,
-                recipe.c.procedure
+                recipe.c.procedure,
+                recipe.c.calories
             
             ).distinct()
             .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
@@ -98,8 +99,8 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
                         recipe.c.description,
                         recipe.c.author_id,
                         recipe.c.default_servings,
-                        recipe.c.procedure
-                    
+                        recipe.c.procedure,
+                        recipe.c.calories
                     ).distinct()
                     .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
                     .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
@@ -129,7 +130,8 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
                             recipe.c.description,
                             recipe.c.author_id,
                             recipe.c.default_servings,
-                            recipe.c.procedure
+                            recipe.c.procedure,
+                            recipe.c.calories
                         )
                         .having(
                             func.count(distinct(recipe_ingredients.c.ingredient_id)) == 
@@ -149,7 +151,7 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
                 result = conn.execute(stmt)
                 rows = result.fetchall()
 
-            recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure in rows]
+            recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure, calories=calories) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure, calories in rows]
 
             #fix the query so it never returns duplicates in the first place
         #     unique_recipes = {}
@@ -209,7 +211,7 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
 
             tag_ids = [id[0] for id in result]
 
-            result = conn.execute(text(f"""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id, procedure)
+            result = conn.execute(text(f"""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id, procedure,calories)
                                     VALUES (
                                     :name,
                                     :mins_prep,
@@ -217,7 +219,8 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
                                     :description,
                                     :default_servings,
                                     :author_id,
-                                    :procedure)
+                                    :procedure,
+                                    :calories)
                                     RETURNING id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure"""
                                     
                 ), {"name":body.name,
@@ -226,8 +229,9 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
                 "mins_cook":body.mins_cook
                 ,"description":body.description,
                 "default_servings":body.default_servings,
-                "procedure":body.procedure})
-            id,name,mins_prep,mins_cook,description,default_servings,author_id,procedure = result.fetchone()
+                "procedure":body.procedure,
+                "calories":body.calories})
+            id,name,mins_prep,mins_cook,description,default_servings,author_id,procedure,calories = result.fetchone()
 
             #Convert ingredient dict to Model and insert missing ingredients
             
@@ -269,7 +273,7 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
                     "tag_id" : tag_id
                 })
 
-            recipe = Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure)
+            recipe = Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure, calories=calories)
             return recipe
     except TypeError as e:
         print("There was a type error:", e)
@@ -291,9 +295,9 @@ def get_recipe_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) ->
     """
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure FROM recipe WHERE id = :id"""),{"id":id})
-            id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure = result.fetchone()
-            return Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure)
+            result = conn.execute(text(f"""SELECT id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories FROM recipe WHERE id = :id"""),{"id":id})
+            id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure, calories = result.fetchone()
+            return Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure, calories=calories)
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error "  + e._message())
     except Exception as e:

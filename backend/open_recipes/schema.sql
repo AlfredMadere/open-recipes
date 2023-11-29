@@ -123,6 +123,7 @@ create table recipe
         references recipe_list,
     mins_cook        integer,
     description      text,
+    calories          integer,
     author_id        integer
         references "user",
     default_servings integer,
