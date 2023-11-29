@@ -340,6 +340,7 @@ def test_user_inventory_search():
 
     # create recipe
     response_recipe1 = client.post(f'/recipes', json=recipe_1_popo)
+    print(response_recipe1)
     assert response_recipe1.status_code == 201
     recipe_id1 = response_recipe1.json()['id']
 
@@ -378,6 +379,7 @@ def test_user_inventory_search():
 def test_get_ingredients_from_recipe():
     # Create a recipe
     response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
+    print(response)
     recipe_id1 = response.json()['id']
     # Create another recipe
     response2 = client.post(f'/recipes', json={'name': 'Penne and Butter', 'procedure': 'Cook penne, add butter'})
@@ -432,6 +434,7 @@ def test_flow_2():
     recipe_list_id = response.json()['id']
     # Create a recipe
     response = client.post("/recipes", json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
+    print(response)
     assert response.status_code == 201
 
     # Get the recipe ID from the response

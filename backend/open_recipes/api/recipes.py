@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from typing import List, Union
+from typing import List, Literal, Union
 from sqlalchemy import exc
 
 from fastapi import FastAPI, HTTPException
@@ -28,11 +28,10 @@ class SearchResults(BaseModel):
 
 #gets all recipes, is our search functionality
 @router.get('', response_model=SearchResults)
-def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | None = None, max_time : int | None = None, cursor: int = 0, tag_key: str | None = None, tag_value: str | None = None, use_inventory_of: int | None = None, current_user: TokenData = Depends(get_current_user),) -> SearchResults:
+def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | None = None, max_time : int | None = None, cursor: int = 0, tag_key: str | None = None, tag_value: str | None = None, use_inventory_of: int | None = None, current_user: TokenData = Depends(get_current_user),order_by : Literal["calories"] | Literal["name"] = "name") -> SearchResults:
     """
     Get all recipes
     """
-
     #print("Name:", name)  # Debug: Print the value of name
     #print("Max Time:", max_time)  # Debug: Prin
     #
@@ -48,6 +47,9 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
         if (use_inventory_of):
             use_inventory_of = current_user.id
     
+    
+
+
 
         metadata_obj = sqlalchemy.MetaData()
         recipe = sqlalchemy.Table("recipe", metadata_obj, autoload_with=engine)
@@ -107,51 +109,24 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
                     
                 )
 
-            if name is not None:
-                stmt = stmt.where(recipe.c.name.ilike(f"%{name}%"))
-            if max_time is not None:
-                stmt = stmt.where(recipe.c.mins_cook + recipe.c.mins_prep <= max_time)
-            if tag_key is not None:
-                stmt = stmt.where(recipe_tag.c.key == tag_key)
-            if tag_value is not None:
-                stmt = stmt.where(recipe_tag.c.value == tag_value)
-            if use_inventory_of is not None:
-                stmt = (stmt
-                        .join(recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id)
-                        .outerjoin(user_x_ingredient, 
-                                (recipe_ingredients.c.ingredient_id == user_x_ingredient.c.ingredient_id) & 
-                                (user_x_ingredient.c.user_id == use_inventory_of))
-                        .group_by(
-                            recipe.c.id,
-                            recipe.c.name,
-                            recipe.c.mins_prep,
-                            recipe.c.category_id,
-                            recipe.c.mins_cook,
-                            recipe.c.description,
-                            recipe.c.author_id,
-                            recipe.c.default_servings,
-                            recipe.c.procedure,
-                            recipe.c.calories
-                        )
-                        .having(
-                            func.count(distinct(recipe_ingredients.c.ingredient_id)) == 
-                            func.count(distinct(case((user_x_ingredient.c.ingredient_id != None, recipe_ingredients.c.ingredient_id),)))
-                        )
-                )
-
+        if order_by == "calories":
+            stmt = (stmt.limit(page_size + 1)
+            .offset(cursor)
+            .order_by(recipe.c.calories)
+        )
+        else:
             stmt = (stmt.limit(page_size + 1)
                 .offset(cursor)
                 .order_by(recipe.c.name)
             )
 
 
-            print('statement', stmt)
-            
-            with engine.connect() as conn:
-                result = conn.execute(stmt)
-                rows = result.fetchall()
-
-            recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure, calories=calories) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure, calories in rows]
+        
+        with engine.connect() as conn:
+            result = conn.execute(stmt)
+            rows = result.fetchall()
+            print("rows", rows)
+        recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure, calories=calories) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure, calories in rows]
 
             #fix the query so it never returns duplicates in the first place
         #     unique_recipes = {}
@@ -162,20 +137,21 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
         # #    Now, unique_recipes contains only unique recipes by id
         #     deduped_recipes_result = list(unique_recipes.values())
 
-            next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
-            prev_cursor = cursor - page_size if cursor > 0 else None
-            
-            search_result = SearchResults(
-                prev_cursor= prev_cursor,
-                next_cursor= next_cursor,
-                recipe= recipes_result 
-            )
+        next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
+        prev_cursor = cursor - page_size if cursor > 0 else None
+        search_result = SearchResults(
+            prev_cursor= prev_cursor,
+            next_cursor= next_cursor,
+            recipe= recipes_result 
+        )
+        print("search result", search_result)
+        return search_result
+
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error " + e._message())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return search_result
 
 
 #SMOKE TESTED
@@ -221,7 +197,7 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
                                     :author_id,
                                     :procedure,
                                     :calories)
-                                    RETURNING id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure"""
+                                    RETURNING id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories"""
                                     
                 ), {"name":body.name,
                 "author_id":body.author_id,
