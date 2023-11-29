@@ -14,7 +14,7 @@ import sqlalchemy
 from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError, DataError, SQLAlchemyError, DBAPIError
 import uvicorn
 from pydantic import BaseModel, ValidationError
-from api.auth import get_current_user, TokenData
+from open_recipes.api.auth import get_current_user, TokenData
 
 router = APIRouter(
   prefix="/recipes",

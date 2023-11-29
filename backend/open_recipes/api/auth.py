@@ -19,7 +19,7 @@ from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from typing import Optional
-from models import User, UserInDB, SignUpRequest
+from open_recipes.models import User, UserInDB, SignUpRequest
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 

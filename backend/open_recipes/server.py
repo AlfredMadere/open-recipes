@@ -27,13 +27,13 @@ from open_recipes.api.tags import router as tag_router
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from typing import Optional
-from models import User, UserInDB, SignUpRequest
+from open_recipes.models import User, UserInDB, SignUpRequest
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from api.auth import oauth2_scheme, create_access_token, get_current_active_user
+from open_recipes.api.auth import oauth2_scheme, create_access_token, get_current_active_user
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from api.auth import router as auth_router
-from api.recipe_lists import router as recipe_list_router
+from open_recipes.api.auth import router as auth_router
+from open_recipes.api.recipe_lists import router as recipe_list_router
 
 
 
