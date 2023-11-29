@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy import exc, text
 from sqlalchemy.engine import Engine
 
-from open_recipes.database import get_engine
+from open_recipes.database import get_engine, recipe_tag
 from open_recipes.models import CreateTagRequest, Tag
 
 router = APIRouter(
@@ -24,7 +24,6 @@ metadata_obj = sqlalchemy.MetaData()
 @router.get("", response_model=None)
 def get_tags(engine : Annotated[Engine, Depends(get_engine)], cursor: int = 0, key: str | None = None, value: str | None = None, page_size: int = 10) -> Union[None, Tag]:
     try:
-        recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
         stmt = (
                 sqlalchemy.select(
                     recipe_tag.c.id,
