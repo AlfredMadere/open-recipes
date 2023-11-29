@@ -4,40 +4,20 @@
 
 from __future__ import annotations
 
-from typing import List, Union
-from sqlalchemy import exc
+from typing import Annotated, List, Optional
 
-
-from fastapi import FastAPI, Form, HTTPException, Query, Request
-from typing import Annotated, Optional
-from sqlalchemy.engine import Engine
-from fastapi import Depends, FastAPI, HTTPException, status
-
-from fastapi import Depends
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
-from open_recipes.database import get_engine 
-from sqlalchemy import text, func, distinct, case
-import sqlalchemy
 import uvicorn
+from fastapi import Depends, FastAPI, Request
 from pydantic import BaseModel
-from open_recipes.api.users import router as user_router
-from open_recipes.api.recipes import router as recipe_router 
-from open_recipes.api.ingredients import router as ingredient_router
-from open_recipes.api.tags import router as tag_router
-from fastapi.security import OAuth2PasswordBearer
-from datetime import datetime, timedelta
-from typing import Optional
-from open_recipes.models import User, UserInDB, SignUpRequest
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from open_recipes.api.auth import oauth2_scheme, create_access_token, get_current_active_user
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
+from open_recipes.api.auth import oauth2_scheme
 from open_recipes.api.auth import router as auth_router
+from open_recipes.api.ingredients import router as ingredient_router
 from open_recipes.api.recipe_lists import router as recipe_list_router
-
-
-
-
+from open_recipes.api.recipes import router as recipe_router
+from open_recipes.api.tags import router as tag_router
+from open_recipes.api.users import router as user_router
+from open_recipes.models import Recipe
 
 # class User(BaseModel):
 #     username: str
@@ -151,8 +131,6 @@ async def test_post(request: Request):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     config = uvicorn.Config(
         app, port=3000, log_level="info", reload=True
     )

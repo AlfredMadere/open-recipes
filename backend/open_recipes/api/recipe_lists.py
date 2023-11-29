@@ -1,17 +1,14 @@
-from fastapi import APIRouter
+from typing import Annotated, List, Optional, Union
 
-from typing import List, Union
-
-from fastapi import FastAPI
-from typing import Annotated, Optional
-from sqlalchemy.engine import Engine
-from fastapi import Depends
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
-from open_recipes.database import get_engine 
-from sqlalchemy import text, func, distinct, case
 import sqlalchemy
-import uvicorn
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+from sqlalchemy import text
+from sqlalchemy.engine import Engine
+
+from open_recipes.database import get_engine
+from open_recipes.models import (CreateRecipeListRequest, Recipe, RecipeList,
+                                 RecipeListResponse, Tag)
 
 router = APIRouter(
   prefix="/recipe-lists",
@@ -30,7 +27,7 @@ def get_recipe_lists(engine : Annotated[Engine, Depends(get_engine)]) -> List[Re
     """
     recipeListAll = []
     with engine.begin() as conn:
-        result = conn.execute(text(f"SELECT id, name, description FROM recipe_list ORDER BY id"))
+        result = conn.execute(text("SELECT id, name, description FROM recipe_list ORDER BY id"))
         rows = result.fetchall()
         for row in rows: 
             id, name, description = row
@@ -45,7 +42,7 @@ def post_recipe_lists(body: CreateRecipeListRequest,engine : Annotated[Engine, D
     Create a new recipe list
     """
     with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO recipe_list (name, description)
+        result = conn.execute(text("""INSERT INTO recipe_list (name, description)
                                     VALUES (:name, :description)
                                     RETURNING id, name, description 
                                    """
@@ -61,7 +58,7 @@ def post_recipe_to_list(recipe_id: int, recipe_list_id: int,engine : Annotated[E
     Add a recipe to a recipe list
     """
     with engine.begin() as conn:
-        result = conn.execute(text(f"""INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id)
+        result = conn.execute(text("""INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id)
                                     VALUES (:recipe_id, :recipe_list_id)
                                     RETURNING recipe_id, recipe_list_id 
                                    """
@@ -77,9 +74,9 @@ def get_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> 
     Get a recipe list by id
     """
     with engine.begin() as conn:
-        result = conn.execute(text(f"""SELECT id, name, description FROM recipe_list WHERE id = :recipe_id"""),{"recipe_id": id})
+        result = conn.execute(text("""SELECT id, name, description FROM recipe_list WHERE id = :recipe_id"""),{"recipe_id": id})
         id, name, description = result.fetchone()
-        result = conn.execute(text(f"""SELECT id, name, description, mins_prep, mins_cook, default_servings, author_id, procedure
+        result = conn.execute(text("""SELECT id, name, description, mins_prep, mins_cook, default_servings, author_id, procedure
                                         FROM recipe
                                         JOIN recipe_x_recipe_list AS rl ON rl.recipe_id = recipe.id
                                         WHERE rl.recipe_list_id = :list_id"""),{"list_id": id})
@@ -100,7 +97,7 @@ def get_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> 
 @router.delete("/{id}")
 def delete_recipe_list(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
     with engine.begin() as conn:
-        result = conn.execute(text(f"""DELETE FROM recipe_list 
+        conn.execute(text("""DELETE FROM recipe_list 
                                    WHERE id = :id"""),{"id":id})
     return "OK"
        

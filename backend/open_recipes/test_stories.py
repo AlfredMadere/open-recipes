@@ -1,13 +1,14 @@
-import requests
 import os
-import pytest
+
 import dotenv
+import pytest
 from fastapi.testclient import TestClient
-dotenv.load_dotenv()
-# base_route = "http://127.0.0.1:8000"
-from open_recipes.server import app
-from open_recipes.database import get_engine
 from sqlalchemy import create_engine, text
+
+from open_recipes.database import get_engine
+from open_recipes.server import app
+
+dotenv.load_dotenv()
 client = TestClient(app)
 
 #post user, #get user, #get users
@@ -71,7 +72,7 @@ def test_create_user():
     # Send a POST request to create a user
 
     response = client.post("/users", json={'name': 'John Doe', 'email': 'john.doe@example.com'})
-    response2 = client.post("/users", json={'name': 'Bob Doe', 'email': 'bob.doe@example.com'})
+    client.post("/users", json={'name': 'Bob Doe', 'email': 'bob.doe@example.com'})
 
     assert response.status_code == 201 # this will fail
 
@@ -97,9 +98,9 @@ def test_create_user():
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_create_recipe_list():
     # Send a POST request to create a recipe list
-    response = client.post(f'/recipe-lists', json={'name': 'My Recipes', 'description': 'My favorite recipes'})
+    response = client.post('/recipe-lists', json={'name': 'My Recipes', 'description': 'My favorite recipes'})
     assert response.status_code == 201
-    response2 = client.post(f'/recipe-lists', json={'name': 'My Recipes 2', 'description': 'My almost favorite recipes'})
+    client.post('/recipe-lists', json={'name': 'My Recipes 2', 'description': 'My almost favorite recipes'})
     assert response.status_code == 201
 
     # Get the recipe list ID from the response
@@ -122,10 +123,10 @@ def test_create_recipe_list():
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_create_recipe():
     # Send a POST request to create a recipe
-    response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
+    response = client.post('/recipes', json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
     assert response.status_code == 201
 
-    response2 = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara 2', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese but do it twice'})
+    client.post('/recipes', json={'name': 'Spaghetti Carbonara 2', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese but do it twice'})
     assert response.status_code == 201
 
     # Get the recipe ID from the response
@@ -141,11 +142,11 @@ def test_create_recipe():
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_add_recipe_to_recipe_list():
     # Create a recipe
-    response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
+    response = client.post('/recipes', json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
     recipe_id = response.json()['id']
 
     # Create a recipe list
-    response = client.post(f'/recipe-lists', json={'name': 'My Recipes'})
+    response = client.post('/recipe-lists', json={'name': 'My Recipes'})
     recipe_list_id = response.json()['id']
 
     # Add the recipe to the recipe list
@@ -170,25 +171,25 @@ tag_2_popo = {'key': 'Cuisine', 'value': 'Vietnamese'}
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_search():
     # Create a recipe
-    response = client.post(f'/recipes', json=recipe_1_popo)
-    recipe_id_0 = response.json()['id']
+    response = client.post('/recipes', json=recipe_1_popo)
+    response.json()['id']
 
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
-def test_search():
+def test_search2():
     # Create a recipe
-    response = client.post(f'/recipes', json=recipe_1_popo)
-    recipe_id_0 = response.json()['id']
-    response = client.post(f'/recipes', json=recipe_2_popo)
-    recipe_id_1 = response.json()['id']
+    response = client.post('/recipes', json=recipe_1_popo)
+    response.json()['id']
+    response = client.post('/recipes', json=recipe_2_popo)
+    response.json()['id']
 
-    response = client.get(f'/recipes')
+    response = client.get('/recipes')
     assert response.status_code == 200
     assert len(response.json()['recipe']) == 2
     assert response.json()['recipe'][0]['name'] == 'Pho'
     assert response.json()['recipe'][1]['name'] == 'Spaghetti Carbonara'
 
     #Search for recipe by time
-    response = client.get(f"/recipes?max_time=20")
+    response = client.get("/recipes?max_time=20")
     assert response.status_code == 200
     assert len(response.json()['recipe']) == 1
     assert response.json()['recipe'][0]['name'] == 'Pho'
@@ -208,11 +209,11 @@ def test_search():
 def test_create_tag():
     
     # Create a recipe
-    response = client.post(f'/recipes', json=recipe_1_popo)
+    response = client.post('/recipes', json=recipe_1_popo)
     recipe_id = response.json()['id']
 
-    tag_create_response1 = client.post(f'/tags', json=tag_1_popo)
-    tag_create_response2 = client.post(f'/tags', json=tag_2_popo)
+    tag_create_response1 = client.post('/tags', json=tag_1_popo)
+    tag_create_response2 = client.post('/tags', json=tag_2_popo)
 
     assert tag_create_response1.status_code == 201
     assert tag_create_response2.status_code == 201
@@ -231,26 +232,26 @@ def test_create_tag():
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_filter_tag():
     # Create recipes
-    response1 = client.post(f'/recipes', json=recipe_1_popo)
-    response2 = client.post(f'/recipes', json=recipe_2_popo)
-    response3 = client.post(f'/recipes', json=recipe_3_popo)
-    response4 = client.post(f'/recipes', json=recipe_4_popo)
+    response1 = client.post('/recipes', json=recipe_1_popo)
+    response2 = client.post('/recipes', json=recipe_2_popo)
+    response3 = client.post('/recipes', json=recipe_3_popo)
+    response4 = client.post('/recipes', json=recipe_4_popo)
 
-    tag_create_response1 = client.post(f'/tags', json=tag_1_popo)
-    tag_create_response2 = client.post(f'/tags', json=tag_2_popo)
+    tag_create_response1 = client.post('/tags', json=tag_1_popo)
+    tag_create_response2 = client.post('/tags', json=tag_2_popo)
 
     #Create tags
-    tag_response1 = client.post(f'/recipes/{response1.json()["id"]}/tags/{tag_create_response1.json()["id"]}', json=tag_1_popo)
-    tag_response2 = client.post(f'/recipes/{response2.json()["id"]}/tags/{tag_create_response2.json()["id"]}', json=tag_2_popo)
-    tag_response3 = client.post(f'/recipes/{response3.json()["id"]}/tags/{tag_create_response1.json()["id"]}', json=tag_1_popo)
-    tag_response4 = client.post(f'/recipes/{response4.json()["id"]}/tags/{tag_create_response2.json()["id"]}', json=tag_2_popo)
+    client.post(f'/recipes/{response1.json()["id"]}/tags/{tag_create_response1.json()["id"]}', json=tag_1_popo)
+    client.post(f'/recipes/{response2.json()["id"]}/tags/{tag_create_response2.json()["id"]}', json=tag_2_popo)
+    client.post(f'/recipes/{response3.json()["id"]}/tags/{tag_create_response1.json()["id"]}', json=tag_1_popo)
+    client.post(f'/recipes/{response4.json()["id"]}/tags/{tag_create_response2.json()["id"]}', json=tag_2_popo)
 
     #/recipes/{recipe_id}/tags/{tag_id}
 
     #Search for recipe by name
 
     #Search for recipe by time
-    response = client.get(f"/recipes?max_time=20")
+    response = client.get("/recipes?max_time=20")
     assert response.status_code == 200
     assert len(response.json()['recipe']) == 3
     assert response.json()['recipe'][0]['name'] == 'Pho'
@@ -261,7 +262,7 @@ def test_filter_tag():
     assert len(response.json()['recipe']) == 0
 
     #Search by tag
-    response = client.get(f"/recipes?tag_key=Cuisine&tag_value=Italian")
+    response = client.get("/recipes?tag_key=Cuisine&tag_value=Italian")
     assert response.status_code == 200
     print(response.json())
     assert len(response.json()['recipe']) == 2
@@ -276,7 +277,7 @@ def test_create_ingredient():
     user_response = client.post("/users", json={'name': 'John Doe', 'email': 'john@doe.com'})
     user_id = user_response.json()['id']
 
-    response = client.post(f'/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
+    response = client.post('/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
 
     assert response.status_code == 201
 
@@ -292,7 +293,7 @@ def test_create_ingredient():
     assert response.json()[0]['name'] == 'Spaghetti'
 
 
-    response = client.post(f'/ingredients', json={'name': 'other_ingredient',"type":"pasta","storage":"FRIDGE"})
+    response = client.post('/ingredients', json={'name': 'other_ingredient',"type":"pasta","storage":"FRIDGE"})
     assert response.status_code == 201
     #associcate ingredient with user
     response = client.post(f'/users/{user_id}/ingredients/{response.json()["id"]}')
@@ -311,19 +312,19 @@ def test_user_inventory_search():
 
     user_id = user_response.json()['id']
 
-    response1 = client.post(f'/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
-    response2 = client.post(f'/ingredients', json={'name': 'Bacon',"type":"meat","storage":"FRIDGE"})
-    response3 = client.post(f'/ingredients', json={'name': 'Eggs',"type":"dairy","storage":"FRIDGE"})
-    response4 = client.post(f'/ingredients', json={'name': 'Parmesan',"type":"dairy","storage":"FRIDGE"})
+    response1 = client.post('/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
+    response2 = client.post('/ingredients', json={'name': 'Bacon',"type":"meat","storage":"FRIDGE"})
+    response3 = client.post('/ingredients', json={'name': 'Eggs',"type":"dairy","storage":"FRIDGE"})
+    response4 = client.post('/ingredients', json={'name': 'Parmesan',"type":"dairy","storage":"FRIDGE"})
     assert response1.status_code == 201
     assert response2.status_code == 201
     assert response3.status_code == 201
     assert response4.status_code == 201
 
     # add pho ingredients not to user
-    response5 = client.post(f'/ingredients', json={'name': 'Noodles',"type":"noodles","storage":"PANTRY"})
-    response6 = client.post(f'/ingredients', json={'name': 'Beef',"type":"meat","storage":"FRIDGE"})
-    response7 = client.post(f'/ingredients', json={'name': 'Cinnamon',"type":"spice","storage":"PANTRY"})
+    response5 = client.post('/ingredients', json={'name': 'Noodles',"type":"noodles","storage":"PANTRY"})
+    response6 = client.post('/ingredients', json={'name': 'Beef',"type":"meat","storage":"FRIDGE"})
+    response7 = client.post('/ingredients', json={'name': 'Cinnamon',"type":"spice","storage":"PANTRY"})
     assert response5.status_code == 201
     assert response6.status_code == 201
     assert response7.status_code == 201
@@ -339,12 +340,12 @@ def test_user_inventory_search():
     assert response.status_code == 201
 
     # create recipe
-    response_recipe1 = client.post(f'/recipes', json=recipe_1_popo)
+    response_recipe1 = client.post('/recipes', json=recipe_1_popo)
     print(response_recipe1)
     assert response_recipe1.status_code == 201
     recipe_id1 = response_recipe1.json()['id']
 
-    response_recipe2 = client.post(f'/recipes', json=recipe_2_popo)
+    response_recipe2 = client.post('/recipes', json=recipe_2_popo)
     assert response_recipe2.status_code == 201
     recipe_id2 = response_recipe2.json()['id']
 
@@ -378,21 +379,21 @@ def test_user_inventory_search():
 @pytest.mark.skipif(os.environ.get('ENV') != 'DEV', reason="Only run in dev")
 def test_get_ingredients_from_recipe():
     # Create a recipe
-    response = client.post(f'/recipes', json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
+    response = client.post('/recipes', json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese'})
     print(response)
     recipe_id1 = response.json()['id']
     # Create another recipe
-    response2 = client.post(f'/recipes', json={'name': 'Penne and Butter', 'procedure': 'Cook penne, add butter'})
+    response2 = client.post('/recipes', json={'name': 'Penne and Butter', 'procedure': 'Cook penne, add butter'})
     recipe_id2 = response2.json()['id']
     #add ingredients for recipe1
-    response1 = client.post(f'/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
-    response2 = client.post(f'/ingredients', json={'name': 'Bacon',"type":"meat","storage":"FRIDGE"})
+    response1 = client.post('/ingredients', json={'name': 'Spaghetti',"type":"pasta","storage":"PANTRY"})
+    response2 = client.post('/ingredients', json={'name': 'Bacon',"type":"meat","storage":"FRIDGE"})
     assert response1.status_code == 201
     assert response2.status_code == 201
     #add ingredients for recipe2
-    response3 = client.post(f'/ingredients', json={'name': 'Penne',"type":"pasta","storage":"PANTRY"})
-    response4 = client.post(f'/ingredients', json={'name': 'Butter',"type":"dairy","storage":"FRIDGE"})
-    response5 = client.post(f'/ingredients', json={'name': 'frozen Bacon',"type":"meat","storage":"FRIDGE"})
+    response3 = client.post('/ingredients', json={'name': 'Penne',"type":"pasta","storage":"PANTRY"})
+    response4 = client.post('/ingredients', json={'name': 'Butter',"type":"dairy","storage":"FRIDGE"})
+    response5 = client.post('/ingredients', json={'name': 'frozen Bacon',"type":"meat","storage":"FRIDGE"})
     assert response3.status_code == 201
     assert response4.status_code == 201
     assert response5.status_code == 201
@@ -450,7 +451,7 @@ def test_flow_2():
     assert len(response.json()['recipes']) == 1
     assert response.json()['recipes'][0]['name'] == 'Spaghetti Carbonara'
 
-def test_create_recipe():
+def test_create_recipe2():
 
     response = client.post("/recipes", json={'name': 'Spaghetti Carbonara', 'procedure': 'Cook spaghetti, fry bacon, mix with eggs and cheese', "mins_prep": 20, "mins_cook": 30,"tags":[{"key":"Cuisine","value":"Italian"}]})
     assert response.status_code == 201

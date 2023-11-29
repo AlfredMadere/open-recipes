@@ -1,20 +1,16 @@
-from fastapi import APIRouter
+from typing import Annotated, List, Literal, Optional
 
-from typing import List, Literal, Union
-from sqlalchemy import exc
-
-from fastapi import FastAPI, HTTPException
-from typing import Annotated, Optional
-from sqlalchemy.engine import Engine
-from fastapi import Depends, FastAPI
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest, CreateIngredientRequest, CreateIngredientWithAmount
-from open_recipes.database import get_engine 
-from sqlalchemy import text, func, distinct, case
 import sqlalchemy
-from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError, DataError, SQLAlchemyError, DBAPIError
-import uvicorn
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ValidationError
-from open_recipes.api.auth import get_current_user, TokenData
+from sqlalchemy import exc, text
+from sqlalchemy.engine import Engine
+from sqlalchemy.exc import SQLAlchemyError
+
+from open_recipes.api.auth import TokenData, get_current_user
+from open_recipes.database import get_engine
+from open_recipes.models import (CreateIngredientWithAmount,
+                                 CreateRecipeRequest, Ingredient, Recipe, Tag)
 
 router = APIRouter(
   prefix="/recipes",
@@ -171,7 +167,7 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
                     tag = Tag.parse_obj(tag_dict) 
                     body.tags[i] = tag  # Attempt to parse the dictionary as a Tag
                 except ValidationError:
-                    raise TypeError(f"Expected 'tag_dict' to have the same attributes as 'Tag', but it doesn't")
+                    raise TypeError("Expected 'tag_dict' to have the same attributes as 'Tag', but it doesn't")
         
                 #verify that its of type Tag, throw type error if not
                 result = conn.execute(text("""INSERT INTO recipe_tag (key, value) VALUES (:key, :value) 
@@ -187,7 +183,7 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
 
             tag_ids = [id[0] for id in result]
 
-            result = conn.execute(text(f"""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id, procedure,calories)
+            result = conn.execute(text("""INSERT INTO recipe (name, mins_prep, mins_cook, description, default_servings, author_id, procedure,calories)
                                     VALUES (
                                     :name,
                                     :mins_prep,
@@ -217,10 +213,10 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
                     body.ingredients[i] = ingredient  # Attempt to parse the dictionary as a Tag
                 except ValidationError:
 
-                    raise TypeError(f"Expected 'ingredient_dict' to have the same attributes as 'CreateIngredientRequest', but it doesn't")
+                    raise TypeError("Expected 'ingredient_dict' to have the same attributes as 'CreateIngredientRequest', but it doesn't")
                 
                 #FIXME: there will be many ingredients so if this is low, build a values clause and do it in one query
-                upsert_query = f"""
+                upsert_query = """
                 INSERT INTO ingredient (name, type, storage, category_id) VALUES (:name, :type, :storage, :category_id)
                 ON CONFLICT (name) DO NOTHING
                 """
@@ -271,7 +267,7 @@ def get_recipe_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) ->
     """
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories FROM recipe WHERE id = :id"""),{"id":id})
+            result = conn.execute(text("""SELECT id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories FROM recipe WHERE id = :id"""),{"id":id})
             id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure, calories = result.fetchone()
             return Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure, calories=calories)
     except exc.SQLAlchemyError as e:
@@ -291,7 +287,7 @@ def get_recipe_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) ->
 def add_recipe_to_recipe_list(recipe_id: int, recipe_list_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
     try:
         with engine.begin() as conn:
-            conn.execute(text(f"INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES (:recipe_id, :recipe_list_id)"),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
+            conn.execute(text("INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES (:recipe_id, :recipe_list_id)"),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
             return "OK"
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error " + e._message())
@@ -303,7 +299,7 @@ def add_recipe_to_recipe_list(recipe_id: int, recipe_list_id: int,engine : Annot
 def add_recipe_tag(recipe_id: int, tag_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
     try:
         with engine.begin() as conn:
-            conn.execute(text(f"INSERT INTO recipe_x_tag (recipe_id, tag_id) VALUES (:recipe_id, :tag_id)"),{"recipe_id":recipe_id,"tag_id":tag_id})
+            conn.execute(text("INSERT INTO recipe_x_tag (recipe_id, tag_id) VALUES (:recipe_id, :tag_id)"),{"recipe_id":recipe_id,"tag_id":tag_id})
             return "OK"
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error "  + e._message())
@@ -315,7 +311,7 @@ def add_recipe_tag(recipe_id: int, tag_id: int,engine : Annotated[Engine, Depend
 def get_recipe_tags(recipe_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT rt.id, rt.key, rt.value 
+            result = conn.execute(text("""SELECT rt.id, rt.key, rt.value 
                                     FROM recipe_x_tag rxt
                                     JOIN recipe_tag rt on rxt.tag_id = rt.id 
                                     WHERE rxt.recipe_id = :recipe_id"""),{"recipe_id":recipe_id})
@@ -332,7 +328,7 @@ def add_ingredient_to_recipe(recipe_id: int, ingredient_id: int, engine : Annota
     try:
         with engine.begin() as conn:
             #FIXME: add ability to specify quantity and unit
-            conn.execute(text(f"INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (:recipe_id, :ingredient_id, :quantity)"),{"recipe_id":recipe_id,"ingredient_id":ingredient_id, "quantity":1})
+            conn.execute(text("INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (:recipe_id, :ingredient_id, :quantity)"),{"recipe_id":recipe_id,"ingredient_id":ingredient_id, "quantity":1})
             return "OK"
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error " + str(e))
@@ -344,7 +340,7 @@ def add_ingredient_to_recipe(recipe_id: int, ingredient_id: int, engine : Annota
 def get_recipe_ingredients(recipe_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Ingredient]:
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT ri.id, ri.name, ri.type, ri.storage, ri.category_id 
+            result = conn.execute(text("""SELECT ri.id, ri.name, ri.type, ri.storage, ri.category_id 
                                     FROM recipe_ingredients rix
                                     JOIN ingredient ri on rix.ingredient_id = ri.id 
                                     WHERE rix.recipe_id = :recipe_id"""),{"recipe_id":recipe_id})

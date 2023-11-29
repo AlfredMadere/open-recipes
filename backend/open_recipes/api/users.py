@@ -1,19 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from typing import Annotated, List, Union
 
-from typing import List, Union
-
-from sqlalchemy import exc
-from fastapi import FastAPI
-from typing import Annotated, Optional
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import exc, text
 from sqlalchemy.engine import Engine
-from fastapi import Depends
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
-from open_recipes.database import get_engine 
-from sqlalchemy import text, func, distinct, case
-import sqlalchemy
-import uvicorn
+
+from open_recipes.database import get_engine
+from open_recipes.models import CreateUserRequest, Ingredient, User
+
 from .auth import get_current_active_user
-from pydantic import BaseModel
 
 router = APIRouter(
   prefix="/users",
@@ -26,7 +20,7 @@ def get_users(engine : Annotated[Engine, Depends(get_engine)]) -> List[User]:
     """
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" ORDER BY id"""))
+            result = conn.execute(text("""SELECT id, name, email, phone FROM "user" ORDER BY id"""))
             rows= result.fetchall()
             return [User(id=id, name=name, email=email, phone=phone) for id, name, email, phone in rows]
     except exc.SQLAlchemyError as e:
@@ -43,9 +37,9 @@ def get_user_by_id(user_id: int,engine : Annotated[Engine, Depends(get_engine)])
     """
     with engine.begin() as conn:
         try:
-            result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" WHERE id = :user_id"""),{"user_id":user_id})
+            result = conn.execute(text("""SELECT id, name, email, phone FROM "user" WHERE id = :user_id"""),{"user_id":user_id})
             row = result.fetchone()
-            if row == None:
+            if row is None:
                 raise Exception("No user found with that given id")
             id, name, email, phone = row
             return User(id=id, name=name, email=email, phone=phone)
@@ -56,7 +50,7 @@ def get_user_by_id(user_id: int,engine : Annotated[Engine, Depends(get_engine)])
                 raise HTTPException(status_code = 500, detail = "Unknown Error Occurred")
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, email, phone FROM "user" WHERE id = :user_id"""),{"user_id":user_id})
+            result = conn.execute(text("""SELECT id, name, email, phone FROM "user" WHERE id = :user_id"""),{"user_id":user_id})
             id, name, email, phone = result.fetchone()
             return User(id=id, name=name, email=email, phone=phone)
     except exc.SQLAlchemyError as e:
@@ -72,7 +66,7 @@ def create_users(body: CreateUserRequest,engine : Annotated[Engine, Depends(get_
     """
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""INSERT INTO "user" (name, email, phone)
+            result = conn.execute(text("""INSERT INTO "user" (name, email, phone)
                                         VALUES (:name, :email, :phone)
                                         RETURNING id, name, email, phone
                                     """
@@ -104,7 +98,7 @@ def create_users(body: CreateUserRequest,engine : Annotated[Engine, Depends(get_
 def get_users_inventory(user_id: int,engine : Annotated[Engine, Depends(get_engine)]  ) -> list[Ingredient]:
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""
+            result = conn.execute(text("""
             SELECT id, name, type, storage, category_id
             FROM ingredient
             JOIN user_x_ingredient ON ingredient.id = user_x_ingredient.ingredient_id
@@ -158,7 +152,7 @@ def update_users_inventory(body: list[Ingredient], user_id: int, engine: Annotat
 def add_ingredient_to_user_inventory(user_id: int, ingredient_id: int, engine: Annotated[Engine, Depends(get_engine)]) -> str:
     try:
         with engine.begin() as conn:
-            conn.execute(text(f"INSERT INTO user_x_ingredient (user_id, ingredient_id) VALUES (:user_id, :ingredient_id)"),{"user_id":user_id,"ingredient_id":ingredient_id})
+            conn.execute(text("INSERT INTO user_x_ingredient (user_id, ingredient_id) VALUES (:user_id, :ingredient_id)"),{"user_id":user_id,"ingredient_id":ingredient_id})
             return "OK"
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error "  + e._message())

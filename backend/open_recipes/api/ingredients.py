@@ -1,19 +1,13 @@
-from fastapi import APIRouter, HTTPException
-from sqlalchemy import exc
+from typing import Annotated, List, Union
 
-from typing import List, Union
-
-from fastapi import FastAPI
-from typing import Annotated, Optional
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import exc, text
 from sqlalchemy.engine import Engine
-from fastapi import Depends
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
-from open_recipes.database import get_engine 
-from sqlalchemy import text, func, distinct, case
-import sqlalchemy
-from .auth import get_current_user, TokenData
-import uvicorn
-from pydantic import BaseModel
+
+from open_recipes.database import get_engine
+from open_recipes.models import Ingredient
+
+from .auth import TokenData, get_current_user
 
 router = APIRouter(
   prefix="/ingredients",
@@ -29,7 +23,7 @@ def get_ingredients(engine : Annotated[Engine, Depends(get_engine)], current_use
     user_id = current_user.id
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
+            result = conn.execute(text("""SELECT id, name, type, storage, category_id 
                                     FROM ingredient
                                 JOIN user_x_ingredient ON ingredient.id = user_x_ingredient.ingredient_id
                                 WHERE user_x_ingredient.user_id = :user
@@ -62,7 +56,7 @@ def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_
     """
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, name, type, storage, category_id 
+            result = conn.execute(text("""SELECT id, name, type, storage, category_id 
                                     FROM ingredient
                                     WHERE id = :id"""))
             id, name, storage, type, category_id = result.fetchone()
@@ -102,7 +96,7 @@ def create_ingredients(body: Ingredient, engine : Annotated[Engine, Depends(get_
     """
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""INSERT INTO ingredient (name, type, storage, category_id)
+            result = conn.execute(text("""INSERT INTO ingredient (name, type, storage, category_id)
                                         VALUES (:name, :type, :storage, :category_id)
                                         RETURNING id, name, type, storage, category_id
                                     """

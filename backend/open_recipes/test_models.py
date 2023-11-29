@@ -1,7 +1,3 @@
-import dotenv
-import os
-from sqlalchemy import create_engine
-import requests
 # engine = None
 # def setup_module():
 #     dotenv.load_dotenv()

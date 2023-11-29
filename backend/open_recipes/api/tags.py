@@ -1,18 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from typing import Annotated, List, Optional, Union
 
-from typing import List, Union
-from sqlalchemy import exc
-
-from fastapi import FastAPI
-from typing import Annotated, Optional
-from sqlalchemy.engine import Engine
-from fastapi import Depends
-from open_recipes.models import Ingredient, Recipe, RecipeList, Review, User, PopulatedRecipe, CreateUserRequest, CreateRecipeListRequest, CreateRecipeRequest, RecipeListResponse, Tag, CreateTagRequest
-from open_recipes.database import get_engine 
-from sqlalchemy import text, func, distinct, case
 import sqlalchemy
-import uvicorn
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from sqlalchemy import exc, text
+from sqlalchemy.engine import Engine
+
+from open_recipes.database import get_engine
+from open_recipes.models import CreateTagRequest, Tag
 
 router = APIRouter(
   prefix="/tags",
@@ -72,7 +67,7 @@ def get_tags(engine : Annotated[Engine, Depends(get_engine)], cursor: int = 0, k
 def create_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Tag]:
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""INSERT INTO recipe_tag (key, value) VALUES (:key, :value) RETURNING id, key, value"""),{"key":tag.key,"value":tag.value})
+            result = conn.execute(text("""INSERT INTO recipe_tag (key, value) VALUES (:key, :value) RETURNING id, key, value"""),{"key":tag.key,"value":tag.value})
             id, key, value = result.fetchone()
             return Tag(id=id, key=key, value=value)
     except exc.SQLAlchemyError as e:
@@ -85,7 +80,7 @@ def create_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_eng
 def get_tag_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(f"""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":id})
+            result = conn.execute(text("""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":id})
             id, key, value = result.fetchone()
             return Tag(id=id, key=key, value=value)
     except exc.SQLAlchemyError as e:

@@ -4,9 +4,9 @@
 
 from __future__ import annotations
 
-from typing import Optional,Literal,Tuple,List,Any
-from pydantic import BaseModel
+from typing import Any, List, Literal, Optional
 
+from pydantic import BaseModel
 
 
 #TODO: define all request types 
@@ -67,7 +67,7 @@ class Recipe(BaseModel):
     def get_author(self, engine):
         with engine.connect() as conn:
             result = conn.execute(
-                f"""
+                """
                 SELECT id, name, email, phone FROM users WHERE id = :author_id
                 """, {"author_id": self.author_id}
             )
@@ -77,7 +77,7 @@ class Recipe(BaseModel):
     def get_tags(self, engine):
         with engine.connect() as conn:
             result = conn.execute(
-                f"""
+                """
                 SELECT id, key, value 
                 FROM tag
                 JOIN recipe_x_tag as rxt ON tag.id = rxt.tag_id 
@@ -135,7 +135,7 @@ class RecipeList(BaseModel):
     def get_recipes(self, engine ):
         with engine.connect() as conn:
             result = conn.execute(
-                f"""
+                """
                 SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings
                 FROM recipe
                 JOIN recipe_x_recipe_list as rxl ON recipe.id = rxl.recipe_id

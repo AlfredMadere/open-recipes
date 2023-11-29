@@ -5,26 +5,19 @@
 
 from __future__ import annotations
 
-from typing import List, Union
-
-from fastapi import APIRouter
-from typing import Annotated, Optional
-from sqlalchemy.engine import Engine
-from fastapi import Depends, FastAPI, HTTPException, status
-
-from fastapi import Depends
-from open_recipes.database import get_engine 
-from sqlalchemy import text, func, distinct, case
-from pydantic import BaseModel
-from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
-from typing import Optional
-from open_recipes.models import User, UserInDB, SignUpRequest
-from passlib.context import CryptContext
-from jose import JWTError, jwt
+from typing import Annotated, Optional
 
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from pydantic import BaseModel
+from sqlalchemy import text
+from sqlalchemy.engine import Engine
 
+from open_recipes.database import get_engine
+from open_recipes.models import SignUpRequest, UserInDB
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
