@@ -1,48 +1,94 @@
-create sequence “user”_id_seq;
-
-alter sequence “user”_id_seq owner to alfred;
-
-create sequence recipe_list_id_seq
+create sequence “user”_id_seq
     as integer;
 
-alter sequence recipe_list_id_seq owner to alfred;
+alter sequence “user”_id_seq owner to postgres;
+
+grant select, update, usage on sequence “user”_id_seq to anon;
+
+grant select, update, usage on sequence “user”_id_seq to authenticated;
+
+grant select, update, usage on sequence “user”_id_seq to service_role;
 
 create sequence ing_category_column_name_seq
     as integer;
 
-alter sequence ing_category_column_name_seq owner to alfred;
+alter sequence ing_category_column_name_seq owner to postgres;
+
+grant select, update, usage on sequence ing_category_column_name_seq to anon;
+
+grant select, update, usage on sequence ing_category_column_name_seq to authenticated;
+
+grant select, update, usage on sequence ing_category_column_name_seq to service_role;
 
 create sequence user_id_seq
     as integer;
 
-alter sequence user_id_seq owner to alfred;
+alter sequence user_id_seq owner to postgres;
 
-create sequence recipe_list_id_seq1;
+grant select, update, usage on sequence user_id_seq to anon;
 
-alter sequence recipe_list_id_seq1 owner to alfred;
+grant select, update, usage on sequence user_id_seq to authenticated;
+
+grant select, update, usage on sequence user_id_seq to service_role;
+
+create sequence recipe_list_id_seq1
+    as integer;
+
+alter sequence recipe_list_id_seq1 owner to postgres;
+
+grant select, update, usage on sequence recipe_list_id_seq1 to anon;
+
+grant select, update, usage on sequence recipe_list_id_seq1 to authenticated;
+
+grant select, update, usage on sequence recipe_list_id_seq1 to service_role;
+
+create sequence user_id_seq1;
+
+alter sequence user_id_seq1 owner to postgres;
+
+grant select, update, usage on sequence user_id_seq1 to anon;
+
+grant select, update, usage on sequence user_id_seq1 to authenticated;
+
+grant select, update, usage on sequence user_id_seq1 to service_role;
+
+create sequence recipe_list_id_seq2
+    as integer;
+
+alter sequence recipe_list_id_seq2 owner to postgres;
+
+grant select, update, usage on sequence recipe_list_id_seq2 to anon;
+
+grant select, update, usage on sequence recipe_list_id_seq2 to authenticated;
+
+grant select, update, usage on sequence recipe_list_id_seq2 to service_role;
 
 create type storage as enum ('PANTRY', 'FRIDGE', 'FREEZER');
 
-alter type storage owner to alfred;
+alter type storage owner to postgres;
 
 create table "user"
 (
-    id              integer generated always as identity
+    id    integer generated always as identity
         constraint “user”_pkey
             primary key,
-    name            text                  not null,
-    email           text                  not null
+    name  text not null,
+    email text not null
         constraint “user”_email_key
             unique,
-    phone           text,
-    hashed_password text,
-    disabled        boolean default false not null
+    phone text
 );
 
 alter table "user"
-    owner to alfred;
+    owner to postgres;
 
-alter sequence “user”_id_seq owned by "user".id;
+alter sequence user_id_seq1 owned by "user".id;
+
+grant delete, insert, references, select, trigger, truncate, update on "user" to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on "user" to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on "user" to service_role;
 
 create table recipe_list
 (
@@ -53,9 +99,19 @@ create table recipe_list
 );
 
 alter table recipe_list
-    owner to alfred;
+    owner to postgres;
 
-alter sequence recipe_list_id_seq1 owned by recipe_list.id;
+grant select, update, usage on sequence recipe_list_id_seq to anon;
+
+grant select, update, usage on sequence recipe_list_id_seq to authenticated;
+
+grant select, update, usage on sequence recipe_list_id_seq to service_role;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_list to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_list to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_list to service_role;
 
 create table recipe
 (
@@ -75,7 +131,19 @@ create table recipe
 );
 
 alter table recipe
-    owner to alfred;
+    owner to postgres;
+
+grant select, update, usage on sequence recipe_id_seq to anon;
+
+grant select, update, usage on sequence recipe_id_seq to authenticated;
+
+grant select, update, usage on sequence recipe_id_seq to service_role;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe to service_role;
 
 create table review
 (
@@ -91,7 +159,19 @@ create table review
 );
 
 alter table review
-    owner to alfred;
+    owner to postgres;
+
+grant select, update, usage on sequence review_id_seq to anon;
+
+grant select, update, usage on sequence review_id_seq to authenticated;
+
+grant select, update, usage on sequence review_id_seq to service_role;
+
+grant delete, insert, references, select, trigger, truncate, update on review to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on review to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on review to service_role;
 
 create table user_x_recipe_list
 (
@@ -105,7 +185,13 @@ create table user_x_recipe_list
 );
 
 alter table user_x_recipe_list
-    owner to alfred;
+    owner to postgres;
+
+grant delete, insert, references, select, trigger, truncate, update on user_x_recipe_list to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on user_x_recipe_list to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on user_x_recipe_list to service_role;
 
 create table ing_category
 (
@@ -117,9 +203,15 @@ create table ing_category
 );
 
 alter table ing_category
-    owner to alfred;
+    owner to postgres;
 
 alter sequence ing_category_column_name_seq owned by ing_category.id;
+
+grant delete, insert, references, select, trigger, truncate, update on ing_category to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on ing_category to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on ing_category to service_role;
 
 create table ingredient
 (
@@ -138,7 +230,19 @@ create table ingredient
 );
 
 alter table ingredient
-    owner to alfred;
+    owner to postgres;
+
+grant select, update, usage on sequence ingredient_id_seq to anon;
+
+grant select, update, usage on sequence ingredient_id_seq to authenticated;
+
+grant select, update, usage on sequence ingredient_id_seq to service_role;
+
+grant delete, insert, references, select, trigger, truncate, update on ingredient to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on ingredient to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on ingredient to service_role;
 
 create table recipe_ingredients
 (
@@ -155,7 +259,13 @@ create table recipe_ingredients
 );
 
 alter table recipe_ingredients
-    owner to alfred;
+    owner to postgres;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_ingredients to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_ingredients to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_ingredients to service_role;
 
 create table recipe_tag
 (
@@ -168,7 +278,19 @@ create table recipe_tag
 );
 
 alter table recipe_tag
-    owner to alfred;
+    owner to postgres;
+
+grant select, update, usage on sequence recipe_tag_id_seq to anon;
+
+grant select, update, usage on sequence recipe_tag_id_seq to authenticated;
+
+grant select, update, usage on sequence recipe_tag_id_seq to service_role;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_tag to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_tag to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_tag to service_role;
 
 create table recipe_x_tag
 (
@@ -181,7 +303,13 @@ create table recipe_x_tag
 );
 
 alter table recipe_x_tag
-    owner to alfred;
+    owner to postgres;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_x_tag to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_x_tag to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_x_tag to service_role;
 
 create table recipe_x_recipe_list
 (
@@ -198,7 +326,13 @@ create table recipe_x_recipe_list
 );
 
 alter table recipe_x_recipe_list
-    owner to alfred;
+    owner to postgres;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_x_recipe_list to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_x_recipe_list to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on recipe_x_recipe_list to service_role;
 
 create table user_x_ingredient
 (
@@ -215,5 +349,11 @@ create table user_x_ingredient
 );
 
 alter table user_x_ingredient
-    owner to alfred;
+    owner to postgres;
+
+grant delete, insert, references, select, trigger, truncate, update on user_x_ingredient to anon;
+
+grant delete, insert, references, select, trigger, truncate, update on user_x_ingredient to authenticated;
+
+grant delete, insert, references, select, trigger, truncate, update on user_x_ingredient to service_role;
 
