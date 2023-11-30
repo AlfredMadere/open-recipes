@@ -9,6 +9,7 @@ import {
   Alert,
   TextInput,
   Button,
+  StyleSheet
 } from "react-native";
 import React, { useEffect, useState } from "react";
 
@@ -118,7 +119,7 @@ export default function One() {
                     style={{ justifyContent: "center", alignItems: "center" }}
                   >
                     <View>
-                    <Text style={{ textDecorationLine: "underline" }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
                       Create New List
                     </Text>
                   </View>
@@ -130,13 +131,10 @@ export default function One() {
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
-                     style={{
-                      height: 40,
-                      width: 200,
-                      margin: 12,
-                      borderWidth: 1,
-                      padding: 10,
-                     }}
+                     style={
+                      errors["name"] ? styles.error : styles.input
+                     }
+                      placeholder={`Enter name here...`}
                       onBlur={onBlur}
                       onChangeText={(value) => onChange(value)}
                       value={value}
@@ -145,20 +143,17 @@ export default function One() {
                       name="name"
                       rules={{ required: true }}
                      />
-                     {errors.name && <Text>This is required.</Text>}
-                    
+                     {errors.name && <Text style={{color: 'red', fontWeight: 'bold', fontSize: 10}}>This is required.</Text>}
+                     <Text> </Text>
                     <Text>Description</Text>
                     <Controller
                       control={control}
                       render={({ field: { onChange, onBlur, value } }) => (
                       <TextInput
-                      style={{
-                        height: 40,
-                        width: 200,
-                        margin: 12,
-                        borderWidth: 1,
-                        padding: 10,
-                      }}
+                      style={
+                        errors["description"] ? styles.error : styles.input
+                       }
+                       placeholder={`Enter description here...`}
                         onBlur={onBlur}
                         onChangeText={(value) => onChange(value)}
                         value={value}/>
@@ -166,9 +161,9 @@ export default function One() {
                      name="description"
                      rules={{ maxLength: 100, }}
                      />
-                      {errors.description && <Text>This description has exceeded the word count.</Text>}
+                      {errors.description && <Text style={{color: 'red', fontWeight: 'bold', fontSize: 10}}>This description has exceeded the word count.</Text>}
                     
-                    <View style={{ padding: 20 }}>
+                    <View style={{ padding: 3 }}>
                     <Button onPress={handleSubmit(onSubmit)}
                     title="Create"
                     color="green"
@@ -253,7 +248,7 @@ export function ListCard(props: { id: string; name: string; description: string 
       });
 
       if (response.ok) {
-        console.log("Deletion was a success! Navigating now.")
+        
         setIsDeleted(true);
 
       } else {
@@ -271,23 +266,29 @@ export function ListCard(props: { id: string; name: string; description: string 
     {!isDeleted && (
     <Card elevate size="4" width={305} height={120} bordered>
       <Card.Header padded>
-        <Text>{name}</Text>
+        <Text style={{fontWeight: 'bold'}}>{name}</Text>
       </Card.Header>
+      <Stack margin={20}>
+      <Text style={{fontSize: 10}}>{description}</Text>
+      </Stack>
+
       <Card.Footer padded>
-        <XStack flex={1} />
-        <Text>{description}</Text>
+        <XStack maxWidth ={1} flex={10} />
+        
+
         <Button
             onPress={handleDelete}
-            title="Delete List"
+            title="Delete"
             color="red"
         />
+        
         <Button
             onPress={() => {
               router.push(`/lists/${id}`);
             }}
             title="View"
-            color="blue"
         />
+
        
       </Card.Footer>
     </Card>
@@ -295,3 +296,21 @@ export function ListCard(props: { id: string; name: string; description: string 
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  input: {
+    height: 40,
+    width: 200,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+  error: {
+    borderColor: "red",
+    height: 40,
+    width: 200,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+});

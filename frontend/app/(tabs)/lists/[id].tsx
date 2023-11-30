@@ -4,7 +4,7 @@ import {
   FlatList,
   Button,
 } from "react-native";
-import { View, Card, XStack } from "tamagui";
+import { View, Card, XStack, Stack } from "tamagui";
 import React, { useEffect, useState } from "react";
 
 export default function Page() {
@@ -55,6 +55,7 @@ const RecipeComponent = ({ data }: any) => {
       data={data}
       numColumns={3}
       keyExtractor={(item, index) => index.toString()}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       renderItem={({ item }) => (
         <View style={{ flex: 1, marginLeft: 45,
           marginRight: 45,
@@ -86,20 +87,25 @@ export function RecipeCard(props: RecipeCardProps) {
   const recipe = props.recipe
   const router = useRouter();
 
+
   return (
     <Card
       elevate
       size="4"
-      width={120}
+      width={305}
       height={120}
       bordered
       {...props}
     >
       <Card.Header padded>
-        <Text>{recipe.name}</Text>
+        <Text style={{fontWeight :'bold'}}>{recipe.name}</Text>
       </Card.Header>
+      <Stack margin={20}>
+        <Text style={{fontSize: 12}}>{recipe.description}</Text>
+        </Stack>
+      
       <Card.Footer padded>
-        <XStack flex={1} />
+        <XStack flex={1} maxWidth ={1} />
         <Button title="View" onPress={() => {router.push(`/recipes/${recipe.id}`)}}/>
       </Card.Footer>
     </Card>
