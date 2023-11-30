@@ -1,28 +1,20 @@
-import { useRouter, Link, useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   useForm,
   useFieldArray,
   Controller,
-  UseFieldArrayReturn,
 } from "react-hook-form";
 import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
 import { ScrollView } from "tamagui";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {Recipe, FormattedRecipe, emptyData, sampleData} from "../../components/create-recipe-types/create-recipe-helper"
 
 export default function Page() {
-  const queryClient = useQueryClient();
   const {
-    register,
-    setValue,
     handleSubmit,
     control,
     reset,
     formState: { errors },
-    getValues,
-    watch,
   } = useForm<Recipe>({
     defaultValues: emptyData,
   });
