@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
+
 import tamaguiConfig from "../tamagui.config";
 import "expo-router/entry";
 
@@ -36,7 +37,9 @@ const StartPage = () => {
     //     <Button title="Two" />
     //   </Link>
     // </View>
-    <Redirect href={"/profile"} />
+    <View>
+      <Redirect href={"/login"} />
+    </View>
   );
 };
 
