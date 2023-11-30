@@ -41,6 +41,7 @@ export default function Page() {
 
   const handleDelete = async () => {
     try {
+      router.back();
       const response = await fetch(`https://open-recipes.onrender.com/recipe-lists/${id}`, {
         method: 'DELETE',
         headers: {
@@ -50,7 +51,6 @@ export default function Page() {
 
       if (response.ok) {
         console.log("Deletion was a success! Navigating now.")
-        router.replace('/index');
 
       } else {
         throw new Error('Failed to delete list');
