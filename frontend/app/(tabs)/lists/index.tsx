@@ -21,7 +21,6 @@ export default function One() {
     reset,
     control,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -213,7 +212,8 @@ export default function One() {
   );
 }
 
-const ListComponent = ({ data }: any) => {
+const ListComponent = ({ data }) => {
+
   return (
     <FlatList
       data={data}
@@ -231,16 +231,17 @@ const ListComponent = ({ data }: any) => {
           }}
           space
         >
-          <ListCard name={item.name} description={item.description} />
+          <ListCard id={item.id} name={item.name} description={item.description} />
         </View>
       )}
     />
   );
 };
 
-export function ListCard(props: { name: string; description: string }) {
-  const { name, description } = props;
+export function ListCard(props: { id: string; name: string; description: string }) {
+  const { name, description, id } = props;
   const router = useRouter();
+
 
   return (
     <Card elevate size="4" width={305} height={120} bordered>
@@ -252,7 +253,7 @@ export function ListCard(props: { name: string; description: string }) {
         <Text>{description}</Text>
         <Button
             onPress={() => {
-              router.push("/lists/[id]");
+              router.push(`/lists/${id}`);
             }}
             title="View"
             color="blue"

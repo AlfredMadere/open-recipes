@@ -11,10 +11,14 @@ export default function Page() {
   const { id } = useLocalSearchParams();
   const [recipes, setRecipes] = useState([]);
 
-
   useEffect(() => {
-    fetchDataFromBackend();
-  }, []);
+    if(id) {
+      console.log('The value of id is:', id);
+      fetchDataFromBackend();
+    } else {
+      console.log('No id found.');
+    }}, []);
+
 
   const fetchDataFromBackend = async () => {
     try {
@@ -24,7 +28,10 @@ export default function Page() {
       }
 
       const data = await response.json();
-      setRecipes(data);
+      console.log('Response Data:', data);
+      const {recipes} = data;
+      console.log('Recipes:', recipes);
+      setRecipes(recipes);
     } catch (error) {
       console.error('Error fetching data:', error.message);
     }
@@ -115,4 +122,5 @@ type RecipeCardProps = {
     procedure: string;
     default_servings: number;
   };
-};
+}; 
+
