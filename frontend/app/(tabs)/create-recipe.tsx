@@ -13,13 +13,20 @@ import axios from "axios";
 
 interface FormValues {
   name: string;
-  description: string;
-  default_servings: number;
   mins_prep: string;
   mins_cook: string;
+  description: string;
+  default_servings: string;
   procedure: string;
-  tags: { category: string; value: string }[];
-  ingredients: { quantity: string; units: string; value: string }[];
+  created_at: string;
+  author_id: string;
+  tags: { key: string; value: string }[];
+  ingredients: {
+    quantity: string;
+    unit: string;
+    name: string;
+    storage: string;
+  }[];
 }
 
 export default function Page() {
@@ -38,12 +45,12 @@ export default function Page() {
     defaultValues: {
       name: "",
       description: "",
-      default_servings: undefined,
+      default_servings: "",
       mins_prep: "",
       mins_cook: "",
       procedure: "",
-      tags: [{ category: "", value: "" }],
-      ingredients: [{ quantity: "", units: "", value: "" }],
+      tags: [{ key: "", value: "" }],
+      ingredients: [{ quantity: "", unit: "", name: "", storage: "FRIDGE" }],
     },
     // defaultValues: {
     //   value1: [{ email: "Bill", password: "Luo" }],
@@ -51,7 +58,7 @@ export default function Page() {
   });
   // const name = watch("name");
   // console.log("name: ", name);
-  
+
   const {
     fields: fields1,
     append: append1,
@@ -69,44 +76,80 @@ export default function Page() {
     name: "ingredients", // unique name for your Field Array
   });
   async function postData(data) {
-    axios.post(
-      "https://open-recipes.onrender.com/test-post",
-      data,
-    )
-    .then(function (response) {
-     // console.log(response);
-    })
-    .catch(function (error) {
+    axios
+      .post("https://open-recipes.onrender.com/recipes", data)
+      .then(function (response) {
+        console.log(response, null, 2);
+      })
+      .catch(function (error) {
         console.log(error);
-    });
+      });
   }
 
-const requireIntegerInput = (newValue, onChange) => {
-  // Use parseInt to convert the string to an integer
-  const integerValue = parseInt(newValue, 10);
+  const requireIntegerInput = (newValue, onChange) => {
+    // Use parseInt to convert the string to an integer
+    const integerValue = parseInt(newValue, 10);
 
-  // Check if the parsed value is a valid integer
-  if (!isNaN(integerValue) || newValue === "") {
-    onChange(integerValue);
-  }
-};
+    // Check if the parsed value is a valid integer
+    if (!isNaN(integerValue) || newValue === "") {
+      onChange(integerValue);
+    }
+  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
-    postData(data)
     const newData = data;
-    newData.author_id = '0';
     newData.created_at = Date().toLocaleString();
     console.log("Form Data: ", JSON.stringify(newData));
+    const formattedData = {
+      ...newData,
+      default_servings: parseInt(data.default_servings),
+      mins_prep: parseInt(data.mins_prep),
+      mins_cook: parseInt(data.mins_cook),
+      author_id: null,
+      ingredients: data.ingredients.map((ingredient) => {
+        return {
+          ...ingredient,
+          quantity: 1, //FIXME
+          storage: "FRIDGE",
+        };
+      }),
+    };
+    const fakeData = {
+      "name": "Coffee Recipe",
+      "mins_prep": 0,
+      "mins_cook": 0,
+      "description": "string",
+      "default_servings": 0,
+      "procedure": "string",
+      "created_at": "string",
+      "author_id": null,
+      "tags": [
+        {
+          "key": "Cusine",
+          "value": "Italian"
+        }
+      ],
+      "ingredients": [
+        {
+          "name": "ICED COFFEE",
+          "storage": "FRIDGE",
+          "quantity": 1,
+          "unit": "cup"
+        }
+      ]};
+    
+
+    console.log(formattedData);
+    postData(formattedData);
+
     //  axios.post("https://open-recipes.onrender.com/recipes", JSON.stringify(data), {
     //   headers: {
     // 'Content-Type': 'application/json'
     //   }
-    // }) 
+    // })
     //  .then(res => {console.log('Response: ', res.data)})
     //  .catch(error => {console.error('Error: ', error)})
-
-
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -148,7 +191,7 @@ const requireIntegerInput = (newValue, onChange) => {
             <TextInput
               style={errors["default_servings"] ? styles.error : styles.input}
               onBlur={onBlur}
-              onChangeText={(newValue) => requireIntegerInput (newValue, onChange)}        
+              onChangeText={(value) => onChange(value)}
               value={value}
               keyboardType="numeric"
             />
@@ -169,6 +212,7 @@ const requireIntegerInput = (newValue, onChange) => {
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
+                keyboardType="numeric"
               />
             )}
             name="mins_prep"
@@ -184,6 +228,7 @@ const requireIntegerInput = (newValue, onChange) => {
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
+                keyboardType="numeric"
               />
             )}
             name="mins_cook"
@@ -200,18 +245,17 @@ const requireIntegerInput = (newValue, onChange) => {
                 render={({ field }) => (
                   <TextInput
                     style={
-                      //TODO need to get this logic functioning, and need to connect to backend.
-                      errors["tags"]?.[index]?.["category"]
+                      errors["tags"]?.[index]?.["key"]
                         ? styles.error
                         : styles.input
                     }
-                    placeholder={`Category`}
+                    placeholder={`Key`}
                     placeholderTextColor={"gray"}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`tags.${index}.category` as keyof FormValues}
+                name={`tags.${index}.key` as keyof FormValues}
                 rules={{ required: true }}
               />
               <Controller
@@ -251,7 +295,7 @@ const requireIntegerInput = (newValue, onChange) => {
             title="Add Tag"
             color="white"
             onPress={() => {
-              append1({ category: "", value: "" });
+              append1({ key: "", value: "" });
             }}
           />
         </View>
@@ -283,17 +327,17 @@ const requireIntegerInput = (newValue, onChange) => {
                 render={({ field }) => (
                   <TextInput
                     style={
-                      errors["ingredients"]?.[index]?.["units"]
+                      errors["ingredients"]?.[index]?.["unit"]
                         ? styles.error
                         : styles.input
                     }
-                    placeholder={`Units`}
+                    placeholder={`Unit`}
                     placeholderTextColor={"gray"}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`ingredients.${index}.units` as keyof FormValues}
+                name={`ingredients.${index}.unit` as keyof FormValues}
                 rules={{ required: true }}
               />
               <Controller
@@ -301,7 +345,7 @@ const requireIntegerInput = (newValue, onChange) => {
                 render={({ field }) => (
                   <TextInput
                     style={
-                      errors["ingredients"]?.[index]?.["value"]
+                      errors["ingredients"]?.[index]?.["name"]
                         ? styles.error
                         : styles.input
                     }
@@ -311,10 +355,9 @@ const requireIntegerInput = (newValue, onChange) => {
                     value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`ingredients.${index}.value` as keyof FormValues}
+                name={`ingredients.${index}.name` as keyof FormValues}
                 rules={{ required: true }}
               />
-
               <View style={styles.smallButton}>
                 <Button
                   onPress={() => {
@@ -333,7 +376,12 @@ const requireIntegerInput = (newValue, onChange) => {
             title="Add Ingredient"
             color="white"
             onPress={() => {
-              append2({ quantity: "", units: "", value: "" });
+              append2({
+                quantity: "",
+                unit: "",
+                name: "",
+                storage: "FRIDGE",
+              });
             }}
           />
         </View>
@@ -359,14 +407,44 @@ const requireIntegerInput = (newValue, onChange) => {
           color="red"
           onPress={() => {
             reset({
-                name: "",
-                description: "",
-                default_servings: undefined,
-                mins_prep: "",
-                mins_cook: "",
-                procedure: "",
-                tags: [{ category: "", value: "" }],
-                ingredients: [{ quantity: "", units: "", value: "" }],
+              name: "",
+              description: "",
+              default_servings: "",
+              mins_prep: "",
+              mins_cook: "",
+              procedure: "",
+              tags: [{ key: "", value: "" }],
+              ingredients: [{ quantity: "", unit: "", name: "", storage: "" }],
+            });
+          }}
+        />
+        <Button
+          title="Fill Form - Test"
+          color="blue"
+          onPress={() => {
+            reset({
+              name: "Coffee Recipe",
+              mins_prep: "0",
+              mins_cook: "0",
+              description: "string",
+              default_servings: "0",
+              procedure: "string",
+              created_at: "string",
+              author_id: "",
+              tags: [
+                {
+                  key: "Cusine",
+                  value: "Italian",
+                },
+              ],
+              ingredients: [
+                {
+                  name: "ICED COFFEE",
+                  storage: "FRIDGE",
+                  quantity: "1",
+                  unit: "cup",
+                },
+              ],
             });
           }}
         />
