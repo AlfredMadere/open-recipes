@@ -1,11 +1,30 @@
-import { useRouter } from "expo-router";
+import { useRouter, Link, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
-import { Link } from "expo-router";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import {
+  useForm,
+  useFieldArray,
+  Controller,
+  UseFieldArrayReturn,
+} from "react-hook-form";
 import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
 import { ScrollView } from "tamagui";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
+interface FormValues {
+  name: string;
+  description: string;
+  default_servings: string;
+  mins_prep: string;
+  mins_cook: string;
+  procedure: string;
+  tags: { category: string; value: string }[];
+  ingredients: { quantity: string; units: string; value: string }[];
+}
 
 export default function Page() {
+  const queryClient = useQueryClient();
+
   const {
     register,
     setValue,
@@ -14,29 +33,32 @@ export default function Page() {
     reset,
     formState: { errors },
     getValues,
-  } = useForm({
+    watch,
+  } = useForm<FormValues>({
     defaultValues: {
       name: "",
       description: "",
-      servings: "",
+      default_servings: "",
       mins_prep: "",
       mins_cook: "",
-      fieldArray: [],
-      fieldArray2: [],
-      instructions: "",
+      procedure: "",
+      tags: [{ category: "", value: "" }],
+      ingredients: [{ quantity: "", units: "", value: "" }],
     },
     // defaultValues: {
     //   value1: [{ email: "Bill", password: "Luo" }],
     // },
   });
-
+  // const name = watch("name");
+  // console.log("name: ", name);
+  
   const {
     fields: fields1,
     append: append1,
     remove: remove1,
   } = useFieldArray({
+    name: "tags",
     control, // control props comes from useForm (optional: if you are using FormContext)
-    name: "fieldArray", // unique name for your Field Array
   });
   const {
     fields: fields2,
@@ -44,26 +66,35 @@ export default function Page() {
     remove: remove2,
   } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
-    name: "fieldArray2", // unique name for your Field Array
+    name: "ingredients", // unique name for your Field Array
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
-    console.log("Form Data: ", data);
+    const newData = data;
+    newData.author_id = '0';
+    newData.created_at = Date().toLocaleString();
+    console.log("Form Data: ", JSON.stringify(newData));
+    //  axios.post("https://open-recipes.onrender.com/recipes", JSON.stringify(data), {
+    //   headers: {
+    // 'Content-Type': 'application/json'
+    //   }
+    // }) 
+    //  .then(res => {console.log('Response: ', res.data)})
+    //  .catch(error => {console.error('Error: ', error)})
 
-    const items = getValues("fieldArray2");
-    console.log(items);
-  };
+
+  }
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollViewContent}>
-        <Text style={styles.label}>Title</Text>
+        <Text style={styles.label}>Name</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={errors["name"] ? styles.error : styles.input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -79,7 +110,7 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={errors["description"] ? styles.error : styles.input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -93,13 +124,13 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={errors["default_servings"] ? styles.error : styles.input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
             />
           )}
-          name="servings"
+          name="default_servings"
           rules={{ required: true }}
         />
 
@@ -111,7 +142,7 @@ export default function Page() {
               <TextInput
                 placeholder={`Prep Time`}
                 placeholderTextColor={"gray"}
-                style={styles.input}
+                style={errors["mins_prep"] ? styles.error : styles.input}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -126,7 +157,7 @@ export default function Page() {
               <TextInput
                 placeholder={`Cook Time`}
                 placeholderTextColor={"gray"}
-                style={styles.input}
+                style={errors["mins_cook"] ? styles.error : styles.input}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -145,36 +176,44 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
-                    style={styles.input}
-                    placeholder={`Key`}
+                    style={
+                      //TODO need to get this logic functioning, and need to connect to backend.
+                      errors["tags"]?.[index]?.["category"]
+                        ? styles.error
+                        : styles.input
+                    }
+                    placeholder={`Category`}
                     placeholderTextColor={"gray"}
                     onChangeText={field.onChange}
-                    value={field.value}
+                    value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`key[${index}].value`}
-                defaultValue=""
+                name={`tags.${index}.category` as keyof FormValues}
+                rules={{ required: true }}
               />
               <Controller
                 control={control}
                 render={({ field }) => (
                   <TextInput
-                    style={styles.input}
+                    style={
+                      errors["tags"]?.[index]?.["value"]
+                        ? styles.error
+                        : styles.input
+                    }
                     placeholder={`Value`}
                     placeholderTextColor={"gray"}
                     onChangeText={field.onChange}
-                    value={field.value}
+                    value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`value[${index}].value`}
+                name={`tags.${index}.value` as keyof FormValues}
+                rules={{ required: true }}
                 defaultValue=""
               />
 
               <View style={styles.smallButton}>
                 <Button
                   onPress={() => {
-                    setValue(`key[${index}].value`, "");
-                    setValue(`value[${index}].value`, "");
                     remove1(index);
                   }}
                   title="Remove"
@@ -189,7 +228,7 @@ export default function Page() {
             title="Add Tag"
             color="white"
             onPress={() => {
-              append1({ value: "" });
+              append1({ category: "", value: "" });
             }}
           />
         </View>
@@ -202,51 +241,60 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
-                    style={styles.input}
+                    style={
+                      errors["ingredients"]?.[index]?.["quantity"]
+                        ? styles.error
+                        : styles.input
+                    }
                     placeholder={`Quantity`}
                     placeholderTextColor={"gray"}
                     onChangeText={field.onChange}
-                    value={field.value}
+                    value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`quantity[${index}].value`}
-                defaultValue=""
+                name={`ingredients.${index}.quantity` as keyof FormValues}
+                rules={{ required: true }}
               />
               <Controller
                 control={control}
                 render={({ field }) => (
                   <TextInput
-                    style={styles.input}
+                    style={
+                      errors["ingredients"]?.[index]?.["units"]
+                        ? styles.error
+                        : styles.input
+                    }
                     placeholder={`Units`}
                     placeholderTextColor={"gray"}
                     onChangeText={field.onChange}
-                    value={field.value}
+                    value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`units[${index}].value`}
-                defaultValue=""
+                name={`ingredients.${index}.units` as keyof FormValues}
+                rules={{ required: true }}
               />
               <Controller
                 control={control}
                 render={({ field }) => (
                   <TextInput
-                    style={styles.input}
+                    style={
+                      errors["ingredients"]?.[index]?.["value"]
+                        ? styles.error
+                        : styles.input
+                    }
                     placeholder={`Ingredient`}
                     placeholderTextColor={"gray"}
                     onChangeText={field.onChange}
-                    value={field.value}
+                    value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`ingredients[${index}].value`}
-                defaultValue=""
+                name={`ingredients.${index}.value` as keyof FormValues}
+                rules={{ required: true }}
               />
 
               <View style={styles.smallButton}>
                 <Button
                   onPress={() => {
-                    setValue(`ingredients[${index}].value`, "");
-                    setValue(`units[${index}].value`, "");
-                    setValue(`quantity[${index}].value`, "");
                     remove2(index);
                   }}
                   title="Remove"
@@ -262,7 +310,7 @@ export default function Page() {
             title="Add Ingredient"
             color="white"
             onPress={() => {
-              append2({ value: "" });
+              append2({ quantity: "", units: "", value: "" });
             }}
           />
         </View>
@@ -272,13 +320,13 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={errors["procedure"] ? styles.error : styles.input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
             />
           )}
-          name="instructions"
+          name="procedure"
           rules={{ required: true }}
         />
       </ScrollView>
@@ -288,12 +336,34 @@ export default function Page() {
           color="red"
           onPress={() => {
             reset({
-              name: "",
-              description: "",
+                name: "",
+                description: "",
+                default_servings: "",
+                mins_prep: "",
+                mins_cook: "",
+                procedure: "",
+                tags: [{ category: "", value: "" }],
+                ingredients: [{ quantity: "", units: "", value: "" }],
             });
           }}
         />
-        <Button title="Create" color="green" onPress={handleSubmit(onSubmit)} />
+        <Button
+          title="Create"
+          color="green"
+          onPress={() => {
+            handleSubmit(onSubmit)();
+            reset({
+              name: "",
+              description: "",
+              default_servings: "",
+              mins_prep: "",
+              mins_cook: "",
+              procedure: "",
+              tags: [{ category: "", value: "" }],
+              ingredients: [{ quantity: "", units: "", value: "" }],
+            });
+          }}
+        />
       </View>
     </View>
   );
@@ -341,6 +411,14 @@ const styles = StyleSheet.create({
     backgroundColor: "gray",
   },
   input: {
+    backgroundColor: "white",
+    height: 40,
+    borderRadius: 4,
+    padding: 10,
+  },
+  error: {
+    borderColor: "red",
+    borderWidth: 1,
     backgroundColor: "white",
     height: 40,
     borderRadius: 4,

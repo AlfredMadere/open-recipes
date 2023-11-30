@@ -1,14 +1,16 @@
-import requests
 import os
-import pytest
+
 import dotenv
+import pytest
 from fastapi.testclient import TestClient
-dotenv.load_dotenv()
+from sqlalchemy import create_engine, text
+
+from open_recipes.database import get_engine
 # base_route = "http://127.0.0.1:8000"
 from open_recipes.server import app
-from open_recipes.database import get_engine
-from sqlalchemy import create_engine, text
+
 client = TestClient(app)
+dotenv.load_dotenv()
 
 
 
@@ -66,7 +68,7 @@ def test_create_user():
     assert response.status_code == 200
     assert response.json()['name'] == 'John Doe'
     assert response.json()['email'] == 'john.doe@example.com'
-    response = client.get(f'/users')
+    response = client.get('/users')
     assert response.status_code == 200
     assert len(response.json()) == 1
 
