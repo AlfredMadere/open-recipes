@@ -10,12 +10,10 @@ import React, { useEffect, useState } from "react";
 export default function Page() {
   const { id } = useLocalSearchParams();
   const [recipes, setRecipes] = useState([]);
-  const router = useRouter();
 
 
   useEffect(() => {
     if(id) {
-      console.log('The value of id is:', id);
       fetchDataFromBackend();
     } else {
       console.log('No id found.');
@@ -30,33 +28,10 @@ export default function Page() {
       }
 
       const data = await response.json();
-      console.log('Response Data:', data);
       const {recipes} = data;
-      console.log('Recipes:', recipes);
       setRecipes(recipes);
     } catch (error) {
       console.error('Error fetching data:', error.message);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      router.back();
-      const response = await fetch(`https://open-recipes.onrender.com/recipe-lists/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        console.log("Deletion was a success! Navigating now.")
-
-      } else {
-        throw new Error('Failed to delete list');
-      }
-    } catch (error) {
-      console.error('Error deleting list:', error.message);
     }
   };
 
@@ -65,11 +40,6 @@ export default function Page() {
   return (
     <View style={{ width: "100%", flex: 1 }}>
       <View style={{ flex: 1, marginVertical: 20 }}>
-      <Button
-            onPress={handleDelete}
-            title="Delete List"
-            color="red"
-        />
         <View style={{ flex: 1 }}>
           <RecipeComponent data={recipes} />
         </View>

@@ -69,12 +69,11 @@ export default function One() {
   };
 
 
-
   return (
     <View style={{ width: "100%", flex: 1 }}>
       <View style={{ flex: 1, marginVertical: 20 }}>
         <View style={{ flex: 1 }}>
-          <ListComponent data={lists} />
+          <ListComponent data={lists}/>
         </View>
       </View>
       <View style={{ alignSelf: "flex-end" }}>
@@ -212,7 +211,7 @@ export default function One() {
   );
 }
 
-const ListComponent = ({ data }) => {
+const ListComponent = ({ data}) => {
 
   return (
     <FlatList
@@ -231,7 +230,7 @@ const ListComponent = ({ data }) => {
           }}
           space
         >
-          <ListCard id={item.id} name={item.name} description={item.description} />
+          <ListCard id={item.id} name={item.name} description={item.description}/>
         </View>
       )}
     />
@@ -242,9 +241,34 @@ export function ListCard(props: { id: string; name: string; description: string 
   const { name, description, id } = props;
   const router = useRouter();
 
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`https://open-recipes.onrender.com/recipe-lists/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        console.log("Deletion was a success! Navigating now.")
+        setIsDeleted(true);
+
+      } else {
+        throw new Error('Failed to delete list');
+      }
+    } catch (error) {
+      console.error('Error deleting list:', error.message);
+    }
+  };
+
 
 
   return (
+    <>
+    {!isDeleted && (
     <Card elevate size="4" width={305} height={120} bordered>
       <Card.Header padded>
         <Text>{name}</Text>
@@ -252,6 +276,11 @@ export function ListCard(props: { id: string; name: string; description: string 
       <Card.Footer padded>
         <XStack flex={1} />
         <Text>{description}</Text>
+        <Button
+            onPress={handleDelete}
+            title="Delete List"
+            color="red"
+        />
         <Button
             onPress={() => {
               router.push(`/lists/${id}`);
@@ -262,5 +291,7 @@ export function ListCard(props: { id: string; name: string; description: string 
        
       </Card.Footer>
     </Card>
+)}  
+    </>
   );
 }
