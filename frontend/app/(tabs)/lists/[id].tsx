@@ -4,12 +4,14 @@ import {
   FlatList,
   Button,
 } from "react-native";
-import { View, Stack, Card, XStack } from "tamagui";
+import { View, Card, XStack } from "tamagui";
 import React, { useEffect, useState } from "react";
 
 export default function Page() {
   const { id } = useLocalSearchParams();
   const [recipes, setRecipes] = useState([]);
+  const router = useRouter();
+
 
   useEffect(() => {
     if(id) {
@@ -37,13 +39,37 @@ export default function Page() {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`https://open-recipes.onrender.com/recipe-lists/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        console.log("Deletion was a success! Navigating now.")
+        router.replace('/index');
+
+      } else {
+        throw new Error('Failed to delete list');
+      }
+    } catch (error) {
+      console.error('Error deleting list:', error.message);
+    }
+  };
 
   
 
   return (
     <View style={{ width: "100%", flex: 1 }}>
       <View style={{ flex: 1, marginVertical: 20 }}>
-      <Text>Recipes</Text>
+      <Button
+            onPress={handleDelete}
+            title="Delete List"
+            color="red"
+        />
         <View style={{ flex: 1 }}>
           <RecipeComponent data={recipes} />
         </View>

@@ -243,6 +243,7 @@ export function ListCard(props: { id: string; name: string; description: string 
   const router = useRouter();
 
 
+
   return (
     <Card elevate size="4" width={305} height={120} bordered>
       <Card.Header padded>
@@ -258,6 +259,7 @@ export function ListCard(props: { id: string; name: string; description: string 
             title="View"
             color="blue"
         />
+       
       </Card.Footer>
     </Card>
   );
