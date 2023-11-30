@@ -29,8 +29,6 @@ export default function Page() {
       console.error('Error fetching data:', error.message);
     }
   };
-
-
   
 
   return (

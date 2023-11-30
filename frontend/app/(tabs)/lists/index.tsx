@@ -29,30 +29,26 @@ export default function One() {
       description: "",
     },
   })
-  const name = watch ("name"); //see if it's populated in the console
-  const description = watch ("description");
-  console.log("name: ", name)
-  console.log("description: ", description)
-  // try commenting out sections at a time to see if it is specific sections affecting it
  
   const onSubmit = async (data) => {
     try {
       const response = await fetch('https://open-recipes.onrender.com/recipe-lists', {
-        method: 'POST',
-        headers: {
+      method: 'POST',
+      headers: {
           'Content-Type': 'application/json',
-        },
+         },
         body: JSON.stringify(data),
-      });
+       });
 
-      if (!response.ok) {
-        throw new Error('Failed to add data');
-      }
+       if (!response.ok) {
+         throw new Error('Failed to add data');
+       }
 
       fetchDataFromBackend();
     } catch (error) {
       console.error('Error adding data:', error.message);
     }
+    setModalVisible(!modalVisible)
   };
 
   useEffect(() => {
@@ -175,10 +171,7 @@ export default function One() {
                       {errors.description && <Text>This description has exceeded the word count.</Text>}
                     
                     <View style={{ padding: 20 }}>
-                    <Button onPress={() => {
-                      setModalVisible(!modalVisible)
-                      handleSubmit(onSubmit)
-                      }}
+                    <Button onPress={handleSubmit(onSubmit)}
                     title="Create"
                     color="green"
                     />
