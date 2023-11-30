@@ -48,6 +48,7 @@ export default function Page() {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const RecipeComponent = ({ data }: any) => {
   return (
     <FlatList
