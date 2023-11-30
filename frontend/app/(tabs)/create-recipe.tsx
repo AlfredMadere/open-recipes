@@ -10,28 +10,10 @@ import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
 import { ScrollView } from "tamagui";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-
-interface FormValues {
-  name: string;
-  mins_prep: string;
-  mins_cook: string;
-  description: string;
-  default_servings: string;
-  procedure: string;
-  created_at: string;
-  author_id: string;
-  tags: { key: string; value: string }[];
-  ingredients: {
-    quantity: string;
-    unit: string;
-    name: string;
-    storage: string;
-  }[];
-}
+import {Recipe, FormattedRecipe, emptyData, sampleData} from "../../components/create-recipe-types/create-recipe-helper"
 
 export default function Page() {
   const queryClient = useQueryClient();
-
   const {
     register,
     setValue,
@@ -41,41 +23,29 @@ export default function Page() {
     formState: { errors },
     getValues,
     watch,
-  } = useForm<FormValues>({
-    defaultValues: {
-      name: "",
-      description: "",
-      default_servings: "",
-      mins_prep: "",
-      mins_cook: "",
-      procedure: "",
-      tags: [{ key: "", value: "" }],
-      ingredients: [{ quantity: "", unit: "", name: "", storage: "FRIDGE" }],
-    },
-    // defaultValues: {
-    //   value1: [{ email: "Bill", password: "Luo" }],
-    // },
+  } = useForm<Recipe>({
+    defaultValues: emptyData,
   });
-  // const name = watch("name");
-  // console.log("name: ", name);
 
-  const {
-    fields: fields1,
-    append: append1,
-    remove: remove1,
+  const { // fieldArray for Tags section
+    fields: fieldsTag,
+    append: appendTag,
+    remove: removeTag,
   } = useFieldArray({
     name: "tags",
-    control, // control props comes from useForm (optional: if you are using FormContext)
+    control,
   });
-  const {
-    fields: fields2,
-    append: append2,
-    remove: remove2,
+
+  const { // fieldArray for Ingredients section
+    fields: fieldsIngredient,
+    append: appendIngredient,
+    remove: removeIngredient,
   } = useFieldArray({
-    control, // control props comes from useForm (optional: if you are using FormContext)
-    name: "ingredients", // unique name for your Field Array
+    control,
+    name: "ingredients",
   });
-  async function postData(data) {
+
+  async function postData(data: FormattedRecipe) {
     axios
       .post("https://open-recipes.onrender.com/recipes", data)
       .then(function (response) {
@@ -86,74 +56,34 @@ export default function Page() {
       });
   }
 
-  const requireIntegerInput = (newValue, onChange) => {
-    // Use parseInt to convert the string to an integer
-    const integerValue = parseInt(newValue, 10);
-
-    // Check if the parsed value is a valid integer
-    if (!isNaN(integerValue) || newValue === "") {
-      onChange(integerValue);
-    }
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = (data: any) => {
-    const newData = data;
-    newData.created_at = Date().toLocaleString();
-    console.log("Form Data: ", JSON.stringify(newData));
+  const onSubmit = (data: Recipe) => {
+    const currentDateTime = Date().toLocaleString();
     const formattedData = {
-      ...newData,
+      ...data,
       default_servings: parseInt(data.default_servings),
       mins_prep: parseInt(data.mins_prep),
       mins_cook: parseInt(data.mins_cook),
       author_id: null,
+      created_at: currentDateTime,
       ingredients: data.ingredients.map((ingredient) => {
         return {
           ...ingredient,
-          quantity: 1, //FIXME
-          storage: "FRIDGE",
+          quantity: parseInt(ingredient.quantity),
+          storage: "FRIDGE", // set storage to FRIDGE for all ingredients
         };
       }),
     };
-    const fakeData = {
-      "name": "Coffee Recipe",
-      "mins_prep": 0,
-      "mins_cook": 0,
-      "description": "string",
-      "default_servings": 0,
-      "procedure": "string",
-      "created_at": "string",
-      "author_id": null,
-      "tags": [
-        {
-          "key": "Cusine",
-          "value": "Italian"
-        }
-      ],
-      "ingredients": [
-        {
-          "name": "ICED COFFEE",
-          "storage": "FRIDGE",
-          "quantity": 1,
-          "unit": "cup"
-        }
-      ]};
-    
-
-    console.log(formattedData);
+    //console.log(formattedData);
     postData(formattedData);
-
-    //  axios.post("https://open-recipes.onrender.com/recipes", JSON.stringify(data), {
-    //   headers: {
-    // 'Content-Type': 'application/json'
-    //   }
-    // })
-    //  .then(res => {console.log('Response: ', res.data)})
-    //  .catch(error => {console.error('Error: ', error)})
+    reset(emptyData);
+    Alert.alert("recipe created");
   };
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollViewContent}>
+
+{/* Name */}
         <Text style={styles.label}>Name</Text>
         <Controller
           control={control}
@@ -169,8 +99,8 @@ export default function Page() {
           rules={{ required: true }}
         />
 
+{/* Description */}
         <Text style={styles.label}>Description</Text>
-
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -184,6 +114,8 @@ export default function Page() {
           name="description"
           rules={{ required: true }}
         />
+
+{/* Servings */}
         <Text style={styles.label}>Servings</Text>
         <Controller
           control={control}
@@ -200,6 +132,7 @@ export default function Page() {
           rules={{ required: true }}
         />
 
+{/* Prep and Cooking Time */}
         <Text style={styles.label}>Time</Text>
         <View style={styles.ingredient}>
           <Controller
@@ -236,10 +169,12 @@ export default function Page() {
           />
         </View>
 
+{/* Tags */}
         <Text style={styles.label}>Tags</Text>
-        {fields1.map((field, index) => (
+        {fieldsTag.map((field, index) => (
           <View key={field.id} style={styles.container}>
             <View style={styles.ingredient}>
+              {/* key */}
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -255,9 +190,10 @@ export default function Page() {
                     value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`tags.${index}.key` as keyof FormValues}
+                name={`tags.${index}.key` as keyof Recipe}
                 rules={{ required: true }}
               />
+              {/* value */}
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -273,15 +209,15 @@ export default function Page() {
                     value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`tags.${index}.value` as keyof FormValues}
+                name={`tags.${index}.value` as keyof Recipe}
                 rules={{ required: true }}
                 defaultValue=""
               />
-
+              {/* remove tag */}
               <View style={styles.smallButton}>
                 <Button
                   onPress={() => {
-                    remove1(index);
+                    removeTag(index);
                   }}
                   title="Remove"
                   color="white"
@@ -290,20 +226,23 @@ export default function Page() {
             </View>
           </View>
         ))}
+        {/* add tag */}
         <View style={styles.smallButton}>
           <Button
             title="Add Tag"
             color="white"
             onPress={() => {
-              append1({ key: "", value: "" });
+              appendTag({ key: "", value: "" });
             }}
           />
         </View>
 
+{/* Ingredients */}
         <Text style={styles.label}>Ingredients</Text>
-        {fields2.map((field, index) => (
+        {fieldsIngredient.map((field, index) => (
           <View key={field.id} style={styles.container}>
             <View style={styles.ingredient}>
+              {/* quantity */}
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -319,9 +258,10 @@ export default function Page() {
                     value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`ingredients.${index}.quantity` as keyof FormValues}
+                name={`ingredients.${index}.quantity` as keyof Recipe}
                 rules={{ required: true }}
               />
+              {/* unit */}
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -337,9 +277,10 @@ export default function Page() {
                     value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`ingredients.${index}.unit` as keyof FormValues}
+                name={`ingredients.${index}.unit` as keyof Recipe}
                 rules={{ required: true }}
               />
+              {/* name */}
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -355,13 +296,14 @@ export default function Page() {
                     value={typeof field.value === "string" ? field.value : ""}
                   />
                 )}
-                name={`ingredients.${index}.name` as keyof FormValues}
+                name={`ingredients.${index}.name` as keyof Recipe}
                 rules={{ required: true }}
               />
-              <View style={styles.smallButton}>
+              {/* remove ingredient */}
+              <View style={styles.smallButton}> 
                 <Button
                   onPress={() => {
-                    remove2(index);
+                    removeIngredient(index);
                   }}
                   title="Remove"
                   color="white"
@@ -370,23 +312,24 @@ export default function Page() {
             </View>
           </View>
         ))}
-
+        {/* add ingredient */}
         <View style={styles.smallButton}>
           <Button
             title="Add Ingredient"
             color="white"
             onPress={() => {
-              append2({
+              appendIngredient({
                 quantity: "",
                 unit: "",
                 name: "",
-                storage: "FRIDGE",
+                storage: "",
               });
             }}
           />
         </View>
-        <Text style={styles.label}>Instructions</Text>
-
+        
+{/* Procedure */}
+        <Text style={styles.label}>Procedure</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -401,53 +344,29 @@ export default function Page() {
           rules={{ required: true }}
         />
       </ScrollView>
+
+{/* Footer */}
       <View style={styles.footer}>
         <Button
           title="Cancel"
           color="red"
           onPress={() => {
-            reset({
-              name: "",
-              description: "",
-              default_servings: "",
-              mins_prep: "",
-              mins_cook: "",
-              procedure: "",
-              tags: [{ key: "", value: "" }],
-              ingredients: [{ quantity: "", unit: "", name: "", storage: "" }],
-            });
+            reset(emptyData);
+            Alert.alert("form reset");
           }}
         />
+
+  {/* Button for testing, populates form with sample data */}
+    {/*         
         <Button
           title="Fill Form - Test"
           color="blue"
           onPress={() => {
-            reset({
-              name: "Coffee Recipe",
-              mins_prep: "0",
-              mins_cook: "0",
-              description: "string",
-              default_servings: "0",
-              procedure: "string",
-              created_at: "string",
-              author_id: "",
-              tags: [
-                {
-                  key: "Cusine",
-                  value: "Italian",
-                },
-              ],
-              ingredients: [
-                {
-                  name: "ICED COFFEE",
-                  storage: "FRIDGE",
-                  quantity: "1",
-                  unit: "cup",
-                },
-              ],
-            });
+            reset(sampleData);
           }}
-        />
+        /> 
+    */}
+
         <Button
           title="Create"
           color="green"
@@ -459,6 +378,8 @@ export default function Page() {
     </View>
   );
 }
+
+// Formatting
 const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
