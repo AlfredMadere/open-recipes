@@ -1,50 +1,80 @@
 /* eslint-disable react/prop-types */
 import { useRouter } from "expo-router";
-import { Button, View, Stack, Card, XStack } from "tamagui";
+import { View, Stack, Card, XStack } from "tamagui";
+import { useForm, Controller } from "react-hook-form";
 import {
   Text,
   FlatList,
   Modal,
   Alert,
   TextInput,
-  SafeAreaView,
+  Button,
+  StyleSheet
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
 
 export default function One() {
-  const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
-  const [name, onChangeNameText] = React.useState("");
-  const [description, onChangeDescriptionText] = React.useState("");
+  const [lists, setLists] = useState([]);
 
-  const lists = [
-    {
-      name: "Breakfast",
-      description: "Some description here...",
+  const {
+    reset,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      description: "",
     },
-    {
-      name: "Lunch",
-      description: "Some description here...",
-    },
-    {
-      name: "Dinner",
-      description: "Some description here...",
-    },
-    {
-      name: "Snacks",
-      description: "Some description here...",
-    },
-    {
-      name: "Desserts",
-      description: "Some description here...",
-    },
-  ];
+  })
+ 
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch('https://open-recipes.onrender.com/recipe-lists', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+         },
+        body: JSON.stringify(data),
+       });
+
+       if (!response.ok) {
+         throw new Error('Failed to add data');
+       }
+
+      fetchDataFromBackend();
+    } catch (error) {
+      console.error('Error adding data:', error.message);
+    }
+    setModalVisible(!modalVisible)
+  };
+
+  useEffect(() => {
+    fetchDataFromBackend();
+  }, []);
+
+  const fetchDataFromBackend = async () => {
+    try {
+      const response = await fetch('https://open-recipes.onrender.com/recipe-lists');
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+      setLists(data);
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+    }
+  };
+
 
   return (
     <View style={{ width: "100%", flex: 1 }}>
       <View style={{ flex: 1, marginVertical: 20 }}>
         <View style={{ flex: 1 }}>
-          <ListComponent data={lists} />
+          <ListComponent data={lists}/>
         </View>
       </View>
       <View style={{ alignSelf: "flex-end" }}>
@@ -88,58 +118,70 @@ export default function One() {
                   <View
                     style={{ justifyContent: "center", alignItems: "center" }}
                   >
-                    <Text style={{ textDecorationLine: "underline" }}>
+                    <View>
+                    <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
                       Create New List
                     </Text>
                   </View>
-                  <Button
-                    style={{
-                      color: "red",
-                      backgroundColor: "white",
-                      position: "absolute",
-                      top: -20,
-                      right: -50,
-                      width: 50,
-                      height: 50,
-                    }}
-                    onPress={() => setModalVisible(!modalVisible)}
-                  >
-                    X
-                  </Button>
-
+                
                   <View style={{ height: 300, paddingTop: 25 }}>
-                    <Text>Name:</Text>
-                    <SafeAreaView>
+                   
+                  <Text>Title:</Text>
+                  <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                     style={
+                      errors["name"] ? styles.error : styles.input
+                     }
+                      placeholder={`Enter name here...`}
+                      onBlur={onBlur}
+                      onChangeText={(value) => onChange(value)}
+                      value={value}
+                       />
+                     )}
+                      name="name"
+                      rules={{ required: true }}
+                     />
+                     {errors.name && <Text style={{color: 'red', fontWeight: 'bold', fontSize: 10}}>This is required.</Text>}
+                     <Text> </Text>
+                    <Text>Description</Text>
+                    <Controller
+                      control={control}
+                      render={({ field: { onChange, onBlur, value } }) => (
                       <TextInput
-                        onChangeText={onChangeNameText}
-                        value={name}
-                        style={{
-                          height: 40,
-                          width: 200,
-                          margin: 12,
-                          borderWidth: 1,
-                          padding: 10,
-                        }}
-                      />
-                    </SafeAreaView>
-                    <Text> </Text>
-                    <Text>Description:</Text>
-                    <SafeAreaView>
-                      <TextInput
-                        onChangeText={onChangeDescriptionText}
-                        value={description}
-                        style={{
-                          height: 40,
-                          margin: 12,
-                          borderWidth: 1,
-                          padding: 10,
-                        }}
-                      />
-                    </SafeAreaView>
-                    <View style={{ padding: 20 }}>
-                      <Button onPress={() => setModalVisible(!modalVisible)}>
-                        Save
-                      </Button>
+                      style={
+                        errors["description"] ? styles.error : styles.input
+                       }
+                       placeholder={`Enter description here...`}
+                        onBlur={onBlur}
+                        onChangeText={(value) => onChange(value)}
+                        value={value}/>
+                      )}
+                     name="description"
+                     rules={{ maxLength: 100, }}
+                     />
+                      {errors.description && <Text style={{color: 'red', fontWeight: 'bold', fontSize: 10}}>This description has exceeded the word count.</Text>}
+                    
+                    <View style={{ padding: 3 }}>
+                    <Button onPress={handleSubmit(onSubmit)}
+                    title="Create"
+                    color="green"
+                    />
+
+                    <Button
+                      onPress={() => {
+                      setModalVisible(!modalVisible)
+                      reset({
+                        name: "",
+                        description: "",
+                      });
+                      }}
+                    title="Cancel"
+                    color="red"
+                    />
+
+                    </View>
                     </View>
                   </View>
                 </View>
@@ -147,16 +189,25 @@ export default function One() {
             </View>
           </Modal>
 
-          <Button onPress={() => setModalVisible(true)}>New List</Button>
+          <Button
+                   onPress={() => {
+                    setModalVisible(true)
+                    reset({
+                      name: "",
+                      description: "",
+                    });
+                    }}
+                  title="New List"
+                  color="blue"
+                  />
         </Stack>
       </View>
     </View>
   );
 }
 
-//DO NOT USE THIS SYNTAX, used any to pass eslint for testing
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ListComponent = ({ data }: any) => {
+const ListComponent = ({ data}) => {
+
   return (
     <FlatList
       data={data}
@@ -174,35 +225,92 @@ const ListComponent = ({ data }: any) => {
           }}
           space
         >
-          <ListCard name={item.name} description={item.description} />
+          <ListCard id={item.id} name={item.name} description={item.description}/>
         </View>
       )}
     />
   );
 };
 
-export function ListCard(props: { name: string; description: string }) {
-  const { name, description } = props;
+export function ListCard(props: { id: string; name: string; description: string }) {
+  const { name, description, id } = props;
   const router = useRouter();
 
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`https://open-recipes.onrender.com/recipe-lists/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        
+        setIsDeleted(true);
+
+      } else {
+        throw new Error('Failed to delete list');
+      }
+    } catch (error) {
+      console.error('Error deleting list:', error.message);
+    }
+  };
+
+
+
   return (
+    <>
+    {!isDeleted && (
     <Card elevate size="4" width={305} height={120} bordered>
       <Card.Header padded>
-        <Text>{name}</Text>
+        <Text style={{fontWeight: 'bold'}}>{name}</Text>
       </Card.Header>
+      <Stack margin={20}>
+      <Text style={{fontSize: 10}}>{description}</Text>
+      </Stack>
+
       <Card.Footer padded>
-        <XStack flex={1} />
-        <Text>{description}</Text>
+        <XStack maxWidth ={1} flex={10} />
+        
+
         <Button
-          alignSelf="center"
-          borderRadius="$2"
-          onPress={() => {
-            router.push("/lists/[id]");
-          }}
-        >
-          View
-        </Button>
+            onPress={handleDelete}
+            title="Delete"
+            color="red"
+        />
+        
+        <Button
+            onPress={() => {
+              router.push(`/lists/${id}`);
+            }}
+            title="View"
+        />
+
+       
       </Card.Footer>
     </Card>
+)}  
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  input: {
+    height: 40,
+    width: 200,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+  error: {
+    borderColor: "red",
+    height: 40,
+    width: 200,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+});
