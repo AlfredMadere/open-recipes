@@ -4,7 +4,8 @@
 
 from __future__ import annotations
 
-from typing import Optional,Literal,Tuple
+from typing import Any, List, Literal, Optional
+
 from pydantic import BaseModel
 
 
@@ -15,21 +16,22 @@ class CreateUserRequest(BaseModel):
     phone: Optional[str] = None
 
 class User(BaseModel):
-    id: Optional[int] = None
+    id: int
+    name: str 
+    email: str 
+    phone: Optional[str] = None
+    disabled: Optional[bool] = None
+
+class UserInDB(User):
+    hashed_password: str
+
+
+class SignUpRequest(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
+    password: Optional[str] = None
 
-    @classmethod
-    def get_by_id(cls, engine, id):
-        with engine.connect() as conn:
-            result = conn.execute(
-                f"""
-                SELECT * FROM users WHERE id = {id}
-                """
-            )
-            user = result.first()
-            return cls(*user)
 
 class RecepieTag(BaseModel):
     id: Optional[int] = None
@@ -46,6 +48,9 @@ class CreateRecipeRequest(BaseModel):
     procedure: Optional[str] = None
     created_at: Optional[str] = None
     author_id: Optional[int] = None 
+    calories: Optional[int] = None
+    tags: Optional[List[Any]] = []   # List of CreateTagRequest
+    ingredients: Optional[List[Any]] = []  # List of CreateIngredientRequest
 
 class Recipe(BaseModel):
     id: Optional[int] = None
@@ -57,11 +62,12 @@ class Recipe(BaseModel):
     created_at: Optional[str] = None
     author_id: Optional[str] = None
     procedure: Optional[str] = None
+    calories: Optional[int] = None
 
     def get_author(self, engine):
         with engine.connect() as conn:
             result = conn.execute(
-                f"""
+                """
                 SELECT id, name, email, phone FROM users WHERE id = :author_id
                 """, {"author_id": self.author_id}
             )
@@ -71,7 +77,7 @@ class Recipe(BaseModel):
     def get_tags(self, engine):
         with engine.connect() as conn:
             result = conn.execute(
-                f"""
+                """
                 SELECT id, key, value 
                 FROM tag
                 JOIN recipe_x_tag as rxt ON tag.id = rxt.tag_id 
@@ -129,7 +135,7 @@ class RecipeList(BaseModel):
     def get_recipes(self, engine ):
         with engine.connect() as conn:
             result = conn.execute(
-                f"""
+                """
                 SELECT id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings
                 FROM recipe
                 JOIN recipe_x_recipe_list as rxl ON recipe.id = rxl.recipe_id
@@ -205,6 +211,17 @@ class Ingredient(BaseModel):
     category_id: Optional[int] = None
     type: Optional[str] = None
     storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
+
+class CreateIngredientRequest(BaseModel):
+    name: Optional[str] = None
+    category_id: Optional[int] = None
+    type: Optional[str] = None
+    storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
+
+class CreateIngredientWithAmount(CreateIngredientRequest):
+    quantity: Optional[int] = None
+    unit: Optional[str] = None
+    
 
 class Tag(BaseModel):
     id: Optional[int] = None

@@ -27,6 +27,7 @@ const StackLayout = () => {
   }
 
   return (
+    // auth provider
     <TamaguiProvider config={tamaguiConfig}>
       <QueryClientProvider client={queryClient}>
         <Theme name="light">
