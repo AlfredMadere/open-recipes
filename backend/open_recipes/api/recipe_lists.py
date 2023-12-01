@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
+from open_recipes.api.auth import TokenData, get_current_user
 
 from open_recipes.database import get_engine
 from open_recipes.models import (CreateRecipeListRequest, Recipe, RecipeList,
@@ -21,13 +22,18 @@ class SearchResults(BaseModel):
 
 metadata_obj = sqlalchemy.MetaData()
 @router.get('', response_model=List[RecipeList])
-def get_recipe_lists(engine : Annotated[Engine, Depends(get_engine)]) -> List[RecipeList]:
+def get_recipe_lists(engine : Annotated[Engine, Depends(get_engine)], current_user: TokenData = Depends(get_current_user)) -> List[RecipeList]:
     """
     Get all recipe lists
     """
+    user_id = current_user.id
     recipeListAll = []
     with engine.begin() as conn:
-        result = conn.execute(text("SELECT id, name, description FROM recipe_list ORDER BY id"))
+        result = conn.execute(text("""SELECT id, name, description 
+                                   FROM recipe_list
+                                   JOIN user_x_recipe_list ON recipe_list.id = user_x_recipe_list.recipe_list_id
+                                   WHERE user_x_recipe_list.user_id = :user
+                                   ORDER BY id"""), {"user": user_id})
         rows = result.fetchall()
         for row in rows: 
             id, name, description = row
@@ -37,18 +43,19 @@ def get_recipe_lists(engine : Annotated[Engine, Depends(get_engine)]) -> List[Re
 @router.post(
     '', response_model=None, status_code=201, responses={'201': {'model': RecipeList}}
 )
-def post_recipe_lists(body: CreateRecipeListRequest,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, RecipeList]:
+def post_recipe_lists(body: CreateRecipeListRequest,engine : Annotated[Engine, Depends(get_engine)], current_user: TokenData = Depends(get_current_user)) -> Union[None, RecipeList]:
     """
     Create a new recipe list
     """
+    user_id = current_user.id
     with engine.begin() as conn:
         result = conn.execute(text("""INSERT INTO recipe_list (name, description)
                                     VALUES (:name, :description)
                                     RETURNING id, name, description 
                                    """
                                     ),{"name":body.name,"description":body.description})
-        
         id, name, description= result.fetchone()
+        conn.execute(text("""INSERT INTO user_x_recipe_list (user_id, recipe_list_id) VALUES (:user_id, :recipe_list_id)"""),{"user_id":user_id,"recipe_list_id":id})
         #print(id, name, description)
         return RecipeList(id=id, name=name, description=description)
 
