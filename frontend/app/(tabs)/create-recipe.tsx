@@ -51,7 +51,7 @@ export default function Page() {
   });
   // const name = watch("name");
   // console.log("name: ", name);
-  
+
   const {
     fields: fields1,
     append: append1,
@@ -72,19 +72,17 @@ export default function Page() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
     const newData = data;
-    newData.author_id = '0';
+    newData.author_id = "0";
     newData.created_at = Date().toLocaleString();
     console.log("Form Data: ", JSON.stringify(newData));
     //  axios.post("https://open-recipes.onrender.com/recipes", JSON.stringify(data), {
     //   headers: {
     // 'Content-Type': 'application/json'
     //   }
-    // }) 
+    // })
     //  .then(res => {console.log('Response: ', res.data)})
     //  .catch(error => {console.error('Error: ', error)})
-
-
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -336,14 +334,14 @@ export default function Page() {
           color="red"
           onPress={() => {
             reset({
-                name: "",
-                description: "",
-                default_servings: "",
-                mins_prep: "",
-                mins_cook: "",
-                procedure: "",
-                tags: [{ category: "", value: "" }],
-                ingredients: [{ quantity: "", units: "", value: "" }],
+              name: "",
+              description: "",
+              default_servings: "",
+              mins_prep: "",
+              mins_cook: "",
+              procedure: "",
+              tags: [{ category: "", value: "" }],
+              ingredients: [{ quantity: "", units: "", value: "" }],
             });
           }}
         />

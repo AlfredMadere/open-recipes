@@ -1,9 +1,9 @@
 import { Tabs } from "expo-router";
 import { View } from "react-native";
-import React from "react";
 
 function _layout() {
   return (
+    // If login is successful, show the Tabs
     <Tabs>
       <Tabs.Screen
         name="feed"
