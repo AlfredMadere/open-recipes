@@ -15,6 +15,19 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 //import { useRouter } from "expo-router";
 import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+
+
+
+async function getValueFor(key: string) {
+    const result = await SecureStore.getItemAsync(key);
+    if (result) {
+      alert("🔐 Here's your value 🔐 \n" + result);
+      return result;
+    } else {
+      alert("No values stored under that key.");
+    }
+  }
 
 export default function SearchScreen() {
   //const router = useRouter();
@@ -228,7 +241,7 @@ type runQueryProps = {
 
 function ComputeResults(props: runQueryProps) {
   //Alert.alert("we have reached the function");
-  //Alert.alert("Request: " + props.req);
+  Alert.alert("Request: " + props.req);
 
   type RecipeProps = {
     id: number;
@@ -246,12 +259,21 @@ function ComputeResults(props: runQueryProps) {
   };
 
   async function getSearchResults() {
-    const response = await axios.get(props.req);
+    const authToken = await getValueFor("authtoken");
+
+    alert("inside of get results");
+    const response = await axios.get(props.req,
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      });
 
     console.log("response.data", response.data);
     const datares = JSON.stringify(response.data, null, 2);
 
-    //Alert.alert("response.data: " + datares);
+    Alert.alert("response.data: " + datares);
     return response.data;
   }
 
