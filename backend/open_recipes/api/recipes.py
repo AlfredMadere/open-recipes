@@ -62,8 +62,7 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
                 recipe.c.calories
             
             ).distinct()
-            .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
-            .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
+            
             
         )
 
@@ -71,6 +70,8 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
             stmt = stmt.where(recipe.c.name.ilike(f"%{name}%"))
         if max_time is not None:
             stmt = stmt.where(recipe.c.mins_cook + recipe.c.mins_prep <= max_time)
+        if tag_key or tag_value:
+            stmt = stmt.outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id).outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
         if tag_key is not None:
             stmt = stmt.where(recipe_tag.c.key == tag_key)
         if tag_value is not None:
@@ -78,27 +79,38 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
         if authored_by is not None:
             stmt = stmt.where(recipe.c.author_id == authored_by)
         if use_inventory_of is not None:
-            stmt = (stmt
-                    .join(recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id)
-                    .outerjoin(user_x_ingredient, 
-                            (recipe_ingredients.c.ingredient_id == user_x_ingredient.c.ingredient_id) & 
-                            (user_x_ingredient.c.user_id == use_inventory_of))
-                    .group_by(
-                        recipe.c.id,
-                        recipe.c.name,
-                        recipe.c.mins_prep,
-                        recipe.c.category_id,
-                        recipe.c.mins_cook,
-                        recipe.c.description,
-                        recipe.c.author_id,
-                        recipe.c.default_servings,
-                        recipe.c.procedure,
-                        recipe.c.calories
-                    ).distinct()
-                    .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
-                    .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
+            print("using inventory of user with id", use_inventory_of)
+            # stmt = (stmt
+            #         .join(recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id)
+            #         .outerjoin(user_x_ingredient, 
+            #                 (recipe_ingredients.c.ingredient_id == user_x_ingredient.c.ingredient_id) & 
+            #                 (user_x_ingredient.c.user_id == use_inventory_of))
+            #         .group_by(
+            #             recipe.c.id,
+            #             recipe.c.name,
+            #             recipe.c.mins_prep,
+            #             recipe.c.category_id,
+            #             recipe.c.mins_cook,
+            #             recipe.c.description,
+            #             recipe.c.author_id,
+            #             recipe.c.default_servings,
+            #             recipe.c.procedure,
+            #             recipe.c.calories
+            #         ).distinct()
+            #         .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
+            #         .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
                     
-                )
+            #     )
+            
+            stmt = stmt.outerjoin(recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id).filter(
+    ~sqlalchemy.exists().where(
+        (recipe_ingredients.c.recipe_id == recipe.c.id) &
+        ~sqlalchemy.exists().where(
+            (user_x_ingredient.c.ingredient_id == recipe_ingredients.c.ingredient_id) &
+            (user_x_ingredient.c.user_id == use_inventory_of)
+        ).correlate(recipe_ingredients)
+    ).correlate(recipe)
+)
 
         if order_by == "calories":
             stmt = (stmt.limit(page_size + 1)
@@ -116,17 +128,7 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
         with engine.connect() as conn:
             result = conn.execute(stmt)
             rows = result.fetchall()
-            print("rows", rows)
         recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure, calories=calories) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure, calories in rows]
-
-            #fix the query so it never returns duplicates in the first place
-        #     unique_recipes = {}
-        #     for recipe in recipes_result:
-        #         if recipe.id not in unique_recipes:
-        #             unique_recipes[recipe.id] = recipe
-
-        # #    Now, unique_recipes contains only unique recipes by id
-        #     deduped_recipes_result = list(unique_recipes.values())
 
         next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
         prev_cursor = cursor - page_size if cursor > 0 else None
@@ -135,7 +137,6 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
             next_cursor= next_cursor,
             recipe= recipes_result 
         )
-        print("search result", search_result)
         return search_result
 
     except exc.SQLAlchemyError as e:
