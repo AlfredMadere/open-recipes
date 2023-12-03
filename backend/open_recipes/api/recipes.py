@@ -25,7 +25,7 @@ class SearchResults(BaseModel):
 
 #gets all recipes, is our search functionality
 @router.get('', response_model=SearchResults)
-def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | None = None, max_time : int | None = None, cursor: int = 0, tag_key: str | None = None, tag_value: str | None = None, use_inventory_of: int | None = None, current_user: TokenData = Depends(get_current_user),order_by : Literal["calories"] | Literal["name"] = "name") -> SearchResults:
+def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | None = None, max_time : int | None = None, cursor: int = 0, tag_key: str | None = None, tag_value: str | None = None, authored_by: int | None = None, use_inventory_of: int | None = None, current_user: TokenData = Depends(get_current_user),order_by : Literal["calories"] | Literal["name"] = "name") -> SearchResults:
     """
     Get all recipes
     """
@@ -75,6 +75,8 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
             stmt = stmt.where(recipe_tag.c.key == tag_key)
         if tag_value is not None:
             stmt = stmt.where(recipe_tag.c.value == tag_value)
+        if authored_by is not None:
+            stmt = stmt.where(recipe.c.author_id == authored_by)
         if use_inventory_of is not None:
             stmt = (stmt
                     .join(recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id)
@@ -146,12 +148,13 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
 #SMOKE TESTED
 #FIXME: increment created at in database
 @router.post('',status_code=201)
-def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends(get_engine)]):
+def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends(get_engine)], current_user: TokenData = Depends(get_current_user)):
 #     """
 #     Create a new recipe
 #     """ 
 
     try: 
+        user_id = current_user.id
         with engine.begin() as conn:
             # try:
 
@@ -188,8 +191,8 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
                                     :calories)
                                     RETURNING id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories"""
                                     
-                ), {"name":body.name,
-                "author_id":body.author_id,
+                ), {"name": body.name,
+                "author_id": user_id,
                 "mins_prep":body.mins_prep,
                 "mins_cook":body.mins_cook
                 ,"description":body.description,
@@ -271,9 +274,21 @@ def get_recipe_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) ->
 # def update_recipe(id: int, recipe : Recipe,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
 #     pass
 
-# @router.delete("/{id}")
-# def delete_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
-#     pass
+@router.delete("/{id}")
+def delete_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)], current_user: TokenData = Depends(get_current_user)) -> None:
+    user_id = current_user.id
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text("""DELETE FROM recipe 
+                                   WHERE id = :id AND author_id = :user_id
+                                   RETURNING id"""),{"id":id, "user_id": user_id})
+            if result.fetchall() == []:
+                raise Exception("Recipe not found, you likely aren't the owner")
+        return "OK"
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Database error "  + e._message())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 #adds a recipe to a given recipe_list when both exist already
 @router.post('/{recipe_id}/recipe-lists/{recipe_list_id}', status_code=201, response_model=None)

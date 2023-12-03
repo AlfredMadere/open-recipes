@@ -88,6 +88,8 @@ function LoginPage() {
         if (response.status === 200) {
           const authToken = response.data.access_token;
           // Save the auth token
+          console.log("about to storer auth token", authToken);
+          console.log("type of auth token", typeof authToken);
           save(key, authToken);
 
           const results = await axios.get(
@@ -100,10 +102,11 @@ function LoginPage() {
             },
           );
 
-          save("userId", results.data.id);
+          save("userId", `${results.data.id}`);
 
           // Redirect to the profile page or wherever you need to go
           router.push("/profile");
+
           alert("success, redirecting to profile right now");
         } else {
           throw new Error("Authentication failed");
