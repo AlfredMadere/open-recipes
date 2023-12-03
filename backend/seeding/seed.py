@@ -412,7 +412,7 @@ def insert_all():
     insert_user_x_ingredients()
     print("done w user x ingredients")
 # print("here")
-# insert_all()
+insert_all()
 
-insert_user_x_ingredients()
+# insert_user_x_ingredients()
 
