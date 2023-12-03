@@ -9,10 +9,9 @@ import {
   Alert,
   TextInput,
   Button,
-  StyleSheet
+  StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-
 
 export default function One() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,27 +27,30 @@ export default function One() {
       name: "",
       description: "",
     },
-  })
- 
+  });
+
   const onSubmit = async (data) => {
     try {
-      const response = await fetch('https://open-recipes.onrender.com/recipe-lists', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-         },
-        body: JSON.stringify(data),
-       });
+      const response = await fetch(
+        "https://open-recipes.onrender.com/recipe-lists",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        },
+      );
 
-       if (!response.ok) {
-         throw new Error('Failed to add data');
-       }
+      if (!response.ok) {
+        throw new Error("Failed to add data");
+      }
 
       fetchDataFromBackend();
     } catch (error) {
-      console.error('Error adding data:', error.message);
+      console.error("Error adding data:", error.message);
     }
-    setModalVisible(!modalVisible)
+    setModalVisible(!modalVisible);
   };
 
   useEffect(() => {
@@ -57,24 +59,25 @@ export default function One() {
 
   const fetchDataFromBackend = async () => {
     try {
-      const response = await fetch('https://open-recipes.onrender.com/recipe-lists');
+      const response = await fetch(
+        "https://open-recipes.onrender.com/recipe-lists",
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
 
       const data = await response.json();
       setLists(data);
     } catch (error) {
-      console.error('Error fetching data:', error.message);
+      console.error("Error fetching data:", error.message);
     }
   };
-
 
   return (
     <View style={{ width: "100%", flex: 1 }}>
       <View style={{ flex: 1, marginVertical: 20 }}>
         <View style={{ flex: 1 }}>
-          <ListComponent data={lists}/>
+          <ListComponent data={lists} />
         </View>
       </View>
       <View style={{ alignSelf: "flex-end" }}>
@@ -119,69 +122,89 @@ export default function One() {
                     style={{ justifyContent: "center", alignItems: "center" }}
                   >
                     <View>
-                    <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
-                      Create New List
-                    </Text>
-                  </View>
-                
-                  <View style={{ height: 300, paddingTop: 25 }}>
-                   
-                  <Text>Title:</Text>
-                  <Controller
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                     style={
-                      errors["name"] ? styles.error : styles.input
-                     }
-                      placeholder={`Enter name here...`}
-                      onBlur={onBlur}
-                      onChangeText={(value) => onChange(value)}
-                      value={value}
-                       />
-                     )}
-                      name="name"
-                      rules={{ required: true }}
-                     />
-                     {errors.name && <Text style={{color: 'red', fontWeight: 'bold', fontSize: 10}}>This is required.</Text>}
-                     <Text> </Text>
-                    <Text>Description</Text>
-                    <Controller
-                      control={control}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                      <TextInput
-                      style={
-                        errors["description"] ? styles.error : styles.input
-                       }
-                       placeholder={`Enter description here...`}
-                        onBlur={onBlur}
-                        onChangeText={(value) => onChange(value)}
-                        value={value}/>
-                      )}
-                     name="description"
-                     rules={{ maxLength: 100, }}
-                     />
-                      {errors.description && <Text style={{color: 'red', fontWeight: 'bold', fontSize: 10}}>This description has exceeded the word count.</Text>}
-                    
-                    <View style={{ padding: 3 }}>
-                    <Button onPress={handleSubmit(onSubmit)}
-                    title="Create"
-                    color="green"
-                    />
-
-                    <Button
-                      onPress={() => {
-                      setModalVisible(!modalVisible)
-                      reset({
-                        name: "",
-                        description: "",
-                      });
-                      }}
-                    title="Cancel"
-                    color="red"
-                    />
-
+                      <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                        Create New List
+                      </Text>
                     </View>
+
+                    <View style={{ height: 300, paddingTop: 25 }}>
+                      <Text>Title:</Text>
+                      <Controller
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <TextInput
+                            style={errors["name"] ? styles.error : styles.input}
+                            placeholder={`Enter name here...`}
+                            onBlur={onBlur}
+                            onChangeText={(value) => onChange(value)}
+                            value={value}
+                          />
+                        )}
+                        name="name"
+                        rules={{ required: true }}
+                      />
+                      {errors.name && (
+                        <Text
+                          style={{
+                            color: "red",
+                            fontWeight: "bold",
+                            fontSize: 10,
+                          }}
+                        >
+                          This is required.
+                        </Text>
+                      )}
+                      <Text> </Text>
+                      <Text>Description</Text>
+                      <Controller
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <TextInput
+                            style={
+                              errors["description"]
+                                ? styles.error
+                                : styles.input
+                            }
+                            placeholder={`Enter description here...`}
+                            onBlur={onBlur}
+                            onChangeText={(value) => onChange(value)}
+                            value={value}
+                          />
+                        )}
+                        name="description"
+                        rules={{ maxLength: 100 }}
+                      />
+                      {errors.description && (
+                        <Text
+                          style={{
+                            color: "red",
+                            fontWeight: "bold",
+                            fontSize: 10,
+                          }}
+                        >
+                          This description has exceeded the word count.
+                        </Text>
+                      )}
+
+                      <View style={{ padding: 3 }}>
+                        <Button
+                          onPress={handleSubmit(onSubmit)}
+                          title="Create"
+                          color="green"
+                        />
+
+                        <Button
+                          onPress={() => {
+                            setModalVisible(!modalVisible);
+                            reset({
+                              name: "",
+                              description: "",
+                            });
+                          }}
+                          title="Cancel"
+                          color="red"
+                        />
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -190,24 +213,23 @@ export default function One() {
           </Modal>
 
           <Button
-                   onPress={() => {
-                    setModalVisible(true)
-                    reset({
-                      name: "",
-                      description: "",
-                    });
-                    }}
-                  title="New List"
-                  color="blue"
-                  />
+            onPress={() => {
+              setModalVisible(true);
+              reset({
+                name: "",
+                description: "",
+              });
+            }}
+            title="New List"
+            color="blue"
+          />
         </Stack>
       </View>
     </View>
   );
 }
 
-const ListComponent = ({ data}) => {
-
+const ListComponent = ({ data }) => {
   return (
     <FlatList
       data={data}
@@ -225,14 +247,22 @@ const ListComponent = ({ data}) => {
           }}
           space
         >
-          <ListCard id={item.id} name={item.name} description={item.description}/>
+          <ListCard
+            id={item.id}
+            name={item.name}
+            description={item.description}
+          />
         </View>
       )}
     />
   );
 };
 
-export function ListCard(props: { id: string; name: string; description: string }) {
+export function ListCard(props: {
+  id: string;
+  name: string;
+  description: string;
+}) {
   const { name, description, id } = props;
   const router = useRouter();
 
@@ -240,59 +270,51 @@ export function ListCard(props: { id: string; name: string; description: string 
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`https://open-recipes.onrender.com/recipe-lists/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://open-recipes.onrender.com/recipe-lists/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (response.ok) {
-        
         setIsDeleted(true);
-
       } else {
-        throw new Error('Failed to delete list');
+        throw new Error("Failed to delete list");
       }
     } catch (error) {
-      console.error('Error deleting list:', error.message);
+      console.error("Error deleting list:", error.message);
     }
   };
 
-
-
   return (
     <>
-    {!isDeleted && (
-    <Card elevate size="4" width={305} height={120} bordered>
-      <Card.Header padded>
-        <Text style={{fontWeight: 'bold'}}>{name}</Text>
-      </Card.Header>
-      <Stack margin={20}>
-      <Text style={{fontSize: 10}}>{description}</Text>
-      </Stack>
+      {!isDeleted && (
+        <Card elevate size="4" width={305} height={120} bordered>
+          <Card.Header padded>
+            <Text style={{ fontWeight: "bold" }}>{name}</Text>
+          </Card.Header>
+          <Stack margin={20}>
+            <Text style={{ fontSize: 10 }}>{description}</Text>
+          </Stack>
 
-      <Card.Footer padded>
-        <XStack maxWidth ={1} flex={10} />
-        
+          <Card.Footer padded>
+            <XStack maxWidth={1} flex={10} />
 
-        <Button
-            onPress={handleDelete}
-            title="Delete"
-            color="red"
-        />
-        
-        <Button
-            onPress={() => {
-              router.push(`/lists/${id}`);
-            }}
-            title="View"
-        />
+            <Button onPress={handleDelete} title="Delete" color="red" />
 
-       
-      </Card.Footer>
-    </Card>
-)}  
+            <Button
+              onPress={() => {
+                router.push(`/lists/${id}`);
+              }}
+              title="View"
+            />
+          </Card.Footer>
+        </Card>
+      )}
     </>
   );
 }

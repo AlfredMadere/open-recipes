@@ -1,7 +1,6 @@
 import { Tabs } from "expo-router";
 import { View } from "react-native";
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from @expo/vector-icons
-
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons from @expo/vector-icons
 
 function _layout() {
   return (
@@ -9,8 +8,8 @@ function _layout() {
     <Tabs>
       <Tabs.Screen
         name="feed"
-        options={{ 
-          tabBarLabel: "Feed", 
+        options={{
+          tabBarLabel: "Feed",
           headerTitle: "Feed",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={30} color={color} /> // Change the icon here
@@ -19,17 +18,23 @@ function _layout() {
       />
       <Tabs.Screen
         name="search"
-        options={{ tabBarLabel: "Search", headerTitle: "Search",
-        tabBarIcon: ({ color, size }) => (
-          <Ionicons name="list" size={30} color={color} /> // Change the icon here
-        ), }}
+        options={{
+          tabBarLabel: "Search",
+          headerTitle: "Search",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="list" size={30} color={color} /> // Change the icon here
+          ),
+        }}
       />
       <Tabs.Screen
         name="create-recipe"
-        options={{ tabBarLabel: "Create", headerTitle: "Create Recipe",
-        tabBarIcon: ({ color, size }) => (
-          <Ionicons name="create" size={30} color={color} /> // Change the icon here
-        ), }}
+        options={{
+          tabBarLabel: "Create",
+          headerTitle: "Create Recipe",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="create" size={30} color={color} /> // Change the icon here
+          ),
+        }}
       />
       <Tabs.Screen
         name="lists"
@@ -44,10 +49,13 @@ function _layout() {
       />
       <Tabs.Screen
         name="profile"
-        options={{ tabBarLabel: "Profile", headerTitle: "Profile",
-        tabBarIcon: ({ color, size }) => (
-          <Ionicons name="ios-person" size={30} color={color} /> // Change the icon here
-        ), }}
+        options={{
+          tabBarLabel: "Profile",
+          headerTitle: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="ios-person" size={30} color={color} /> // Change the icon here
+          ),
+        }}
       />
     </Tabs>
   );

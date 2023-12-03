@@ -71,7 +71,6 @@ function LoginPage() {
   const handleLogin = async () => {
     try {
       if (email.length > 0 && password.length > 0) {
-        alert("we got here 1")
         const response = await axios.post(
           "https://open-recipes.onrender.com/auth/token",
           `grant_type=&username=${encodeURIComponent(
@@ -85,18 +84,14 @@ function LoginPage() {
             },
           },
         );
-          alert("we got here 2")
+
         if (response.status === 200) {
-          alert(
-            "we got it here 3"
-          )
           const authToken = response.data.access_token;
           // Save the auth token
-          console.log("about to storer auth token", authToken)
-          console.log("type of auth token", typeof authToken)
+          console.log("about to storer auth token", authToken);
+          console.log("type of auth token", typeof authToken);
           save(key, authToken);
 
-          alert("we got here 4")
           const results = await axios.get(
             "https://open-recipes.onrender.com/users/me/",
             {
@@ -107,13 +102,11 @@ function LoginPage() {
             },
           );
 
-          alert("we got here 5")
-
           save("userId", `${results.data.id}`);
-        alert("we got here 6");
+
           // Redirect to the profile page or wherever you need to go
           router.push("/profile");
-          alert("we got here 7");
+
           alert("success, redirecting to profile right now");
         } else {
           throw new Error("Authentication failed");
