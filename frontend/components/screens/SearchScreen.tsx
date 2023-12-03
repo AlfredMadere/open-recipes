@@ -17,78 +17,66 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-
-
 async function getValueFor(key: string) {
-    const result = await SecureStore.getItemAsync(key);
-    if (result) {
-      //alert("🔐 Here's your value 🔐 \n" + result);
-      return result;
-    } else {
-      //alert("No values stored under that key.");
-    }
+  const result = await SecureStore.getItemAsync(key);
+  if (result) {
+    //alert("🔐 Here's your value 🔐 \n" + result);
+    return result;
+  } else {
+    //alert("No values stored under that key.");
   }
+}
 
-  type InputTextProps = {
-    size: SizeTokens;
-    searchText: string;
-    setSearchText: Function;
-    onPressGoButton: Function;
-  };
+type InputTextProps = {
+  size: SizeTokens;
+  searchText: string;
+  setSearchText: Function;
+  onPressGoButton: Function;
+};
 
-  type RecipeProps = {
-    id: number;
-    name: string;
-    mins_prep: number;
-    mins_cook: number;
-    description: string;
-    default_servings: number;
-    created_at: string;
-    author_id: string;
-    procedure: string;
+type RecipeProps = {
+  id: number;
+  name: string;
+  mins_prep: number;
+  mins_cook: number;
+  description: string;
+  default_servings: number;
+  created_at: string;
+  author_id: string;
+  procedure: string;
 
-    next_cursor: 0;
-    prev_cursor: 0;
-  };
-   type onPressButtonProps = {
-     key: string;
-     value: string;
-   };
+  next_cursor: 0;
+  prev_cursor: 0;
+};
+type onPressButtonProps = {
+  key: string;
+  value: string;
+};
 
-   type tagProps = {
-     id: number;
-     key: string;
-     value: string;
-   };
+type tagProps = {
+  id: number;
+  key: string;
+  value: string;
+};
 
-   type runQueryProps = {
-     req: string;
-     setPress: Function;
-     setInventory: Function;
-     inventory : boolean;
-     searchText: String;
-     filterKey: String;
-     filterValue: String;
-   };
+type runQueryProps = {
+  req: string;
+  setPress: Function;
+  setInventory: Function;
+  inventory: boolean;
+  searchText: String;
+  filterKey: String;
+  filterValue: String;
+};
 
-   type ResultsProps = {
-     query: {
-       data: {
-         recipe: RecipeProps[];
-       };
-     };
-   };
 export default function SearchScreen() {
   //const router = useRouter();
   //const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState("");
   const [filterKey, setFilterKey] = useState("");
   const [filterValue, setFilterValue] = useState("");
-  const [results, setResults] = useState([]);
   const [pressed, setPressed] = useState(false);
   const [inventory, setInventory] = useState(false);
-
- 
 
   const onPressButton = (props: onPressButtonProps) => {
     // Code for the first action
@@ -98,7 +86,6 @@ export default function SearchScreen() {
   };
 
   function onUseInventory() {
-    
     setPressed(false);
     setInventory(true);
   }
@@ -110,7 +97,6 @@ export default function SearchScreen() {
     filterKey +
     "&tag_value=" +
     filterValue;
-
 
   async function getFilters() {
     const response = await axios.get(
@@ -164,22 +150,28 @@ export default function SearchScreen() {
         {((pressed &&
           searchText.length > 0 &&
           filterKey.length > 0 &&
-          filterValue.length > 0) || inventory) && (
-            <ComputeResults searchText={searchText} filterKey={filterKey} filterValue={filterValue} inventory={inventory}  setInventory={setInventory} setPress={setPressed} req={req} />
-          )}
-        
+          filterValue.length > 0) ||
+          inventory) && (
+          <ComputeResults
+            searchText={searchText}
+            filterKey={filterKey}
+            filterValue={filterValue}
+            inventory={inventory}
+            setInventory={setInventory}
+            setPress={setPressed}
+            req={req}
+          />
+        )}
       </ScrollView>
     </YStack>
   );
 }
 
-
-
 function ComputeResults(props: runQueryProps) {
   //Alert.alert("we have reached the function");
- // Alert.alert("Request: " + props.req);
+  // Alert.alert("Request: " + props.req);
   async function getInventoryResults() {
-   // alert("in get inventory results");
+    // alert("in get inventory results");
     const authToken = await getValueFor("authtoken");
     const userId = await getValueFor("userId");
 
@@ -191,7 +183,7 @@ function ComputeResults(props: runQueryProps) {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",
         },
-      }
+      },
     );
     //alert("response.data" + response.data);
     return response.data;
@@ -201,13 +193,12 @@ function ComputeResults(props: runQueryProps) {
     const authToken = await getValueFor("authtoken");
 
     //alert("inside of get results");
-    const response = await axios.get(props.req,
-      {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          Accept: "application/json",
-        },
-      });
+    const response = await axios.get(props.req, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        Accept: "application/json",
+      },
+    });
 
     console.log("response.data", response.data);
     const datares = JSON.stringify(response.data, null, 2);
@@ -229,8 +220,7 @@ function ComputeResults(props: runQueryProps) {
 
   if (props.inventory == true) {
     query = query3;
-  }
-  else {
+  } else {
     query = query2;
   }
 
@@ -257,8 +247,6 @@ function ComputeResults(props: runQueryProps) {
 
   return result;
 }
-
-
 
 function InputText(props: InputTextProps) {
   return (

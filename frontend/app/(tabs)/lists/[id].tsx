@@ -1,9 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Text,
-  FlatList,
-  Button,
-} from "react-native";
+import { Text, FlatList, Button } from "react-native";
 import { View, Card, XStack, Stack } from "tamagui";
 import React, { useEffect, useState } from "react";
 
@@ -11,31 +7,30 @@ export default function Page() {
   const { id } = useLocalSearchParams();
   const [recipes, setRecipes] = useState([]);
 
-
   useEffect(() => {
-    if(id) {
+    if (id) {
       fetchDataFromBackend();
     } else {
-      console.log('No id found.');
-    }}, []);
-
+      console.log("No id found.");
+    }
+  }, []);
 
   const fetchDataFromBackend = async () => {
     try {
-      const response = await fetch(`https://open-recipes.onrender.com/recipe-lists/${id}`);
+      const response = await fetch(
+        `https://open-recipes.onrender.com/recipe-lists/${id}`,
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
 
       const data = await response.json();
-      const {recipes} = data;
+      const { recipes } = data;
       setRecipes(recipes);
     } catch (error) {
-      console.error('Error fetching data:', error.message);
+      console.error("Error fetching data:", error.message);
     }
   };
-
-  
 
   return (
     <View style={{ width: "100%", flex: 1 }}>
@@ -57,26 +52,23 @@ const RecipeComponent = ({ data }: any) => {
       keyExtractor={(item, index) => index.toString()}
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       renderItem={({ item }) => (
-        <View style={{ flex: 1, marginLeft: 45,
-          marginRight: 45,
-          marginTop: 20,
-          flexDirection: "column",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        paddingHorizontal="$4"
-        space>
-          {
-                data.map((recipe) => {
-                  return (
-                    <RecipeCard
-                      key={recipe.id}
-                      recipe={recipe}
-                    />
-                  );
-                })
-              }
+        <View
+          style={{
+            flex: 1,
+            marginLeft: 45,
+            marginRight: 45,
+            marginTop: 20,
+            flexDirection: "column",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          paddingHorizontal="$4"
+          space
+        >
+          {data.map((recipe) => {
+            return <RecipeCard key={recipe.id} recipe={recipe} />;
+          })}
         </View>
       )}
     />
@@ -84,29 +76,26 @@ const RecipeComponent = ({ data }: any) => {
 };
 
 export function RecipeCard(props: RecipeCardProps) {
-  const recipe = props.recipe
+  const recipe = props.recipe;
   const router = useRouter();
 
-
   return (
-    <Card
-      elevate
-      size="4"
-      width={305}
-      height={120}
-      bordered
-      {...props}
-    >
+    <Card elevate size="4" width={305} height={120} bordered {...props}>
       <Card.Header padded>
-        <Text style={{fontWeight :'bold'}}>{recipe.name}</Text>
+        <Text style={{ fontWeight: "bold" }}>{recipe.name}</Text>
       </Card.Header>
       <Stack margin={20}>
-        <Text style={{fontSize: 12}}>{recipe.description}</Text>
-        </Stack>
-      
+        <Text style={{ fontSize: 12 }}>{recipe.description}</Text>
+      </Stack>
+
       <Card.Footer padded>
-        <XStack flex={1} maxWidth ={1} />
-        <Button title="View" onPress={() => {router.push(`/recipes/${recipe.id}`)}}/>
+        <XStack flex={1} maxWidth={1} />
+        <Button
+          title="View"
+          onPress={() => {
+            router.push(`/recipes/${recipe.id}`);
+          }}
+        />
       </Card.Footer>
     </Card>
   );
@@ -125,5 +114,4 @@ type RecipeCardProps = {
     procedure: string;
     default_servings: number;
   };
-}; 
-
+};

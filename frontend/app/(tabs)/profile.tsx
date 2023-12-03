@@ -22,8 +22,6 @@ import { Text, View } from "react-native";
 // import * as SecureStore from "expo-secure-store";
 // import { useState } from "react";
 
-
-
 // async function getValueFor(key: string) {
 //     const result = await SecureStore.getItemAsync(key);
 //     if (result) {
@@ -36,9 +34,8 @@ import { Text, View } from "react-native";
 // export default async function One() {
 //   const router = useRouter();
 //   const username = "AlfredRocks33";
-  
+
 //   //console.log("the authToken is: " + authToken);
-  
 
 //   async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
 //       const authToken = await getValueFor("authtoken");
@@ -139,8 +136,7 @@ import { Text, View } from "react-native";
 //   );
 // }
 
-
-export default function Profile () {
+export default function Profile() {
   return (
     <View>
       <Text>Im on the profile</Text>

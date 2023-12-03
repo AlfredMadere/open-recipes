@@ -15,7 +15,7 @@ export type Recipe = {
     name: string;
     storage: string;
   }[];
-}
+};
 
 export type FormattedRecipe = {
   name: string;
@@ -49,7 +49,7 @@ export const emptyData = {
     {
       key: "",
       value: "",
-    }
+    },
   ],
   ingredients: [
     {
@@ -57,8 +57,8 @@ export const emptyData = {
       storage: "",
       quantity: "",
       unit: "",
-    }
-  ]
+    },
+  ],
 };
 
 // EXAMPLE DATA - used in "Fill Form - Test" button
@@ -96,6 +96,6 @@ export const sampleData = {
       storage: "FRIDGE",
       quantity: "2",
       unit: "tbsp",
-    }
-  ]
+    },
+  ],
 };

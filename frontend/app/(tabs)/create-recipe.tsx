@@ -1,13 +1,14 @@
 import React from "react";
-import {
-  useForm,
-  useFieldArray,
-  Controller,
-} from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
 import { ScrollView } from "tamagui";
 import axios from "axios";
-import {Recipe, FormattedRecipe, emptyData, sampleData} from "../../components/create-recipe-types/create-recipe-helper"
+import {
+  Recipe,
+  FormattedRecipe,
+  emptyData,
+  sampleData,
+} from "../../components/create-recipe-types/create-recipe-helper";
 
 export default function Page() {
   const {
@@ -19,7 +20,8 @@ export default function Page() {
     defaultValues: emptyData,
   });
 
-  const { // fieldArray for Tags section
+  const {
+    // fieldArray for Tags section
     fields: fieldsTag,
     append: appendTag,
     remove: removeTag,
@@ -28,7 +30,8 @@ export default function Page() {
     control,
   });
 
-  const { // fieldArray for Ingredients section
+  const {
+    // fieldArray for Ingredients section
     fields: fieldsIngredient,
     append: appendIngredient,
     remove: removeIngredient,
@@ -74,8 +77,7 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollViewContent}>
-
-{/* Name */}
+        {/* Name */}
         <Text style={styles.label}>Name</Text>
         <Controller
           control={control}
@@ -91,7 +93,7 @@ export default function Page() {
           rules={{ required: true }}
         />
 
-{/* Description */}
+        {/* Description */}
         <Text style={styles.label}>Description</Text>
         <Controller
           control={control}
@@ -107,7 +109,7 @@ export default function Page() {
           rules={{ required: true }}
         />
 
-{/* Servings */}
+        {/* Servings */}
         <Text style={styles.label}>Servings</Text>
         <Controller
           control={control}
@@ -124,7 +126,7 @@ export default function Page() {
           rules={{ required: true }}
         />
 
-{/* Prep and Cooking Time */}
+        {/* Prep and Cooking Time */}
         <Text style={styles.label}>Time</Text>
         <View style={styles.ingredient}>
           <Controller
@@ -161,7 +163,7 @@ export default function Page() {
           />
         </View>
 
-{/* Tags */}
+        {/* Tags */}
         <Text style={styles.label}>Tags</Text>
         {fieldsTag.map((field, index) => (
           <View key={field.id} style={styles.container}>
@@ -229,7 +231,7 @@ export default function Page() {
           />
         </View>
 
-{/* Ingredients */}
+        {/* Ingredients */}
         <Text style={styles.label}>Ingredients</Text>
         {fieldsIngredient.map((field, index) => (
           <View key={field.id} style={styles.container}>
@@ -292,7 +294,7 @@ export default function Page() {
                 rules={{ required: true }}
               />
               {/* remove ingredient */}
-              <View style={styles.smallButton}> 
+              <View style={styles.smallButton}>
                 <Button
                   onPress={() => {
                     removeIngredient(index);
@@ -319,8 +321,8 @@ export default function Page() {
             }}
           />
         </View>
-        
-{/* Procedure */}
+
+        {/* Procedure */}
         <Text style={styles.label}>Procedure</Text>
         <Controller
           control={control}
@@ -337,7 +339,7 @@ export default function Page() {
         />
       </ScrollView>
 
-{/* Footer */}
+      {/* Footer */}
       <View style={styles.footer}>
         <Button
           title="Cancel"
@@ -348,8 +350,8 @@ export default function Page() {
           }}
         />
 
-  {/* Button for testing, populates form with sample data */}
-    {/*         
+        {/* Button for testing, populates form with sample data */}
+        {/*         
         <Button
           title="Fill Form - Test"
           color="blue"
