@@ -76,7 +76,6 @@ export default function Page() {
     };
   }, []);
 
-
   const onSubmit = (data: Recipe) => {
     const currentDateTime = Date().toLocaleString();
     const formattedData = {

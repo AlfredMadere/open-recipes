@@ -9,25 +9,24 @@ import { useState } from "react";
 import { getValueFor } from "../../helpers/auth";
 
 const Register = () => {
-   const [authToken, setAuthToken] = useState("");
+  const [authToken, setAuthToken] = useState("");
   const queryClient = useQueryClient();
   const { id } = useGlobalSearchParams();
-  console.log("i am rendering recipe")
+  console.log("i am rendering recipe");
   async function getRecipe(): Promise<Recipe> {
-    console.log("i got called")
+    console.log("i got called");
     try {
-
       const response = await axios.get<Recipe>(
-        `https://open-recipes.onrender.com/recipes/${id}`, 
+        `https://open-recipes.onrender.com/recipes/${id}`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
-    console.log("response.data", response.data);
-    return response.data;
+      console.log("response.data", response.data);
+      return response.data;
     } catch (error) {
       console.error("Error fetching recipe", error);
       throw new Error("Error fetching recipe");
@@ -35,7 +34,9 @@ const Register = () => {
   }
 
   const query = useQuery({
-    queryKey: ["recipe", id], queryFn: getRecipe, enabled: !!authToken, // Only run the query if authToken is not empty
+    queryKey: ["recipe", id],
+    queryFn: getRecipe,
+    enabled: !!authToken, // Only run the query if authToken is not empty
   });
 
   useEffect(() => {
@@ -54,7 +55,6 @@ const Register = () => {
       isMounted = false;
     };
   }, []);
-
 
   const { isLoading, data } = query; // Assuming 'query' is a hook or context providing recipe data
 

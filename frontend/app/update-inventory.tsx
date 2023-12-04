@@ -3,7 +3,13 @@ import React, { useEffect } from "react";
 import { Button, Input, Spinner } from "tamagui";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Control, Controller, UseFormRegister, useFieldArray, useForm } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  UseFormRegister,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
 
 type Ingredient = {
   id: number | null;
@@ -73,7 +79,7 @@ const UpdateInventory = () => {
 
   useEffect(() => {
     if (getInventoryQuery.data) {
-      reset({ ingredients: getInventoryQuery.data});
+      reset({ ingredients: getInventoryQuery.data });
     }
   }, [getInventoryQuery.data, reset]);
 
@@ -158,7 +164,7 @@ interface IngredientItemProps {
   index: number;
   update: (index: number, newValue: Ingredient) => void;
   remove: (index: number) => void;
-  
+
   control: Control<Form, unknown>;
 }
 
@@ -167,7 +173,7 @@ const IngredientItem: React.FC<IngredientItemProps> = ({
   index,
   update,
   remove,
-  control
+  control,
 }) => {
   return (
     <View
