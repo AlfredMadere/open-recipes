@@ -51,6 +51,7 @@ type RecipeProps = {
 type onPressButtonProps = {
   key: string;
   value: string;
+  id: number;
 };
 
 type tagProps = {
@@ -77,18 +78,30 @@ export default function SearchScreen() {
   const [filterValue, setFilterValue] = useState("");
   const [pressed, setPressed] = useState(false);
   const [inventory, setInventory] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState(-1); // New state to track the selected filter
 
   const onPressButton = (props: onPressButtonProps) => {
     // Code for the first action
 
-    setFilterKey(props.key);
-    setFilterValue(props.value);
-    setInventory(false);
+    if (selectedFilter === props.id) {
+      // If the tapped filter is already selected, deselect it
+      setFilterKey("");
+      setFilterValue("");
+      setInventory(false);
+      setSelectedFilter(-1);
+    } else {
+      // Otherwise, select the filter
+      setFilterKey(props.key);
+      setFilterValue(props.value);
+      setInventory(false);
+      setSelectedFilter(props.id);
+    }
   };
 
   function onUseInventory() {
     setPressed(false);
     setInventory(true);
+    setSelectedFilter(-1);
   }
 
   const req =
@@ -136,6 +149,11 @@ export default function SearchScreen() {
                 size="$3"
                 key={tag.id}
                 onPress={() => onPressButton(tag)}
+                // Apply different styles based on whether the button is selected
+                style={{
+                  backgroundColor:
+                    tag.id === selectedFilter ? "grey" : "black",
+                }}
               >
                 {tag.value}
               </Button>
