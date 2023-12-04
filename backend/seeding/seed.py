@@ -349,7 +349,7 @@ def insert_all():
 
     with get_engine().connect() as conn:
         conn.execute(text(
-            f"""
+            """
             TRUNCATE TABLE "user" RESTART IDENTITY CASCADE;
             TRUNCATE TABLE recipe_list RESTART IDENTITY CASCADE ;
             TRUNCATE TABLE recipe RESTART IDENTITY CASCADE;
