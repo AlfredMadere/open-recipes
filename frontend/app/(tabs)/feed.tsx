@@ -22,9 +22,6 @@ import { removeDuplicateIds } from "../../helpers";
 import { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 
-
-
-
 export default function Feed() {
   const router = useRouter();
   const [authToken, setAuthToken] = useState("");
@@ -50,7 +47,7 @@ export default function Feed() {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",
         },
-      }
+      },
     );
     // console.log("response.data", response.data);
     return response.data;
@@ -78,11 +75,10 @@ export default function Feed() {
     };
   }, []);
 
-
   const recipes = removeDuplicateIds(query.data?.recipe || []);
   return (
     <View style={{ width: "100%" }}>
-      <View style={{padding: 10}}>
+      <View style={{ padding: 10 }}>
         <Button
           onPress={() => router.push("update-inventory")}
           size="$4" // Adjust the size
