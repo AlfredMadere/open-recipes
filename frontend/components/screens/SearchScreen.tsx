@@ -80,6 +80,7 @@ export default function SearchScreen() {
 
   const onPressButton = (props: onPressButtonProps) => {
     // Code for the first action
+
     setFilterKey(props.key);
     setFilterValue(props.value);
     setInventory(false);
@@ -100,7 +101,7 @@ export default function SearchScreen() {
 
   async function getFilters() {
     const response = await axios.get(
-      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10",
+      "https://open-recipes.onrender.com/tags?cursor=0&key=meal-type&page_size=10"
     );
 
     return response.data;
@@ -147,10 +148,8 @@ export default function SearchScreen() {
       </ScrollView>
 
       <ScrollView>
-        {((pressed &&
-          searchText.length > 0 &&
-          filterKey.length > 0 &&
-          filterValue.length > 0) ||
+        {((pressed && searchText.length > 0) ||
+          (filterKey.length > 0 && filterValue.length > 0) ||
           inventory) && (
           <ComputeResults
             searchText={searchText}
@@ -183,7 +182,7 @@ function ComputeResults(props: runQueryProps) {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",
         },
-      },
+      }
     );
     //alert("response.data" + response.data);
     return response.data;
@@ -199,13 +198,47 @@ function ComputeResults(props: runQueryProps) {
         Accept: "application/json",
       },
     });
-
     console.log("response.data", response.data);
     const datares = JSON.stringify(response.data, null, 2);
-
     //Alert.alert("response.data: " + datares);
     return response.data;
   }
+
+    async function getTagResults() {
+      const authToken = await getValueFor("authtoken");
+      //alert("HI" + props.filterKey);
+      //alert("inside of get results");
+      const response = await axios.get("https://open-recipes.onrender.com/recipes?cursor=0&tag_key=meal-type&tag_value=" + props.filterValue + "&order_by=name", 
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      });
+      console.log("response.data for Tag: ", response.data);
+      const datares = JSON.stringify(response.data, null, 2);
+      //Alert.alert("response.data: " + datares);
+      return response.data;
+    }
+
+    async function getNameResults() {
+      const authToken = await getValueFor("authtoken");
+      //alert("HI" + props.searchText);
+      //alert("inside of get results");
+      const response = await axios.get(
+        "https://open-recipes.onrender.com/recipes?name=" + props.searchText + "&cursor=0&order_by=name",
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+          },
+        }
+      );
+      console.log("response.data for Tag: ", response.data);
+      const datares = JSON.stringify(response.data, null, 2);
+      //Alert.alert("response.data: " + datares);
+      return response.data;
+    }
 
   const query2 = useQuery({
     queryKey: ["recipe", props.searchText, props.filterKey, props.filterValue],
@@ -216,11 +249,27 @@ function ComputeResults(props: runQueryProps) {
     queryFn: getInventoryResults,
   });
 
+  const query4 = useQuery({
+    queryKey: ["recipe", props.filterKey, props.filterValue],
+    queryFn: getTagResults,
+  });
+
+  const query5 = useQuery({
+    queryKey: ["recipe", props.searchText],
+    queryFn: getNameResults,
+  });
+
   let query;
 
   if (props.inventory == true) {
     query = query3;
-  } else {
+  } else if (props.filterKey.length != 0 && props.searchText.length == 0) {
+    query = query4;
+  }
+  else if (props.filterKey.length == 0 && props.searchText.length != 0) {
+    query = query5;
+  }
+  else {
     query = query2;
   }
 
