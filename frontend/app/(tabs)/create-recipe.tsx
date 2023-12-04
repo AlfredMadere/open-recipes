@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { ScrollView } from "tamagui";
 import axios from "axios";
 import {
@@ -126,8 +127,9 @@ export default function Page() {
           rules={{ required: true }}
         />
 
+       
         {/* Prep and Cooking Time */}
-        <Text style={styles.label}>Time</Text>
+        <Text style={styles.label}>Prep Time</Text>
         <View style={styles.ingredient}>
           <Controller
             control={control}
@@ -145,6 +147,10 @@ export default function Page() {
             name="mins_prep"
             rules={{ required: true }}
           />
+          </View>
+
+          <Text style={styles.label}>Cook Time</Text>
+          <View style={styles.ingredient}>
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -161,7 +167,9 @@ export default function Page() {
             name="mins_cook"
             rules={{ required: true }}
           />
-        </View>
+          </View>
+       
+
 
         {/* Tags */}
         <Text style={styles.label}>Tags</Text>
@@ -208,23 +216,18 @@ export default function Page() {
                 defaultValue=""
               />
               {/* remove tag */}
-              <View style={styles.smallButton}>
-                <Button
-                  onPress={() => {
+              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#f0f0f0" onPress={() => {
                     removeTag(index);
-                  }}
-                  title="Remove"
-                  color="white"
-                />
-              </View>
+                  }}/>
             </View>
           </View>
         ))}
         {/* add tag */}
         <View style={styles.smallButton}>
           <Button
-            title="Add Tag"
+            title="Add"
             color="white"
+            backgroundColor="green"
             onPress={() => {
               appendTag({ key: "", value: "" });
             }}
@@ -294,15 +297,10 @@ export default function Page() {
                 rules={{ required: true }}
               />
               {/* remove ingredient */}
-              <View style={styles.smallButton}>
-                <Button
-                  onPress={() => {
+              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#f0f0f0" onPress={() => {
                     removeIngredient(index);
                   }}
-                  title="Remove"
-                  color="white"
-                />
-              </View>
+                  />
             </View>
           </View>
         ))}
@@ -379,7 +377,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   label: {
-    color: "white",
+    color: "#F4591D",
+    fontWeight: "bold",
+    fontSize: 20,
+    //marginTop: 10,
     margin: 20,
     marginLeft: 0,
   },
@@ -387,7 +388,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     color: "white",
     height: 40,
-    backgroundColor: "gray",
+    //backgroundColor: "gray",
     borderRadius: 0,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -403,18 +404,19 @@ const styles = StyleSheet.create({
     marginTop: 0,
     color: "white",
     height: 40,
-    backgroundColor: "gray",
+    width: 50,
+    backgroundColor: "green",
     borderRadius: 4,
-    justifyContent: "flex-end",
+    justifyContent: "center",
     flex: 0,
     flexDirection: "row",
   },
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: 20,
+    paddingTop: 10,
     padding: 8,
-    backgroundColor: "gray",
+    //backgroundColor: "cream",
   },
   input: {
     backgroundColor: "white",

@@ -130,7 +130,7 @@ function LoginPage() {
         onChangeText={(text) => setEmail(text)}
         value={email}
       />
-      <Text style={styles.label}>password</Text>
+      <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   button: {
-    backgroundColor: "blue",
+    backgroundColor: "#F3652F",
     padding: 10,
     borderRadius: 5,
   },
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     marginTop: 15,
-    color: "blue",
+    color: "#F4591D",
   },
 });
 
