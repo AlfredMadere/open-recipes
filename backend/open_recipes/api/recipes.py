@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from open_recipes.api.auth import TokenData, get_current_user
 from open_recipes.database import get_engine
-from open_recipes.models import (CreateIngredientWithAmount,
+from open_recipes.models import (CreateIngredientWithAmount, PopulatedRecipe, IngredientWithAmount, AuthorResponseUser, 
                                  CreateRecipeRequest, Ingredient, Recipe, Tag)
 from open_recipes.database import recipe, recipe_x_tag, recipe_tag, recipe_ingredients, user_x_ingredient
 
@@ -257,16 +257,39 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
 
 #SMOKE TESTED
 #returns recipe with given id
-@router.get('/{recipe_id}', response_model=Recipe)
-def get_recipe_by_id(recipe_id: int, engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
+@router.get('/{recipe_id}', response_model=PopulatedRecipe)
+def get_recipe_by_id(recipe_id: int, engine : Annotated[Engine, Depends(get_engine)]) -> PopulatedRecipe:
     """
     Get a recipe by id
     """
     try:
         with engine.begin() as conn:
-            result = conn.execute(text("""SELECT id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories FROM recipe WHERE id = :id"""),{"id":recipe_id})
-            id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure, calories = result.fetchone()
-            return Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure, calories=calories)
+            recipe_result= conn.execute(text("""SELECT id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories 
+                                       FROM recipe 
+                                       WHERE id = :id"""),{"id":recipe_id})
+
+            ingredients_result = conn.execute(text("""SELECT i.id, i.name, i.type, i.storage, i.category_id, rix.quantity, rix.unit 
+                                                   FROM ingredient i 
+                                                   JOIN recipe_ingredients rix on i.id = rix.ingredient_id
+                                                   WHERE rix.recipe_id = :id 
+                                                   """), {"id":recipe_id})
+            tags_result = conn.execute(text("""SELECT t.id, t.key, t.value 
+                                            FROM recipe_tag t
+                                            JOIN recipe_x_tag rxt on t.id = rxt.tag_id
+                                            WHERE rxt.recipe_id = :id
+                                            """), {"id":recipe_id})
+            author_result= conn.execute(text("""
+                                            SELECT u.id, u.name
+                                            FROM "user" u
+                                            JOIN recipe r on u.id = r.author_id
+                                            WHERE r.id = :id
+                                            """), {"id":recipe_id})
+            author_id, author_name = author_result.fetchone()
+            author = AuthorResponseUser(id=author_id, name=author_name)
+            tags = [Tag(id=id, key=key, value=value) for id, key, value in tags_result.fetchall()]
+            ingredients= [IngredientWithAmount(id = ingredient_id, name=ingredient_name, type=ingredient_type, storage=ingredient_storage, category=ingredient_category_id, quantity=ingredient_quantity, unit=ingredient_unit) for ingredient_id, ingredient_name, ingredient_type, ingredient_storage, ingredient_category_id, ingredient_quantity, ingredient_unit in ingredients_result.fetchall() ]
+            id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure, calories = recipe_result.fetchone()
+            return PopulatedRecipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure, calories=calories, ingredients=ingredients, tags=tags, author=author)
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error "  + e._message())
     except Exception as e:
