@@ -1,23 +1,60 @@
-import { Text, View, StyleSheet, ScrollView } from "react-native";
-import React from "react";
+import { Text, View, StyleSheet, ScrollView, Alert } from "react-native";
+import React, { useEffect } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useGlobalSearchParams } from "expo-router";
 import axios from "axios";
 import { H1, Spinner } from "tamagui";
 import { Recipe } from "../interfaces/models";
+import { useState } from "react";
+import { getValueFor } from "../../helpers/auth";
 
 const Register = () => {
+   const [authToken, setAuthToken] = useState("");
   const queryClient = useQueryClient();
   const { id } = useGlobalSearchParams();
+  console.log("i am rendering recipe")
   async function getRecipe(): Promise<Recipe> {
-    const response = await axios.get(
-      `https://open-recipes.onrender.com/recipes/${id}`,
-    );
+    console.log("i got called")
+    try {
+
+      const response = await axios.get<Recipe>(
+        `https://open-recipes.onrender.com/recipes/${id}`, 
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+          },
+        }
+      );
     console.log("response.data", response.data);
     return response.data;
+    } catch (error) {
+      console.error("Error fetching recipe", error);
+      throw new Error("Error fetching recipe");
+    }
   }
 
-  const query = useQuery({ queryKey: ["recipe", id], queryFn: getRecipe });
+  const query = useQuery({
+    queryKey: ["recipe", id], queryFn: getRecipe, enabled: !!authToken, // Only run the query if authToken is not empty
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const authToken = await getValueFor("authtoken");
+        if (isMounted) {
+          setAuthToken(authToken);
+        }
+      } catch (error) {
+        Alert.alert("Error", "Couldn't get auth token...");
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
 
   const { isLoading, data } = query; // Assuming 'query' is a hook or context providing recipe data
 
