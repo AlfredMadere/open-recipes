@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 import React, { useEffect } from "react";
-import { Button, Input } from "tamagui";
+import { Button, Input, Spinner } from "tamagui";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Control, Controller, UseFormRegister, useFieldArray, useForm } from "react-hook-form";
 
 type Ingredient = {
   id: number | null;
@@ -39,10 +39,10 @@ const UpdateInventory = () => {
 
   const onSubmit = async (data: Form) => {
     console.log("Form Data: ", data);
-    await updateInventoryMutation.mutate(data.ingredients);
+    await updateInventoryMutation.mutateAsync(data.ingredients);
     await getInventoryQuery.refetch();
   };
-  const { control, handleSubmit, reset } = useForm<Form>({
+  const { control, handleSubmit, reset, register } = useForm<Form>({
     defaultValues: {
       ingredients: [],
     },
@@ -54,16 +54,16 @@ const UpdateInventory = () => {
     keyName: "temp_id",
   });
 
-  const getInventoryQuery = useQuery({
+  const getInventoryQuery = useQuery<Ingredient[], Error>({
     queryKey: ["inventory", user_id],
     queryFn: async () => {
       try {
         console.log("queryFn is called"); // Add this line
-        const result = await axios.get(
+        const result = await axios.get<Ingredient[]>(
           `https://open-recipes.onrender.com/users/2/ingredients/`,
         );
-        console.log("result.data", result.data);
-        return result;
+        console.log("result", result);
+        return result.data;
       } catch (error) {
         console.error("Error fetching inventory", error);
         return [];
@@ -73,7 +73,7 @@ const UpdateInventory = () => {
 
   useEffect(() => {
     if (getInventoryQuery.data) {
-      reset({ ingredients: getInventoryQuery.data.data });
+      reset({ ingredients: getInventoryQuery.data});
     }
   }, [getInventoryQuery.data, reset]);
 
@@ -97,7 +97,6 @@ const UpdateInventory = () => {
     >
       <Button
         onPress={() => {
-          console.log("attempting refetch");
           getInventoryQuery.refetch();
         }}
         bordered
@@ -113,6 +112,7 @@ const UpdateInventory = () => {
             index={index}
             update={update}
             remove={remove}
+            control={control}
           />
         ))}
         <View
@@ -139,8 +139,13 @@ const UpdateInventory = () => {
         </View>
       </View>
       <Button onPress={handleSubmit(onSubmit)} bordered>
-        {" "}
         Update Inventory
+        {getInventoryQuery.isFetching ||
+        updateInventoryMutation.status === "pending" ? (
+          <Spinner size="small" color="$green10" />
+        ) : (
+          ""
+        )}
       </Button>
     </View>
   );
@@ -153,6 +158,8 @@ interface IngredientItemProps {
   index: number;
   update: (index: number, newValue: Ingredient) => void;
   remove: (index: number) => void;
+  
+  control: Control<Form, unknown>;
 }
 
 const IngredientItem: React.FC<IngredientItemProps> = ({
@@ -160,6 +167,7 @@ const IngredientItem: React.FC<IngredientItemProps> = ({
   index,
   update,
   remove,
+  control
 }) => {
   return (
     <View
@@ -169,11 +177,19 @@ const IngredientItem: React.FC<IngredientItemProps> = ({
       {ingredient.id ? (
         <Text style={{ width: "70%" }}>{ingredient.name}</Text>
       ) : (
-        <Input
-          placeholder="Ingredient Name"
-          value={ingredient.name}
-          onChangeText={(text) => update(index, { ...ingredient, name: text })}
-          style={{ width: "70%" }}
+        <Controller
+          control={control}
+          name={`ingredients.${index}.name`}
+          defaultValue={ingredient.name}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Ingredient Name"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              style={{ width: "70%" }}
+            />
+          )}
         />
       )}
       <Button onPress={() => remove(index)} bordered style={{ color: "red" }}>

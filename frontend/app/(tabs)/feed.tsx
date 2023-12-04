@@ -58,28 +58,45 @@ export default function Feed() {
   const query = useQuery({
     queryKey: ["recipes_feed"],
     queryFn: getRecipesFeed,
+    enabled: !!authToken, // Only run the query if authToken is not empty
   });
 
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       try {
-
-      const authToken = await getValueFor("authtoken");
-      setAuthToken(authToken);
+        const authToken = await getValueFor("authtoken");
+        if (isMounted) {
+          setAuthToken(authToken);
+        }
       } catch (error) {
-        alert("Couldn't get auth token, you're probably not logged in and won't be able to access sensitive information")
+        Alert.alert("Error", "Couldn't get auth token...");
       }
-
     })();
-  })
-
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
   return (
     <View style={{ width: "100%" }}>
-      <View>
-        <Button onPress={() => router.push("update-inventory")}>
+      <View style={{padding: 10}}>
+        <Button
+          onPress={() => router.push("update-inventory")}
+          size="$4" // Adjust the size
+          color="$blue10" // Set the button color
+          borderRadius="$6" // Round the corners
+          // shadowColor="$shadow" // Add a shadow
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          hoverStyle={{ backgroundColor: "$blue8" }} // Change color on hover
+          pressStyle={{ backgroundColor: "$blue12" }} // Change color on press
+          fontFamily="$body" // Set the font family
+          fontSize="$4" // Set the font size
+          fontWeight="bold" // Make the text bold
+        >
           Update Inventory
         </Button>
       </View>
