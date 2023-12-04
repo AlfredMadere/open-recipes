@@ -258,13 +258,13 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
 #SMOKE TESTED
 #returns recipe with given id
 @router.get('/{recipe_id}', response_model=Recipe)
-def get_recipe_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
+def get_recipe_by_id(recipe_id: int, engine : Annotated[Engine, Depends(get_engine)]) -> Recipe:
     """
     Get a recipe by id
     """
     try:
         with engine.begin() as conn:
-            result = conn.execute(text("""SELECT id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories FROM recipe WHERE id = :id"""),{"id":id})
+            result = conn.execute(text("""SELECT id, name, mins_prep, mins_cook, description, default_servings, author_id, procedure, calories FROM recipe WHERE id = :id"""),{"id":recipe_id})
             id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure, calories = result.fetchone()
             return Recipe(id=id,name=name,mins_prep=mins_prep,mins_cook=mins_cook,description=description,default_servings=default_servings,author_id=author_id, procedure=procedure, calories=calories)
     except exc.SQLAlchemyError as e:
