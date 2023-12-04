@@ -117,6 +117,7 @@ export default function Feed() {
           {recipes.map((recipe) => {
             return <RecipeCard key={recipe.id} recipe={recipe} />;
           })}
+          <View style={{ height: 100 }} />
         </YStack>
       </ScrollView>
     </View>
