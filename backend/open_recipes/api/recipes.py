@@ -128,6 +128,7 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
         with engine.connect() as conn:
             result = conn.execute(stmt)
             rows = result.fetchall()
+            print("rows", rows)
         recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure, calories=calories) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure, calories in rows]
 
         next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
@@ -322,8 +323,10 @@ def add_recipe_to_recipe_list(recipe_id: int, recipe_list_id: int,engine : Annot
             conn.execute(text("INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES (:recipe_id, :recipe_list_id)"),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
             return "OK"
     except exc.SQLAlchemyError as e:
+        print(str(e))
         raise HTTPException(status_code=500, detail="Database error " + e._message())
     except Exception as e:
+        print(str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 #creates a tag for a recipe

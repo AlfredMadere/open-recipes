@@ -50,7 +50,7 @@ def get_ingredients(engine : Annotated[Engine, Depends(get_engine)], current_use
 
 #returns single ingredient with given ingredient_id
 @router.get('/{ingredient_id}', response_model=Ingredient)
-def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
+def get_ingredient_by_id(ingredient_id : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
     """
     Get an ingredient by id
     """
@@ -58,12 +58,14 @@ def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_
         with engine.begin() as conn:
             result = conn.execute(text("""SELECT id, name, type, storage, category_id 
                                     FROM ingredient
-                                    WHERE id = :id"""))
+                                    WHERE id = :id"""),{"id":ingredient_id})
             id, name, storage, type, category_id = result.fetchone()
             return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
     except exc.SQLAlchemyError as e:
+        print(str(e))
         raise HTTPException(status_code=500, detail="Database error " + e._message())
     except Exception as e:
+        print(str(e))
         raise HTTPException(status_code=500, detail=str(e))
     
 # @router.post("/{id}")

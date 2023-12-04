@@ -177,7 +177,8 @@ class Ingredient(BaseModel):
     name: Optional[str] = None
     category_id: Optional[int] = None
     type: Optional[str] = None
-    storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
+    storage : Optional[str] = None
+    # storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
 
 class CreateIngredientRequest(BaseModel):
     name: Optional[str] = None
