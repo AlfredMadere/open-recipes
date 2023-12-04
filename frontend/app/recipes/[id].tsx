@@ -6,7 +6,7 @@ import axios from "axios";
 import { H1, Spinner } from "tamagui";
 import { Recipe } from "../interfaces/models";
 import { useState } from "react";
-import { getValueFor } from "../../lib/auth";
+import { getValueFor } from "../../helpers/auth";
 
 const Register = () => {
    const [authToken, setAuthToken] = useState("");
