@@ -25,6 +25,7 @@ def get_secret():
     dotenv.load_dotenv()
     return os.environ.get("API_SECRET_KEY")
 print("seret", get_secret())
+SECRET_KEY = get_secret()
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
