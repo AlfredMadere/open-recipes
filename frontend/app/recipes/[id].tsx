@@ -1,23 +1,27 @@
 import { Text, View, StyleSheet, ScrollView, Alert } from "react-native";
 import React, { useEffect } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { useGlobalSearchParams } from "expo-router";
+import { router, useGlobalSearchParams } from "expo-router";
 import axios from "axios";
-import { H1, Spinner } from "tamagui";
-import { Recipe } from "../interfaces/models";
+import { H1, Spinner, Button } from "tamagui";
+import { PopulatedRecipe, Ingredient, Tag} from "../interfaces/models";
 import { useState } from "react";
 import { getValueFor } from "../../helpers/auth";
 
 const Register = () => {
   const [authToken, setAuthToken] = useState("");
+  const [myId, setMyId] = useState<number | null >(null);
   const queryClient = useQueryClient();
   const { id } = useGlobalSearchParams();
-  console.log("i am rendering recipe");
-  async function getRecipe(): Promise<Recipe> {
-    console.log("i got called");
+  console.log("id: ", id);
+  async function getRecipe(): Promise<PopulatedRecipe> {
+    if (!myId) {
+      throw new Error("No id");
+    }
     try {
-      const response = await axios.get<Recipe>(
-        `https://open-recipes.onrender.com/recipes/${id}`,
+
+      const response = await axios.get<PopulatedRecipe>(
+        `https://open-recipes.onrender.com/recipes/${id}`, 
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -34,9 +38,13 @@ const Register = () => {
   }
 
   const query = useQuery({
+<<<<<<< HEAD
     queryKey: ["recipe", id],
     queryFn: getRecipe,
     enabled: !!authToken, // Only run the query if authToken is not empty
+=======
+    queryKey: ["recipe", id], queryFn: getRecipe, enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
+>>>>>>> e5cd77f (profile and recipe progress)
   });
 
   useEffect(() => {
@@ -44,8 +52,10 @@ const Register = () => {
     (async () => {
       try {
         const authToken = await getValueFor("authtoken");
+        const id = await getValueFor('userId');
         if (isMounted) {
           setAuthToken(authToken);
+          setMyId(parseInt(id));
         }
       } catch (error) {
         Alert.alert("Error", "Couldn't get auth token...");
@@ -65,20 +75,24 @@ const Register = () => {
   const ingredients = data?.ingredients || []; // Assuming ingredients are stored in an array
   const tags = data?.tags || []; // Assuming tags are stored in an array
 
-  type RecipeCardProps = {
-    recipe: {
-      name: string;
-      description: string;
-      id: number;
-      mins_prep: number;
-      mins_cook: number;
-      category_id: number;
-      author_id: number;
-      created_at: string;
-      procedure: string;
-      default_servings: number;
-    };
-  };
+  async function deleteRecipe(id: string | string[] | undefined) {
+    console.log(`https://open-recipes.onrender.com/recipes/${id}`)
+    axios
+      .delete(`https://open-recipes.onrender.com/recipes/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      })
+      .then(function (response) {
+        console.log(response, null, 2);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -101,7 +115,7 @@ const Register = () => {
           <Text style={styles.sectionTitle}>Ingredients:</Text>
           {ingredients.map((ingredient, index) => (
             <Text key={index} style={styles.infoItem}>
-              - {ingredient}
+              - {ingredient.name}: {ingredient.quantity}              
             </Text>
           ))}
         </View>
@@ -110,11 +124,39 @@ const Register = () => {
           <Text style={styles.sectionTitle}>Tags:</Text>
           {tags.map((tag, index) => (
             <Text key={index} style={styles.infoItem}>
-              - {tag}
+              - {tag.key}: {tag.value}
             </Text>
           ))}
         </View>
       </View>
+      
+      {data?.author_id == myId ? 
+      
+      (<View style={{padding: 10}}>
+        <Button
+          onPress={() => {deleteRecipe(id)}}
+          size="$4" // Adjust the size
+          color="$red" // Set the button color
+          borderRadius="$6" // Round the corners
+          // shadowColor="$shadow" // Add a shadow
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          hoverStyle={{ backgroundColor: "$red8" }} // Change color on hover
+          pressStyle={{ backgroundColor: "$red8" }} // Change color on press
+          fontFamily="$body" // Set the font family
+          fontSize="$4" // Set the font size
+          fontWeight="bold" // Make the text bold
+        >
+          Delete Recipe
+        </Button>
+      </View>)
+      
+      : ""}
+
+      <View style={{ height: 200 }} />
+      
+
+
     </ScrollView>
   );
 };
