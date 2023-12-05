@@ -104,12 +104,13 @@ export default function Page() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollViewContent}>
         {/* Name */}
-        <Text style={styles.label}>Name</Text>
+        <Text style={styles.label}>Recipe Name:</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["name"] ? styles.error : styles.input}
+              placeholder={`Enter here...`}
+              style={errors["name"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -120,12 +121,13 @@ export default function Page() {
         />
 
         {/* Description */}
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>Description:</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["description"] ? styles.error : styles.input}
+              placeholder={`Enter here...`}
+              style={errors["description"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -136,12 +138,14 @@ export default function Page() {
         />
 
         {/* Servings */}
-        <Text style={styles.label}>Servings</Text>
+        <Text style={styles.label}>Servings:                Times:         </Text>
+        <View style={styles.ingredient}>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["default_servings"] ? styles.error : styles.input}
+              placeholder={`Servings...`}
+              style={errors["default_servings"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -154,15 +158,12 @@ export default function Page() {
 
        
         {/* Prep and Cooking Time */}
-        <Text style={styles.label}>Prep Time</Text>
-        <View style={styles.ingredient}>
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                placeholder={`Prep Time`}
-                placeholderTextColor={"gray"}
-                style={errors["mins_prep"] ? styles.error : styles.input}
+                placeholder={`Prep Time...`}
+                style={errors["mins_prep"] ? styles.error : styles.regular_input}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -172,17 +173,13 @@ export default function Page() {
             name="mins_prep"
             rules={{ required: true }}
           />
-          </View>
-
-          <Text style={styles.label}>Cook Time</Text>
-          <View style={styles.ingredient}>
+     
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                placeholder={`Cook Time`}
-                placeholderTextColor={"gray"}
-                style={errors["mins_cook"] ? styles.error : styles.input}
+                placeholder={`Cook Time...`}
+                style={errors["mins_cook"] ? styles.error : styles.regular_input}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -197,7 +194,7 @@ export default function Page() {
 
 
         {/* Tags */}
-        <Text style={styles.label}>Tags</Text>
+        <Text style={styles.label}>Tags:</Text>
         {fieldsTag.map((field, index) => (
           <View key={field.id} style={styles.container}>
             <View style={styles.ingredient}>
@@ -209,10 +206,9 @@ export default function Page() {
                     style={
                       errors["tags"]?.[index]?.["key"]
                         ? styles.error
-                        : styles.input
+                        : styles.regular_input
                     }
-                    placeholder={`Key`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Key...`}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -228,7 +224,7 @@ export default function Page() {
                     style={
                       errors["tags"]?.[index]?.["value"]
                         ? styles.error
-                        : styles.input
+                        : styles.regular_input
                     }
                     placeholder={`Value`}
                     placeholderTextColor={"gray"}
@@ -241,7 +237,7 @@ export default function Page() {
                 defaultValue=""
               />
               {/* remove tag */}
-              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#f0f0f0" onPress={() => {
+              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#EBE7E0" onPress={() => {
                     removeTag(index);
                   }}/>
             </View>
@@ -265,6 +261,11 @@ export default function Page() {
           <View key={field.id} style={styles.container}>
             <View style={styles.ingredient}>
               {/* quantity */}
+              <Text style={{color: "#F4591D",
+                            fontSize: 12,
+                            marginTop: 10,
+                            margin: 0,
+                            marginLeft: 0,}}>Quantity: </Text>
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -272,7 +273,11 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["quantity"]
                         ? styles.error
-                        : styles.input
+                        : {backgroundColor: "white",
+                            height: 40,
+                            width: 40,
+                            borderRadius: 4,
+                            padding: 10,}
                     }
                     placeholder={`Quantity`}
                     placeholderTextColor={"gray"}
@@ -284,6 +289,11 @@ export default function Page() {
                 rules={{ required: true }}
               />
               {/* unit */}
+              <Text style={{color: "#F4591D",
+                            fontSize: 12,
+                            marginTop: 10,
+                            margin: 0,
+                            marginLeft: 0,}}>Units: </Text>
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -291,7 +301,7 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["unit"]
                         ? styles.error
-                        : styles.input
+                        : styles.small_input
                     }
                     placeholder={`Unit`}
                     placeholderTextColor={"gray"}
@@ -310,7 +320,7 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["name"]
                         ? styles.error
-                        : styles.input
+                        : styles.small_input
                     }
                     placeholder={`Ingredient`}
                     placeholderTextColor={"gray"}
@@ -322,7 +332,7 @@ export default function Page() {
                 rules={{ required: true }}
               />
               {/* remove ingredient */}
-              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#f0f0f0" onPress={() => {
+              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="##EBE7E0" onPress={() => {
                     removeIngredient(index);
                   }}
                   />
@@ -351,7 +361,7 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["procedure"] ? styles.error : styles.input}
+              style={errors["procedure"] ? styles.error : styles.large_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -404,8 +414,8 @@ const styles = StyleSheet.create({
   label: {
     color: "#F4591D",
     fontWeight: "bold",
-    fontSize: 20,
-    //marginTop: 10,
+    fontSize: 16,
+    marginTop: 10,
     margin: 20,
     marginLeft: 0,
   },
@@ -441,9 +451,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 10,
     padding: 8,
-    //backgroundColor: "cream",
+    backgroundColor: "#EBE7E0",
   },
-  input: {
+  regular_input: {
+    backgroundColor: "white",
+    height: 40,
+    borderRadius: 4,
+    padding: 10,
+  },
+  small_input: {
+    backgroundColor: "white",
+    height: 40,
+    width: 80,
+    borderRadius: 4,
+    padding: 10,
+  },
+  large_input: {
     backgroundColor: "white",
     height: 40,
     borderRadius: 4,
