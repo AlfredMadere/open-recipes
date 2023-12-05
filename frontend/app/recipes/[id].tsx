@@ -364,12 +364,12 @@ function RecipeListModal(params: recipeModalInputs) {
                     </Text>
                   </View>
 
-                  <View style={{ height: 300, paddingTop: 400 }}>
+                  <View style={{ height: 300, paddingTop: 40 }}>
                     
                   </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
       {query.isFetching && <Spinner size="large" color="$orange10" />}
-      <ScrollView style={{ width: "100%", paddingBottom: 500 }}>
+      <ScrollView style={{ width: "100%", paddingBottom: 50 }}>
         <YStack
           $sm={{
             flexDirection: "column",
@@ -382,6 +382,7 @@ function RecipeListModal(params: recipeModalInputs) {
           space
         >
           {recipes.map((recipe) => {
+            
             function addRecipetoRecipelist(id: any) {
               throw new Error("Function not implemented.");
             }
@@ -403,7 +404,7 @@ function RecipeListModal(params: recipeModalInputs) {
                   addRecipetoRecipelist(recipe.id)
                 }}
               >
-                View
+                Add
               </Button>
             </Card.Footer>
           </Card>
