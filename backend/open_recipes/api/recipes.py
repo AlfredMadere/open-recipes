@@ -34,7 +34,7 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
     #
     try:
        
-        page_size = 10
+        page_size = 30 
 
         if (use_inventory_of):
             use_inventory_of = current_user.id
