@@ -79,7 +79,7 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
         if authored_by is not None:
             stmt = stmt.where(recipe.c.author_id == authored_by)
         if use_inventory_of is not None:
-            print("using inventory of user with id", use_inventory_of)
+            # print("using inventory of user with id", use_inventory_of)
             # stmt = (stmt
             #         .join(recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id)
             #         .outerjoin(user_x_ingredient, 
@@ -128,7 +128,7 @@ def get_recipes(engine : Annotated[Engine, Depends(get_engine)], name: str | Non
         with engine.connect() as conn:
             result = conn.execute(stmt)
             rows = result.fetchall()
-            print("rows", rows)
+            # print("rows", rows)
         recipes_result = [Recipe(id=id, name=name, mins_prep=mins_prep, category_id=category_id, mins_cook=mins_cook, description=description, author_id=author_id, default_servings=default_servings, procedure=procedure, calories=calories) for id, name, mins_prep, category_id, mins_cook, description, author_id, default_servings, procedure, calories in rows]
 
         next_cursor = None if len(recipes_result) <= page_size else cursor + page_size
@@ -227,14 +227,14 @@ def create_recipes(body: CreateRecipeRequest ,engine : Annotated[Engine, Depends
             ingredient_ids_result = conn.execute(text("SELECT id, name from ingredient where name = ANY(:names)"),{
                 "names" : [ingredient.name for ingredient in body.ingredients],
             }).fetchall()
-            print("ingredients result", ingredient_ids_result)
+            # print("ingredients result", ingredient_ids_result)
             ingredients = [{"id": element[0], "name": element[1]} for element in ingredient_ids_result]
-            print("ingredients", ingredients)
+            # print("ingredients", ingredients)
             sorted_ingredients_w_id = sorted(ingredients, key=lambda x: x['name'])
             sorted_ingredients_w_quantity = sorted(body.ingredients, key=lambda x: x.name)
 
             for i, ingredient in enumerate(sorted_ingredients_w_id):
-                print(f"sorted ingredients ingredient: {sorted_ingredients_w_quantity[i]}")
+                # print(f"sorted ingredients ingredient: {sorted_ingredients_w_quantity[i]}")
                 conn.execute(text("""INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES (:recipe_id, :ingredient_id, :quantity, :unit)"""), {"recipe_id": id, "ingredient_id": ingredient["id"], "quantity": sorted_ingredients_w_quantity[i].quantity, "unit": sorted_ingredients_w_quantity[i].unit})
 
             for tag_id in tag_ids:
@@ -285,8 +285,11 @@ def get_recipe_by_id(recipe_id: int, engine : Annotated[Engine, Depends(get_engi
                                             JOIN recipe r on u.id = r.author_id
                                             WHERE r.id = :id
                                             """), {"id":recipe_id})
-            author_id, author_name = author_result.fetchone()
-            author = AuthorResponseUser(id=author_id, name=author_name)
+            author_row = author_result.fetchone()
+            author = None
+            if author_row:
+                author_id, author_name = author_row
+                author = AuthorResponseUser(id=author_id, name=author_name)
             tags = [Tag(id=id, key=key, value=value) for id, key, value in tags_result.fetchall()]
             ingredients= [IngredientWithAmount(id = ingredient_id, name=ingredient_name, type=ingredient_type, storage=ingredient_storage, category=ingredient_category_id, quantity=ingredient_quantity, unit=ingredient_unit) for ingredient_id, ingredient_name, ingredient_type, ingredient_storage, ingredient_category_id, ingredient_quantity, ingredient_unit in ingredients_result.fetchall() ]
             id, name, mins_prep,mins_cook,description,default_servings,author_id,procedure, calories = recipe_result.fetchone()
