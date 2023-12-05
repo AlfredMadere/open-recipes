@@ -109,6 +109,7 @@ export default function Profile() {
           {recipes.map((recipe) => {
             return <RecipeCard key={recipe.id} recipe={recipe} />;
           })}
+          <View style={{ height: 300 }} />
         </YStack>
       </ScrollView>
       <View style={{ height: 200 }} />

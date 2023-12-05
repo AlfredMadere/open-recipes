@@ -104,7 +104,11 @@ const Register = () => {
   }
   const recipe_id = data?.id;
   if (!recipe_id) {
-    throw new Error("No id");
+    return (
+      <View>
+        <Text>Recipe not found</Text>
+      </View>
+     )
   }
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -127,7 +131,7 @@ const Register = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ingredients:</Text>
-          {ingredients.map((ingredient, index) => (
+          {ingredients?.map((ingredient, index) => (
             <Text key={index} style={styles.infoItem}>
               - {ingredient.quantity} {ingredient.unit} {ingredient.name}:
             </Text>
@@ -136,7 +140,7 @@ const Register = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tags:</Text>
-          {tags.map((tag, index) => (
+          {tags?.map((tag, index) => (
             <Text key={index} style={styles.infoItem}>
               - {tag.key}: {tag.value}
             </Text>
