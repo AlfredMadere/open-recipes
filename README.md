@@ -36,10 +36,11 @@ Open Recipes is a service for meal planning and recipe management aimed primaril
 
 #### Features for MVP
 1. **User Authentication**: Secure login and registration.
-2. **Personal Recipe Lists**: CRUD operations for recipes, lists and ingredients.
-3. **Public Recipe Library**: Read-only access to a collection of public recipes.
-4. **Week Planner**: Ability to add recipes to a plan and generate shopping list from that.
-5. **Recipe Rating and Reviews**: Users can rate recipes and write revivews
+2. **Recipes**: Users can create, edit, and delete recipes.
+3. **Recipe Lists**: Users can create, edit, and delete recipe lists.
+5. **Public Recipe Library**: Users have read-only access to a collection of public recipes.
+6. **Feed and Search**: Users can browse their feed or search for recipes stored in the database.
+7. **Profile**: Users can view their account information and pinned recipes from their profile page.
    
 #### Future Features
 - Weekly planner to enable users to plan for the week and generate a shopping list
