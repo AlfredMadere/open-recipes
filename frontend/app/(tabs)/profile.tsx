@@ -18,34 +18,28 @@ import axios from "axios";
 import { PopulatedRecipe } from "../interfaces/models";
 import { removeDuplicateIds } from "../../helpers";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../AuthContext";
 
 
 export default function Profile() {
-  const router = useRouter();
-  const [authToken, setAuthToken] = useState("");
-  const [myId, setMyId] = useState<number | null >(null);
-  const queryClient = useQueryClient();
 
-  async function getValueFor(key: string) {
-    const result = await SecureStore.getItemAsync(key);
-    if (result) {
-      return result;
-    } else {
-      throw new Error(`No values stored under ${key}.`);
+    const authContext = useContext(AuthContext);
+    if (!authContext) {
+      throw new Error("AuthContext must be used within an AuthProvider");
     }
-  }
+    const { authToken, userId } = authContext;
 
-  async function getRecipesFeed(): Promise<SearchResult<PopulatedRecipe>> {
+    async function getRecipesFeed(): Promise<SearchResult<PopulatedRecipe>> {
     if (!authToken) {
       throw new Error("No auth token");
     }
-    if (!myId) {
+    if (!userId) {
       throw new Error("No id");
     }
     //console.log("myId: ", myId)
     const response = await axios.get(
-      "https://open-recipes.onrender.com/recipes?cursor=0&authored_by=" + myId + "&order_by=name",
+      "https://open-recipes.onrender.com/recipes?cursor=0&authored_by=" + userId + "&order_by=name",
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -60,28 +54,10 @@ export default function Profile() {
     queryKey: ["recipes_feed"],
     gcTime: 0,
     queryFn: getRecipesFeed,
-    enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
+    enabled: authToken && userId ? true : false, // Only run the query if authToken is not empty
   });
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const authToken = await getValueFor("authtoken");
-        const id = await getValueFor('userId');
-        //console.log('id: ', id)
-        if (isMounted) {
-          setAuthToken(authToken);
-          setMyId(parseInt(id));
-        }
-      } catch (error) {
-        Alert.alert("Error", "Couldn't get auth token...");
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  
 
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);

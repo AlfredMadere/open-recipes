@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, ScrollView, Alert, Modal } from "react-native";
-import React, { useEffect } from "react";
+import React, { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { router, useGlobalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
@@ -13,17 +13,16 @@ import {
   Paragraph,
   YStack,
 } from "tamagui";
-import { PopulatedRecipe, Ingredient, Tag } from "../interfaces/models";
+import { PopulatedRecipe, Ingredient, Tag, RecipeList } from "../interfaces/models";
 import { useState } from "react";
 import { getValueFor } from "../../helpers/auth";
-import { removeDuplicateIds } from "../../helpers";
 import * as SecureStore from "expo-secure-store";
+import { AuthContext } from "../AuthContext";
 
 const Register = () => {
   const [visible, setVisible] = useState(false);
   const [authToken, setAuthToken] = useState("");
   const [myId, setMyId] = useState<number | null>(null);
-  const queryClient = useQueryClient();
   const { id } = useGlobalSearchParams();
   //console.log("id: ", id);
   async function getRecipe(): Promise<PopulatedRecipe> {
@@ -54,7 +53,6 @@ const Register = () => {
     enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
   });
 
-  const recipe_id = id
 
   useEffect(() => {
     let isMounted = true;
@@ -104,10 +102,13 @@ const Register = () => {
   function addToRecipeList(id: string | string[] | undefined) {
     setVisible(true);
   }
-
+  const recipe_id = data?.id;
+  if (!recipe_id) {
+    throw new Error("No id");
+  }
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <RecipeListModal visible={visible} setVisible={setVisible} />
+      <RecipeListModal visible={visible} setVisible={setVisible} recipe_id={recipe_id}/>
 
       <View style={styles.recipeDetails}>
         <Text style={styles.title}>{data?.name}</Text>
@@ -250,27 +251,21 @@ const styles = StyleSheet.create({
 });
 
 type recipeModalInputs = {
-  setVisible: (visible: boolean) => null;
+  setVisible: Dispatch<SetStateAction<boolean>>;
   visible: boolean;
+  recipe_id: number;
 };
 
 function RecipeListModal(params: recipeModalInputs) {
-  const { setVisible, visible } = params;
-  const [lists, setLists] = useState([]);
-
+  const { setVisible, visible, recipe_id } = params;
   const router = useRouter();
-  const [authToken, setAuthToken] = useState("");
-  const [myId, setMyId] = useState<number | null>(null);
-  const queryClient = useQueryClient();
+  const authContext = useContext(AuthContext);
 
-  async function getValueFor(key: string) {
-    const result = await SecureStore.getItemAsync(key);
-    if (result) {
-      return result;
-    } else {
-      throw new Error(`No values stored under ${key}.`);
-    }
+  if (!authContext) {
+    throw new Error("must be used within an AuthProvider");
   }
+
+  const { authToken } = authContext;
 
   const addRecipeToList = async (list_id: number, recipe_id: number) => {
     //console.log("data", list_id);
@@ -297,12 +292,9 @@ function RecipeListModal(params: recipeModalInputs) {
   };
 
 
-  async function getRecipeLists(recipe_id: number): Promise<SearchResult<PopulatedRecipe>> {
+  async function getRecipeLists(): Promise<RecipeList[]> {
     if (!authToken) {
       throw new Error("No auth token");
-    }
-    if (!myId) {
-      throw new Error("No id");
     }
     //console.log("myId: ", myId)
     const response = await axios.get(
@@ -314,45 +306,20 @@ function RecipeListModal(params: recipeModalInputs) {
         },
       }
     );
-    // console.log("response.data", response.data);
-    setLists(response.data);
+    console.log("response.data", response.data);
     return response.data;
   }
   const query = useQuery({
     queryKey: ["recipe_lists"],
-    gcTime: 0,
     queryFn: getRecipeLists,
-    enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
+    enabled: !!authToken, // Only run the query if authToken is not empty
   });
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const authToken = await getValueFor("authtoken");
-        const id = await getValueFor("userId");
-        console.log("id: ", id);
-        if (isMounted) {
-          setAuthToken(authToken);
-          setMyId(parseInt(id));
-        }
-      } catch (error) {
-        Alert.alert("Error", "Couldn't get auth token...");
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+ 
 
-  console.log("response data: ", query);
-  console.log(lists);
 
-  function addRecipetoRecipelist(id: number) {
-    throw new Error("Function not implemented.");
-  }
-
-  console.log("ajskdhfadsjflksd", lists);
+  const lists = query.data || [];
+  console.log("lists", lists);
 
   return (
     <View style={{ alignSelf: "flex-end" }}>
@@ -411,28 +378,20 @@ function RecipeListModal(params: recipeModalInputs) {
                     style={{ height: 550, width: 335, paddingBottom: 0 }}
                   >
                     <YStack
-                      $sm={{
+                      style={{
+                        display: "flex",
                         flexDirection: "column",
                         width: "100%",
-                        flex: 1,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                       paddingHorizontal="$4"
                       space
                     >
-                      {lists.map((recipelist) => (
-                        <Card
-                          key={recipelist.id}
-                          elevate
-                          size="$4"
-                          width={"100%"}
-                          height={70}
-                          bordered
-                          marginLeft={20}
-                          alignItems="center"
-                          style={styles.absolutePositioning}
-                        >
+                      {lists.map((recipelist) => {
+
+                      return (
+                        <Card key={recipelist.id} elevate size="$4" width={"100%"} height={70} bordered marginLeft={20} >
                           <Card.Header padded width={"83%"}>
                             <Text>{recipelist.name}</Text>
                             <XStack width={"83%"}>
@@ -447,14 +406,17 @@ function RecipeListModal(params: recipeModalInputs) {
                               borderRadius="$10"
                               onPress={() => {
                                 console.log("clickeddd");
-                                addRecipetoRecipelist(recipelist.id, 10);
+                                addRecipeToList(recipelist.id, recipe_id);
                               }}
                             >
                               Add
                             </Button>
                           </Card.Footer>
                         </Card>
-                      ))}
+                
+                      )
+            
+                      })}
                     </YStack>
                   </ScrollView>
                   <View style={{ height: 20 }} />
