@@ -17,11 +17,16 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
 from open_recipes.database import get_engine
+import dotenv
+import os
 from open_recipes.models import SignUpRequest, UserInDB
 
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+def get_secret():
+    dotenv.load_dotenv()
+    return os.environ.get("API_SECRET_KEY")
+print("seret", get_secret())
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")

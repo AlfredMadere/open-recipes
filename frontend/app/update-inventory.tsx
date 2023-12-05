@@ -1,15 +1,10 @@
 import { Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Button, Input, Spinner } from "tamagui";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import {
-  Control,
-  Controller,
-  UseFormRegister,
-  useFieldArray,
-  useForm,
-} from "react-hook-form";
+import { Control, Controller, useFieldArray, useForm } from "react-hook-form";
+import { AuthContext } from "./AuthContext";
 
 type Ingredient = {
   id: number | null;
@@ -24,15 +19,23 @@ type Form = {
 };
 
 const UpdateInventory = () => {
-  //FIXME: hardcoded user id for now to demo functionality
-  const user_id = 2;
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+  const { userId } = authContext;
 
   const updateInventoryMutation = useMutation({
-    mutationFn: (newInventory: Ingredient[]) =>
-      axios.post(
-        `https://open-recipes.onrender.com/users/${user_id}/ingredients`,
-        newInventory,
-      ),
+    mutationFn: (newInventory: Ingredient[]) => {
+      if (userId === null) {
+        throw new Error("User ID is null");
+      }
+      return axios.post(
+        `https://open-recipes.onrender.com/users/${userId}/ingredients`,
+        newInventory
+      );
+    },
     onSuccess: () => {
       // Handle successful update
       console.log("Inventory updated successfully");
@@ -44,11 +47,10 @@ const UpdateInventory = () => {
   });
 
   const onSubmit = async (data: Form) => {
-    console.log("Form Data: ", data);
     await updateInventoryMutation.mutateAsync(data.ingredients);
     await getInventoryQuery.refetch();
   };
-  const { control, handleSubmit, reset, register } = useForm<Form>({
+  const { control, handleSubmit, reset } = useForm<Form>({
     defaultValues: {
       ingredients: [],
     },
@@ -61,14 +63,15 @@ const UpdateInventory = () => {
   });
 
   const getInventoryQuery = useQuery<Ingredient[], Error>({
-    queryKey: ["inventory", user_id],
+    queryKey: ["inventory", userId],
     queryFn: async () => {
       try {
-        console.log("queryFn is called"); // Add this line
+         if (userId === null) {
+           throw new Error("User ID is null");
+         }
         const result = await axios.get<Ingredient[]>(
-          `https://open-recipes.onrender.com/users/2/ingredients/`,
+          `https://open-recipes.onrender.com/users/${userId}/ingredients/`
         );
-        console.log("result", result);
         return result.data;
       } catch (error) {
         console.error("Error fetching inventory", error);
@@ -171,7 +174,6 @@ interface IngredientItemProps {
 const IngredientItem: React.FC<IngredientItemProps> = ({
   ingredient,
   index,
-  update,
   remove,
   control,
 }) => {

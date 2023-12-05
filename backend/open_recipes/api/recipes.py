@@ -323,7 +323,7 @@ def delete_recipe(id: int,engine : Annotated[Engine, Depends(get_engine)], curre
 def add_recipe_to_recipe_list(recipe_id: int, recipe_list_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
     try:
         with engine.begin() as conn:
-            conn.execute(text("INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES (:recipe_id, :recipe_list_id)"),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
+            conn.execute(text("INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES (:recipe_id, :recipe_list_id) ON CONFLICT (recipe_id, recipe_list_id) DO NOTHING "),{"recipe_id":recipe_id,"recipe_list_id":recipe_list_id})
             return "OK"
     except exc.SQLAlchemyError as e:
         print(str(e))

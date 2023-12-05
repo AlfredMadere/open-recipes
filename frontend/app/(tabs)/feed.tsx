@@ -19,22 +19,19 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Recipe } from "../interfaces/models";
 import { removeDuplicateIds } from "../../helpers";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
+import { AuthContext } from "../AuthContext";
 
 export default function Feed() {
   const router = useRouter();
-  const [authToken, setAuthToken] = useState("");
-  const queryClient = useQueryClient();
+  const authContext = useContext(AuthContext);
 
-  async function getValueFor(key: string) {
-    const result = await SecureStore.getItemAsync(key);
-    if (result) {
-      return result;
-    } else {
-      throw new Error(`No values stored under ${key}.`);
+    if (!authContext) {
+      throw new Error("Feedmust be used within an AuthProvider");
     }
-  }
+    const { authToken, } = authContext;
+
 
   async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
     if (!authToken) {
@@ -58,22 +55,7 @@ export default function Feed() {
     enabled: !!authToken, // Only run the query if authToken is not empty
   });
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const authToken = await getValueFor("authtoken");
-        if (isMounted) {
-          setAuthToken(authToken);
-        }
-      } catch (error) {
-        Alert.alert("Error", "Couldn't get auth token...");
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
   return (
