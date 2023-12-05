@@ -90,7 +90,7 @@ See the initial Figma prototype [here](https://www.figma.com/file/Rjw4vkBVjuUWTl
 Last Updated: 11/03/2023
 
 ## Diagrams
-See our UML diagram [here](https://github.com/AlfredMadere/open-recipes/wiki/Open-Recipes-UML)
+See our UML diagram [here](https://github.com/AlfredMadere/open-recipes/wiki/)
 
 Last Updated: 11/02/2023
 
