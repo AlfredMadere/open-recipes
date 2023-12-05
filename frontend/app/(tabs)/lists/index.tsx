@@ -12,10 +12,12 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import { getValueFor } from "../../../helpers/auth";
 
 export default function One() {
   const [modalVisible, setModalVisible] = useState(false);
   const [lists, setLists] = useState([]);
+  const [authToken, setAuthToken] = useState("");
 
   const {
     reset,
@@ -30,12 +32,16 @@ export default function One() {
   });
 
   const onSubmit = async (data) => {
+    if (!authToken) {
+      throw new Error("No auth token");
+    }
     try {
       const response = await fetch(
         "https://open-recipes.onrender.com/recipe-lists",
         {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
@@ -48,13 +54,30 @@ export default function One() {
 
       fetchDataFromBackend();
     } catch (error) {
-      console.error("Error adding data:", error.message);
+      console.error("Error adding data:");
     }
     setModalVisible(!modalVisible);
   };
 
   useEffect(() => {
     fetchDataFromBackend();
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const authToken = await getValueFor("authtoken");
+        if (isMounted) {
+          setAuthToken(authToken);
+        }
+      } catch (error) {
+        Alert.alert("Error", "Couldn't get auth token...");
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const fetchDataFromBackend = async () => {
@@ -69,7 +92,7 @@ export default function One() {
       const data = await response.json();
       setLists(data);
     } catch (error) {
-      console.error("Error fetching data:", error.message);
+      console.error("Error fetching data");
     }
   };
 
@@ -267,14 +290,19 @@ export function ListCard(props: {
   const router = useRouter();
 
   const [isDeleted, setIsDeleted] = useState(false);
+  const [authToken, setAuthToken] = useState("");
 
   const handleDelete = async () => {
+    if (!authToken) {
+      throw new Error("No auth token");
+    }
     try {
       const response = await fetch(
         `https://open-recipes.onrender.com/recipe-lists/${id}`,
         {
           method: "DELETE",
           headers: {
+            Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
         },
@@ -286,9 +314,26 @@ export function ListCard(props: {
         throw new Error("Failed to delete list");
       }
     } catch (error) {
-      console.error("Error deleting list:", error.message);
+      console.error("Error deleting list");
     }
   };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const authToken = await getValueFor("authtoken");
+        if (isMounted) {
+          setAuthToken(authToken);
+        }
+      } catch (error) {
+        Alert.alert("Error", "Couldn't get auth token...");
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <>
