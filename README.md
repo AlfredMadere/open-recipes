@@ -6,23 +6,24 @@
 ---
 
 ### Contributors
-**Back end - csc365**
-Molly Sandler - mosandle@calpoly.edu
-Alfred Madere - amadere@calpoly.edu
-Mihir Chintawar- mchintaw@calpoly.edu
 
-**Front end - csc307**
-Alfred Madere
-Pau Minguet
-Abigayle Mercer
+**Frontend - csc307:**
+Alfred Madere,
+Abigayle Mercer,
+Pau Minguet,
+Michael Murray,
 Kassi Winter
-Michael Murray
+
+**Backend - csc365:**
+Mihir Chintawar- mchintaw@calpoly.edu, 
+Alfred Madere - amadere@calpoly.edu,
+Molly Sandler - mosandle@calpoly.edu
 
 ---
 
 ### Project Description
 
-We propose to develop a service for a meal planning and recipe management  aimed primarily at college students and young adults. The service will allow users to manually enter recipes into their personal "cookbook" or add existing recipes from a public library. A "week planner" feature will enable users to plan meals for the week, generating a shopping list based on the selected recipes. Additional features like recipe rating, picture uploads, and recipe forking are planned. The service aims to solve the problem of meal planning and grocery shopping, making it easier and more efficient for people first living on their own. While the MVP will focus on core functionalities, future iterations could include AI-enabled inventory management and a premium feature set.
+Open Recipes is a service for meal planning and recipe management aimed primarily at college students and young adults. The service allows users to create their own recipes or search for others' recipes using the search feature. The app also allows for the creation of recipe lists, which can group recipes together, e.g. "Breakfast". Users can view account information and pinned recipes from the 'profile' page. Finally, on the 'feed' page, popular and relevant recipes from the community are displayed for browsing!
 
 ---
 
@@ -41,6 +42,8 @@ We propose to develop a service for a meal planning and recipe management  aimed
 5. **Recipe Rating and Reviews**: Users can rate recipes and write revivews
    
 #### Future Features
+- Weekly planner to enable users to plan for the week and generate a shopping list
+- Ability to add images to your own recipes and rate others' recipes
 - AI-enabled "Fridge" feature for inventory management.
 - Average prep time and cost of ingredients.
 - Recipe scaling based on the number of people.
