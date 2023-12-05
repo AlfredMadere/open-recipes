@@ -1,31 +1,45 @@
-import { Text, View, StyleSheet, ScrollView, Alert } from "react-native";
-import React, { useEffect } from "react";
+import { Text, View, StyleSheet, ScrollView, Alert, Modal } from "react-native";
+import React, { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { useGlobalSearchParams } from "expo-router";
+import { router, useGlobalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
-import { H1, Spinner } from "tamagui";
-import { Recipe } from "../interfaces/models";
+import {
+  H1,
+  Spinner,
+  Button,
+  Stack,
+  Card,
+  XStack,
+  Paragraph,
+  YStack,
+} from "tamagui";
+import { PopulatedRecipe, Ingredient, Tag, RecipeList } from "../interfaces/models";
 import { useState } from "react";
 import { getValueFor } from "../../helpers/auth";
+import * as SecureStore from "expo-secure-store";
+import { AuthContext } from "../AuthContext";
 
 const Register = () => {
+  const [visible, setVisible] = useState(false);
   const [authToken, setAuthToken] = useState("");
-  const queryClient = useQueryClient();
+  const [myId, setMyId] = useState<number | null>(null);
   const { id } = useGlobalSearchParams();
-  console.log("i am rendering recipe");
-  async function getRecipe(): Promise<Recipe> {
-    console.log("i got called");
+  //console.log("id: ", id);
+  async function getRecipe(): Promise<PopulatedRecipe> {
+    if (!myId) {
+      throw new Error("No id");
+    }
     try {
-      const response = await axios.get<Recipe>(
+      const response = await axios.get<PopulatedRecipe>(
         `https://open-recipes.onrender.com/recipes/${id}`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
           },
-        },
+        }
       );
-      console.log("response.data", response.data);
+      //console.log("response.data", response.data);
       return response.data;
     } catch (error) {
       console.error("Error fetching recipe", error);
@@ -36,16 +50,19 @@ const Register = () => {
   const query = useQuery({
     queryKey: ["recipe", id],
     queryFn: getRecipe,
-    enabled: !!authToken, // Only run the query if authToken is not empty
+    enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
   });
+
 
   useEffect(() => {
     let isMounted = true;
     (async () => {
       try {
         const authToken = await getValueFor("authtoken");
+        const id = await getValueFor("userId");
         if (isMounted) {
           setAuthToken(authToken);
+          setMyId(parseInt(id));
         }
       } catch (error) {
         Alert.alert("Error", "Couldn't get auth token...");
@@ -65,23 +82,38 @@ const Register = () => {
   const ingredients = data?.ingredients || []; // Assuming ingredients are stored in an array
   const tags = data?.tags || []; // Assuming tags are stored in an array
 
-  type RecipeCardProps = {
-    recipe: {
-      name: string;
-      description: string;
-      id: number;
-      mins_prep: number;
-      mins_cook: number;
-      category_id: number;
-      author_id: number;
-      created_at: string;
-      procedure: string;
-      default_servings: number;
-    };
-  };
+  async function deleteRecipe(id: string | string[] | undefined) {
+    await axios
+      .delete(`https://open-recipes.onrender.com/recipes/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      })
+      .then(function (response) {
+        console.log(response, null, 2);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    router.push("profile");
+  }
 
+  function addToRecipeList(id: string | string[] | undefined) {
+    setVisible(true);
+  }
+  const recipe_id = data?.id;
+  if (!recipe_id) {
+    return (
+      <View>
+        <Text>Recipe not found</Text>
+      </View>
+     )
+  }
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <RecipeListModal visible={visible} setVisible={setVisible} recipe_id={recipe_id}/>
+
       <View style={styles.recipeDetails}>
         <Text style={styles.title}>{data?.name}</Text>
         <Text style={styles.infoItem}>Author id: {data?.author_id}</Text>
@@ -99,22 +131,70 @@ const Register = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ingredients:</Text>
-          {ingredients.map((ingredient, index) => (
+          {ingredients?.map((ingredient, index) => (
             <Text key={index} style={styles.infoItem}>
-              - {ingredient}
+              - {ingredient.quantity} {ingredient.unit} {ingredient.name}:
             </Text>
           ))}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tags:</Text>
-          {tags.map((tag, index) => (
+          {tags?.map((tag, index) => (
             <Text key={index} style={styles.infoItem}>
-              - {tag}
+              - {tag.key}: {tag.value}
             </Text>
           ))}
         </View>
       </View>
+
+      <View style={{ padding: 10 }}>
+        <Button
+          onPress={() => {
+            addToRecipeList(id);
+          }}
+          size="$4" // Adjust the size
+          color="$green" // Set the button color
+          borderRadius="$6" // Round the corners
+          // shadowColor="$shadow" // Add a shadow
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          hoverStyle={{ backgroundColor: "$green8" }} // Change color on hover
+          pressStyle={{ backgroundColor: "$green8" }} // Change color on press
+          fontFamily="$body" // Set the font family
+          fontSize="$4" // Set the font size
+          fontWeight="bold" // Make the text bold
+        >
+          Add to Recipe List
+        </Button>
+      </View>
+
+      {data?.author_id == myId ? (
+        <View style={{ padding: 10 }}>
+          <Button
+            onPress={() => {
+              deleteRecipe(id);
+            }}
+            size="$4" // Adjust the size
+            color="$red" // Set the button color
+            borderRadius="$6" // Round the corners
+            // shadowColor="$shadow" // Add a shadow
+            shadowRadius={10} // Shadow radius
+            elevation={2} // Elevation for a 3D effect
+            hoverStyle={{ backgroundColor: "$red8" }} // Change color on hover
+            pressStyle={{ backgroundColor: "$red8" }} // Change color on press
+            fontFamily="$body" // Set the font family
+            fontSize="$4" // Set the font size
+            fontWeight="bold" // Make the text bold
+          >
+            Delete Recipe
+          </Button>
+        </View>
+      ) : (
+        ""
+      )}
+
+      <View style={{ height: 80 }} />
     </ScrollView>
   );
 };
@@ -164,6 +244,214 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
   },
+
+  absolutePositioning: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 999, // Set a high zIndex to appear over other components
+    // Other styles for your Card component
+  },
 });
+
+type recipeModalInputs = {
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  visible: boolean;
+  recipe_id: number;
+};
+
+function RecipeListModal(params: recipeModalInputs) {
+  const { setVisible, visible, recipe_id } = params;
+  const router = useRouter();
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("must be used within an AuthProvider");
+  }
+
+  const { authToken } = authContext;
+
+  const addRecipeToList = async (list_id: number, recipe_id: number) => {
+    //console.log("data", list_id);
+    //console.log("stringified", JSON.stringify(data));
+    try {
+      const response = await axios.post(
+        `https://open-recipes.onrender.com/recipe-lists/${list_id}/recipe/${recipe_id}`,
+        {
+          name: "cd",
+          description: "striasdng",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+          },
+        }
+      );
+  
+    } catch (error) {
+      console.error("Error adding data:", error.message);
+    }
+    router.push(`/feed`);
+  };
+
+
+  async function getRecipeLists(): Promise<RecipeList[]> {
+    if (!authToken) {
+      throw new Error("No auth token");
+    }
+    //console.log("myId: ", myId)
+    const response = await axios.get(
+      "https://open-recipes.onrender.com/recipe-lists",
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      }
+    );
+    console.log("response.data", response.data);
+    return response.data;
+  }
+  const query = useQuery({
+    queryKey: ["recipe_lists"],
+    queryFn: getRecipeLists,
+    enabled: !!authToken, // Only run the query if authToken is not empty
+  });
+
+ 
+
+
+  const lists = query.data || [];
+  console.log("lists", lists);
+
+  return (
+    <View style={{ alignSelf: "flex-end" }}>
+      <Stack scale={1.2} marginTop={15}>
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={visible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            setVisible(!visible);
+          }}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                margin: 20,
+                backgroundColor: "white",
+                height: 550,
+                width: 335,
+                borderRadius: 20,
+                padding: 35,
+                alignItems: "center",
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+                elevation: 5,
+              }}
+            >
+              <View>
+                <View
+                  style={{ justifyContent: "center", alignItems: "center" }}
+                >
+                  <View>
+                    <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                      Add to List
+                    </Text>
+                  </View>
+
+                  <View style={{ height: 30, paddingTop: 30 }}></View>
+                  {query.error && <Text>{JSON.stringify(query.error)}</Text>}
+                  {query.isFetching && (
+                    <Spinner size="large" color="$orange10" />
+                  )}
+                  <ScrollView
+                    style={{ height: 550, width: 335, paddingBottom: 0 }}
+                  >
+                    <YStack
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        width: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      paddingHorizontal="$4"
+                      space
+                    >
+                      {lists.map((recipelist) => {
+
+                      return (
+                        <Card key={recipelist.id} elevate size="$4" width={"100%"} height={70} bordered marginLeft={20} >
+                          <Card.Header padded width={"83%"}>
+                            <Text>{recipelist.name}</Text>
+                            <XStack width={"83%"}>
+                              <Paragraph theme="alt2">
+                                {recipelist.description}
+                              </Paragraph>
+                            </XStack>
+                          </Card.Header>
+                          <Card.Footer padded>
+                            <XStack flex={1} />
+                            <Button
+                              borderRadius="$10"
+                              onPress={() => {
+                                console.log("clickeddd");
+                                addRecipeToList(recipelist.id, recipe_id);
+                              }}
+                            >
+                              Add
+                            </Button>
+                          </Card.Footer>
+                        </Card>
+                
+                      )
+            
+                      })}
+                    </YStack>
+                  </ScrollView>
+                  <View style={{ height: 20 }} />
+                </View>
+                <View style={{ padding: 3 }}>
+                  <Button
+                    onPress={() => {
+                      setVisible(!visible);
+                    }}
+                    color="red"
+                    backgroundColor="lightgrey"
+                  >
+                    Cancel
+                  </Button>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        <Button
+          onPress={() => {
+            setVisible(true);
+          }}
+          color="blue"
+        />
+      </Stack>
+    </View>
+  );
+}
+
+
 
 export default Register;

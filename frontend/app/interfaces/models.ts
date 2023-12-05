@@ -1,4 +1,4 @@
-export type Recipe = {
+export type PopulatedRecipe = {
   name: string;
   description: string;
   id: number;
@@ -9,4 +9,26 @@ export type Recipe = {
   created_at: string;
   procedure: string;
   default_servings: number;
+  ingredients: Ingredient[];
+  tags: Tag[];
+};
+
+export type RecipeList = {
+  name: string;
+  description: string;
+  id: number;
+};
+
+export type Ingredient = {
+  id: number;
+  name: string;
+  description: string;
+  quantity: number;
+  unit: string;
+};
+
+export type Tag = {
+  id: number;
+  key: string;
+  value: number;
 };

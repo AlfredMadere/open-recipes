@@ -90,6 +90,7 @@ export default function One() {
     }
   };
 
+
   return (
     <View style={{ width: "100%", flex: 1 }}>
       <View style={{ flex: 1, marginVertical: 20 }}>
@@ -251,6 +252,7 @@ const ListComponent = ({ data }) => {
     <FlatList
       data={data}
       numColumns={1}
+      style={{ width: "100%" , height: "100%" }}
       renderItem={({ item }) => (
         <View
           style={{
@@ -316,7 +318,7 @@ export function ListCard(props: {
             <Text style={{ fontWeight: "bold" }}>{name}</Text>
           </Card.Header>
           <Stack margin={20}>
-            <Text style={{ fontSize: 10 }}>{description}</Text>
+            <Text style={{ fontSize: 10, height: 10, overflow: "hidden" }}>{description }</Text>
           </Stack>
 
           <Card.Footer padded>
