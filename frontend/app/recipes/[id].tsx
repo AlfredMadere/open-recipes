@@ -54,6 +54,8 @@ const Register = () => {
     enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
   });
 
+  const recipe_id = id
+
   useEffect(() => {
     let isMounted = true;
     (async () => {
@@ -256,7 +258,6 @@ function RecipeListModal(params: recipeModalInputs) {
   const { setVisible, visible } = params;
   const [lists, setLists] = useState([]);
 
-
   const router = useRouter();
   const [authToken, setAuthToken] = useState("");
   const [myId, setMyId] = useState<number | null>(null);
@@ -271,7 +272,32 @@ function RecipeListModal(params: recipeModalInputs) {
     }
   }
 
-  async function getRecipeLists(): Promise<SearchResult<PopulatedRecipe>> {
+  const addRecipeToList = async (list_id: number, recipe_id: number) => {
+    //console.log("data", list_id);
+    //console.log("stringified", JSON.stringify(data));
+    try {
+      const response = await axios.post(
+        `https://open-recipes.onrender.com/recipe-lists/${list_id}/recipe/${recipe_id}`,
+        {
+          name: "cd",
+          description: "striasdng",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+          },
+        }
+      );
+  
+    } catch (error) {
+      console.error("Error adding data:", error.message);
+    }
+    router.push(`/feed`);
+  };
+
+
+  async function getRecipeLists(recipe_id: number): Promise<SearchResult<PopulatedRecipe>> {
     if (!authToken) {
       throw new Error("No auth token");
     }
@@ -319,14 +345,14 @@ function RecipeListModal(params: recipeModalInputs) {
     };
   }, []);
 
-
   console.log("response data: ", query);
   console.log(lists);
-
 
   function addRecipetoRecipelist(id: number) {
     throw new Error("Function not implemented.");
   }
+
+  console.log("ajskdhfadsjflksd", lists);
 
   return (
     <View style={{ alignSelf: "flex-end" }}>
@@ -395,8 +421,7 @@ function RecipeListModal(params: recipeModalInputs) {
                       paddingHorizontal="$4"
                       space
                     >
-                      {
-                      lists.map((recipelist) => (
+                      {lists.map((recipelist) => (
                         <Card
                           key={recipelist.id}
                           elevate
@@ -422,7 +447,7 @@ function RecipeListModal(params: recipeModalInputs) {
                               borderRadius="$10"
                               onPress={() => {
                                 console.log("clickeddd");
-                                addRecipetoRecipelist(recipelist.id);
+                                addRecipetoRecipelist(recipelist.id, 10);
                               }}
                             >
                               Add
@@ -460,5 +485,7 @@ function RecipeListModal(params: recipeModalInputs) {
     </View>
   );
 }
+
+
 
 export default Register;
