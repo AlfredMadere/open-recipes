@@ -1,11 +1,67 @@
 ## Fake Data Modeling
 
-@mihir
+Find the python file used to generate the rows by navigating to `cd ../../backend/seeding/seed.py` from this file.
+
+Should contain a link to the python file you used to construct the million rows of data for your service. Should also contain a writeup explaining how many final rows of data you have in each of your table to get to a million rows AND a justification for why you think your service would scale in that way. There is no single right answer to this, but your reasoning must be justifiable.
+
+ingredients - 50008
+
+ing_category - 8
+
+recipe - 100007
+
+recipe_ingredients - 400008
+
+recipe_list - 50005
+
+recipe_tag- 206
+
+recipe_x_recipe_list - 11
+
+recipe_x_tag - 300006
+
+user - 5010
+
+user_x_ingredient - 299936
+
+user_x_recipe_list - 5
 
 ## Performance results of hitting endpoints
 
-For each endpoint, list how many ms it took to execute. State which three endpoints were the slowest. @mihir
+**In ascending order**
 
+You can regenerate this data by running `Pytest -s -k performance `
+
+POST /recipes/{recipe_id}/tags/{tag_id}: 0.002276182174682617 seconds
+GET /users/{user_id}: 0.0023698806762695312 seconds
+GET /ingredients/{ingredient_id}: 0.0025229454040527344 seconds
+POST /recipes/{recipe_id}/ingredients/{ingredient_id}: 0.002593994140625 seconds
+GET /recipe-lists/{id}: 0.0026710033416748047 seconds
+GET /tags/{tag_id}: 0.002796649932861328 seconds
+POST /recipe-lists/{recipe_list_id}/recipe/{recipe_id}: 0.0031952857971191406 seconds
+POST /tags: 0.003217935562133789 seconds
+POST /recipes/{recipe_id}/recipe-lists/{recipe_list_id}: 0.0032949447631835938 seconds
+GET /recipe-lists: 0.0036630630493164062 seconds
+POST /ingredients: 0.0036690235137939453 seconds
+POST /users: 0.004442930221557617 seconds
+POST /recipes: 0.00451207160949707 seconds
+POST /recipe-lists: 0.0046100616455078125 seconds - this is not a realistic test because its getting all recipe lists not just the recipe lists of a specific user. Though this is slow we are not fixing it.
+GET /users/{user_id}/ingredients/: 0.005557060241699219 seconds
+GET /ingredients: 0.006129264831542969 seconds
+GET /tags: 0.006928205490112305 seconds
+GET /recipes: 0.00816488265991211 seconds
+GET /recipes/{recipe_id}/tags: 0.010950803756713867 seconds
+GET /recipes/{recipe_id}/ingredients: 0.01697993278503418 seconds
+GET /recipes?name=Ability&max_time=50&cursor=0&tag_key=other&tag_value=leg&authored_by=518&order_by=name: 0.020543813705444336 seconds
+GET /recipes/{recipe_id}: 0.026441097259521484 seconds
+GET /recipes?name=Ability&max_time=50&cursor=0&tag_key=other&tag_value=leg&authored_by=518&use_inventory_of=1&order_by=name: 0.07448601722717285 seconds
+GET /users: 0.23003506660461426 seconds
+
+The 3 slowest endpoints are the following
+1. GET /recipes - There are many options to specify and it builds a query based on what you want to search over. the use_inventory_of optoin causes the largest slowdown. In order to work on the indexs and speeding up the search, I have chosen to use the worst case schenario where every option is specified. `/recipes?name=Ability&max_time=50&cursor=0&tag_key=other&tag_value=leg&authored_by=518&order_by=name` 
+2. GET /users/{user_id}/ingredients/: 0.005557060241699219 seconds. This is 5.5 ms, thats so rediculously fast its not worth optomizing. All the joins in this query already have indexes because they are the primary key so theres really nothing i can do to speed it up
+3. Everything else takes less than 10 ms and or has no filtering or joining
+ 
 ## Performance tuning
 
 ### Slowest endpoints
@@ -349,6 +405,6 @@ Execution Time: 62.437 ms
 **Conclusion for /recipes search endpoint:** The `recipe.name` index was the only one that the optimizer actually found useful. All the others were never used so I removed them
 
 
-2. Next endpoint
+2. The next slowest endpoint takes less than 10 ms and cannot be improved by adding indexes because all joins and filtering are already happening on primary keys
 
-3. Next endpoint
+3. the next slowest endpoint doesn't even do any joins and takes less than 10 ms

@@ -15,7 +15,7 @@ engine = None
 def get_engine():
     global engine
     if engine is None:
-        engine = create_engine(database_connection_url(), pool_pre_ping=True, echo=True)
+        engine = create_engine(database_connection_url(), pool_pre_ping=True)
     return engine
 
 metadata_obj = sqlalchemy.MetaData()
