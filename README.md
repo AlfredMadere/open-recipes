@@ -1,9 +1,6 @@
 
 
-# Project Proposal for Fall 2023
-## Lucas Pierce
-
----
+# Open Recipes
 
 ### Contributors
 
