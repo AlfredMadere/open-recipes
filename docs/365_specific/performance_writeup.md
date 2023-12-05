@@ -1,28 +1,26 @@
 ## Fake Data Modeling
 
-Find the python file used to generate the rows by navigating to `cd ../../backend/seeding/seed.py` from this file.
-
 We based everything on the users column with every other table having a multiplier based on the amount of users, and then chose the number for users based on what would get us to 1 million rows, which ended up being 5000 users.
  
-The ingredients and tags are fixed values not revolving around the users, based on information we found on the internet. 
-ingredients has 50,000 rows, because that is the average amount of ingredients in an American grocery store. 
-tags is 200 rows, because including allergies, appliances, cuisines, etc that was the most we could fathom being realistic unique key value pairs. 
+The ingredients, ing_catgory, and tags are fixed values not revolving around the users, based on information we found on the internet. ingredients has 50,000 rows, because that is the average amount of ingredients in an American grocery store. tags is 200 rows, because including allergies, appliances, cuisines, etc that was the most we could fathom being realistic unique key value pairs. ing_category is just groups of ingredients, so there are only 8 because those are the categories we came up with. 
 
-Recipe lists = user x 10
-recipes = user x 20 
 users = x
+Recipe_lists = user x 10
+recipe = user x 20 
+recipe_ingredients = user x 160
  
-User x ingredient = user x 10
-Recipe x ingredient: = (user x 20) x 8
-Recipe x tag = (user x 20 ) x 3
+User_x_ingredient = user x 10
+user_x_recipe_list = user x 10
+Recipe_x_ingredients: = (user x 20) x 8
+Recipe_x_tag = (user x 20 ) x 3
 
 We thought that each user would make about 20 recipes, with 5 for each breakfast, lunch, dinner, and dessert. 
 
-With sectioning those into breakfast, lunch dinner, dessert, and then sectioning each of those down further, we figured around 10 recipe lists per user as well. 
+With sectioning those into breakfast, lunch dinner, dessert, and then sectioning each of those down further, we figured around 10 recipe lists per user as well. recipe_ingredients is all ingredients associated with all recipies so this would scale the largest compared to the other tables. If each user has about 20 recipes and each recipe has about 8 ingredients thats 160 ingredient to recipe joins per user.  
 
-Then our join tables would scale accordingly, being based on their respective tables being joined. User x ingredient assumes each user has about 10 ingredients in their inventory at any given time, given the space in a fridge for the average person. Recipe x ingredient assumes each recipe has about 8 ingredients, making sense with a main component, some sides, and some spices and cooking supplies like oil. Finally, recipe x tag assumes each recipe has about 3 tags, including an appliance, an allergen, and a cuisine tag. 
+Then our join tables would scale accordingly, being based on their respective tables being joined. User_x_ingredient assumes each user has about 10 ingredients in their inventory at any given time, given the space in a fridge for the average person. Recipe_x_ingredient assumes each recipe has about 8 ingredients, making sense with a main component, some sides, and some spices and cooking supplies like oil. user_x_recipe_list assumes each user makes about 10 recipe_lists associated with them specifically. Finally, recipe_x_tag assumes each recipe has about 3 tags, including an appliance, an allergen, and a cuisine tag. 
 
-While all of these would be fluid with some outliers for sure, these made the most sense on average for our rows to hit 1 million.
+While all of these would be fluid with some outliers for sure, these made the most sense on average for our rows to hit 1 million. 
 
 Rows in tables:
 

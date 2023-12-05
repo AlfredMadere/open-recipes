@@ -6,6 +6,7 @@ import tamaguiConfig from "../tamagui.config";
 import { TamaguiProvider, Theme } from "tamagui";
 import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const StackLayout = () => {
     // auth provider
     <TamaguiProvider config={tamaguiConfig}>
       <QueryClientProvider client={queryClient}>
+        <AuthProvider>
         <Theme name="light">
           <Stack>
             <Stack.Screen name="index" options={{ title: "Home" }} />
@@ -63,6 +65,7 @@ const StackLayout = () => {
             <Stack.Screen name="[missing]" options={{ title: "404" }} />
           </Stack>
         </Theme>
+      </AuthProvider>
       </QueryClientProvider>
     </TamaguiProvider>
   );

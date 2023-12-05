@@ -11,11 +11,20 @@ import {
   Button,
   StyleSheet,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../AuthContext";
+import axios from "axios";
 
 export default function One() {
   const [modalVisible, setModalVisible] = useState(false);
   const [lists, setLists] = useState([]);
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("Feedmust be used within an AuthProvider");
+  }
+  const { authToken} = authContext;
+
 
   const {
     reset,
@@ -30,21 +39,22 @@ export default function One() {
   });
 
   const onSubmit = async (data) => {
+    console.log("data", data);
+    console.log("stringified", JSON.stringify(data));
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "https://open-recipes.onrender.com/recipe-lists",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+          name: "cd",
+          description: "striasdng",
         },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+          },
+        }
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to add data");
-      }
 
       fetchDataFromBackend();
     } catch (error) {
@@ -60,9 +70,16 @@ export default function One() {
   const fetchDataFromBackend = async () => {
     try {
       const response = await fetch(
-        "https://open-recipes.onrender.com/recipe-lists",
+        "https://open-recipes.onrender.com/recipe-lists", 
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+          },
+        }
       );
       if (!response.ok) {
+        console.log("response", response);
         throw new Error("Failed to fetch data");
       }
 
@@ -265,26 +282,27 @@ export function ListCard(props: {
 }) {
   const { name, description, id } = props;
   const router = useRouter();
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext not found");
+  }
+  const { authToken } = authContext;
 
   const [isDeleted, setIsDeleted] = useState(false);
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(
+      console.log("id to delet is", id)
+      const response = await axios.delete(
         `https://open-recipes.onrender.com/recipe-lists/${id}`,
         {
-          method: "DELETE",
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
           },
-        },
+        }
       );
-
-      if (response.ok) {
         setIsDeleted(true);
-      } else {
-        throw new Error("Failed to delete list");
-      }
     } catch (error) {
       console.error("Error deleting list:", error.message);
     }

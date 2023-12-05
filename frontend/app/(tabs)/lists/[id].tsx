@@ -1,12 +1,18 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Text, FlatList, Button } from "react-native";
 import { View, Card, XStack, Stack } from "tamagui";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../AuthContext";
 
 export default function Page() {
   const { id } = useLocalSearchParams();
   const [recipes, setRecipes] = useState([]);
+  const authContext = useContext(AuthContext);
 
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+  const { authToken } = authContext;
   useEffect(() => {
     if (id) {
       fetchDataFromBackend();
@@ -19,8 +25,15 @@ export default function Page() {
     try {
       const response = await fetch(
         `https://open-recipes.onrender.com/recipe-lists/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+          },
+        }
       );
       if (!response.ok) {
+        console.log("response", response);
         throw new Error("Failed to fetch data");
       }
 
