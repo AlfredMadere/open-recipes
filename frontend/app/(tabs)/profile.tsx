@@ -58,6 +58,7 @@ export default function Profile() {
   }
   const query = useQuery({
     queryKey: ["recipes_feed"],
+    gcTime: 0,
     queryFn: getRecipesFeed,
     enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
   });
@@ -100,12 +101,24 @@ export default function Profile() {
           <Text>{username}</Text>
         </Stack>
       </View>
+      <View style={{ alignSelf: "center" }}>
+      <Button
+        onPress={() => {
+          query.refetch();
+        }}
+        bordered
+        style={{ width: "50%" }}
+      >
+        Refresh
+      </Button>
+      </View>
       <View style={{ marginLeft: 10, marginTop: 20, marginBottom: 20 }}>
+
         <Text>Authored Recipes:</Text>
       </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
       {query.isFetching && <Spinner size="large" color="$orange10" />}
-      <ScrollView style={{ width: "100%" }}>
+      <ScrollView style={{ width: "100%", paddingBottom: 500 }}>
         <YStack
           $sm={{
             flexDirection: "column",
@@ -122,13 +135,11 @@ export default function Profile() {
           })}
         </YStack>
       </ScrollView>
-      <YStack></YStack>
+      <View style={{ height: 200 }} />
     </View>
   );
 }
 
-//DO NOT USE THIS SYNTAX, used any to pass eslint for testing
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 type RecipeCardProps = {
   recipe: {

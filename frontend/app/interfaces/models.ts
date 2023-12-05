@@ -18,6 +18,7 @@ export type Ingredient = {
   name: string;
   description: string;
   quantity: number;
+  unit: string;
 };
 
 export type Tag = {
