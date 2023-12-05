@@ -13,6 +13,12 @@ export type PopulatedRecipe = {
   tags: Tag[];
 };
 
+export type RecipeList = {
+  name: string;
+  description: string;
+  id: number;
+};
+
 export type Ingredient = {
   id: number;
   name: string;

@@ -3,13 +3,21 @@ import React, { useEffect } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { router, useGlobalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
-import { H1, Spinner, Button, Stack, Card, XStack, Paragraph, YStack } from "tamagui";
+import {
+  H1,
+  Spinner,
+  Button,
+  Stack,
+  Card,
+  XStack,
+  Paragraph,
+  YStack,
+} from "tamagui";
 import { PopulatedRecipe, Ingredient, Tag } from "../interfaces/models";
 import { useState } from "react";
 import { getValueFor } from "../../helpers/auth";
 import { removeDuplicateIds } from "../../helpers";
 import * as SecureStore from "expo-secure-store";
-
 
 const Register = () => {
   const [visible, setVisible] = useState(false);
@@ -97,8 +105,7 @@ const Register = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-
-      <RecipeListModal visible={visible} setVisible={setVisible}/>
+      <RecipeListModal visible={visible} setVisible={setVisible} />
 
       <View style={styles.recipeDetails}>
         <Text style={styles.title}>{data?.name}</Text>
@@ -230,30 +237,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
   },
+
+  absolutePositioning: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 999, // Set a high zIndex to appear over other components
+    // Other styles for your Card component
+  },
 });
 
-
-
-
-
-
-
-
-
-
-
-
 type recipeModalInputs = {
-  setVisible: (visible: boolean) => null,
+  setVisible: (visible: boolean) => null;
   visible: boolean;
-}
+};
 
 function RecipeListModal(params: recipeModalInputs) {
-  const {setVisible, visible} = params;
+  const { setVisible, visible } = params;
+  const [lists, setLists] = useState([]);
+
 
   const router = useRouter();
   const [authToken, setAuthToken] = useState("");
-  const [myId, setMyId] = useState<number | null >(null);
+  const [myId, setMyId] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
   async function getValueFor(key: string) {
@@ -265,7 +271,7 @@ function RecipeListModal(params: recipeModalInputs) {
     }
   }
 
-  async function getRecipesFeed(): Promise<SearchResult<PopulatedRecipe>> {
+  async function getRecipeLists(): Promise<SearchResult<PopulatedRecipe>> {
     if (!authToken) {
       throw new Error("No auth token");
     }
@@ -283,12 +289,13 @@ function RecipeListModal(params: recipeModalInputs) {
       }
     );
     // console.log("response.data", response.data);
+    setLists(response.data);
     return response.data;
   }
   const query = useQuery({
-    queryKey: ["recipes_feed"],
+    queryKey: ["recipe_lists"],
     gcTime: 0,
-    queryFn: getRecipesFeed,
+    queryFn: getRecipeLists,
     enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
   });
 
@@ -297,8 +304,8 @@ function RecipeListModal(params: recipeModalInputs) {
     (async () => {
       try {
         const authToken = await getValueFor("authtoken");
-        const id = await getValueFor('userId');
-        console.log('id: ', id)
+        const id = await getValueFor("userId");
+        console.log("id: ", id);
         if (isMounted) {
           setAuthToken(authToken);
           setMyId(parseInt(id));
@@ -313,9 +320,14 @@ function RecipeListModal(params: recipeModalInputs) {
   }, []);
 
 
-  console.log('response data: ', query)
-  const recipes = removeDuplicateIds(query.data?.recipe || []);
-  
+  console.log("response data: ", query);
+  console.log(lists);
+
+
+  function addRecipetoRecipelist(id: number) {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <View style={{ alignSelf: "flex-end" }}>
       <Stack scale={1.2} marginTop={15}>
@@ -364,63 +376,77 @@ function RecipeListModal(params: recipeModalInputs) {
                     </Text>
                   </View>
 
-                  <View style={{ height: 300, paddingTop: 40 }}>
-                    
-                  </View>
-      {query.error && <Text>{JSON.stringify(query.error)}</Text>}
-      {query.isFetching && <Spinner size="large" color="$orange10" />}
-      <ScrollView style={{ width: "100%", paddingBottom: 50 }}>
-        <YStack
-          $sm={{
-            flexDirection: "column",
-            width: "100%",
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          paddingHorizontal="$4"
-          space
-        >
-          {recipes.map((recipe) => {
-            
-            function addRecipetoRecipelist(id: any) {
-              throw new Error("Function not implemented.");
-            }
-
-            return (
-            
-            <Card key={recipe.id} elevate size="$4" width={"100%"} height={70} bordered >
-            <Card.Header padded width={'83%'}>
-              <Text>{recipe.name}</Text>
-              <XStack width={'83%'}>
-                <Paragraph theme="alt2">{recipe.description}</Paragraph>
-              </XStack>
-            </Card.Header>
-            <Card.Footer padded>
-              <XStack flex={1} />
-              <Button
-                borderRadius="$10"
-                onPress={() => {
-                  addRecipetoRecipelist(recipe.id)
-                }}
-              >
-                Add
-              </Button>
-            </Card.Footer>
-          </Card>
-          );
-          })}
-        </YStack>
-      </ScrollView>
-      <View style={{ height: 200 }} />
-    </View>
-                    <View style={{ padding: 3 }}>
-                
-
-                    <Button onPress={() => {setVisible(!visible);}} color="red">Close</Button>
-                    </View>
-                  </View>
+                  <View style={{ height: 30, paddingTop: 30 }}></View>
+                  {query.error && <Text>{JSON.stringify(query.error)}</Text>}
+                  {query.isFetching && (
+                    <Spinner size="large" color="$orange10" />
+                  )}
+                  <ScrollView
+                    style={{ height: 550, width: 335, paddingBottom: 0 }}
+                  >
+                    <YStack
+                      $sm={{
+                        flexDirection: "column",
+                        width: "100%",
+                        flex: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      paddingHorizontal="$4"
+                      space
+                    >
+                      {
+                      lists.map((recipelist) => (
+                        <Card
+                          key={recipelist.id}
+                          elevate
+                          size="$4"
+                          width={"100%"}
+                          height={70}
+                          bordered
+                          marginLeft={20}
+                          alignItems="center"
+                          style={styles.absolutePositioning}
+                        >
+                          <Card.Header padded width={"83%"}>
+                            <Text>{recipelist.name}</Text>
+                            <XStack width={"83%"}>
+                              <Paragraph theme="alt2">
+                                {recipelist.description}
+                              </Paragraph>
+                            </XStack>
+                          </Card.Header>
+                          <Card.Footer padded>
+                            <XStack flex={1} />
+                            <Button
+                              borderRadius="$10"
+                              onPress={() => {
+                                console.log("clickeddd");
+                                addRecipetoRecipelist(recipelist.id);
+                              }}
+                            >
+                              Add
+                            </Button>
+                          </Card.Footer>
+                        </Card>
+                      ))}
+                    </YStack>
+                  </ScrollView>
+                  <View style={{ height: 20 }} />
+                </View>
+                <View style={{ padding: 3 }}>
+                  <Button
+                    onPress={() => {
+                      setVisible(!visible);
+                    }}
+                    color="red"
+                    backgroundColor="lightgrey"
+                  >
+                    Cancel
+                  </Button>
+                </View>
               </View>
+            </View>
           </View>
         </Modal>
 
@@ -435,9 +461,4 @@ function RecipeListModal(params: recipeModalInputs) {
   );
 }
 
-
-
 export default Register;
-
-
-
