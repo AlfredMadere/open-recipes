@@ -38,6 +38,11 @@ Open Recipes is a service for meal planning and recipe management aimed primaril
 5. **Public Recipe Library**: Users have read-only access to a collection of public recipes.
 6. **Feed and Search**: Users can browse their feed or search for recipes stored in the database.
 7. **Profile**: Users can view their account information and pinned recipes from their profile page.
+
+#### UI Prototype
+See the initial Figma prototype at https://www.figma.com/file/Rjw4vkBVjuUWTl80Z0OY7t/Mobile-App-Wire-Frame?type=design&node-id=0%3A1&mode=design&t=m4IlCNr30s8LjF4p-1 
+
+Last Updated: 11/03/2023
    
 #### Future Features
 - Weekly planner to enable users to plan for the week and generate a shopping list
