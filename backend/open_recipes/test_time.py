@@ -22,7 +22,7 @@ def get_user_test(username: str):
         return None
 
 def get_current_user_test ():
-    return get_user_test("juliebright@example.net")
+    return get_user_test("qburns@example.com")
 app.dependency_overrides[get_current_user] = get_current_user_test
 def time_endpoint(method, url, data):
     start_time = time.time()
@@ -54,6 +54,9 @@ def test_endpoint_performance():
         # ('post', '/users/{user_id}/ingredients/{ingredient_id}', {'user_id': '5', 'ingredient_id': '4'}),
         # ('get', '/users/me/', {}),
         ('get', '/recipes', {"cursor": 0, "order_by": "name"}),
+        # /recipes?name=Ability&max_time=50&cursor=0&tag_key=other&tag_value=leg&authored_by=518&use_inventory_of=1&order_by=name
+        ('get', '/recipes?name=Ability&max_time=50&cursor=0&tag_key=other&tag_value=leg&authored_by=518&use_inventory_of=1&order_by=name', {}),
+        ('get', '/recipes?name=Ability&max_time=50&cursor=0&tag_key=other&tag_value=leg&authored_by=518&order_by=name', {}),
         ('post', '/recipes', {'json': {
             "name": str(uuid.uuid4()),
             "description": "example",
@@ -88,10 +91,20 @@ def test_endpoint_performance():
         # ('get', '/', {}),
         # ('post', '/test-post', {'json': {}}),
     ]
-
+    resultsArray = []
     for method, url, data in endpoints:
         duration = time_endpoint(method, url, data)
-        print(f"{method.upper()} {url}: {duration} seconds")
+        resultObject = {
+            "method": method,
+            "url": url,
+            "duration": duration,
+            "summary": f"{method.upper()} {url}: {duration} seconds" 
+        }
+        resultsArray.append(resultObject)
+
+    resultsArray.sort(key=lambda x: x['duration'])
+    for result in resultsArray:
+        print(result['summary'])
         # assert duration < 2  # Set your acceptable duration threshold here
 
 # Optionally, you can add more specific tests for each endpoint
