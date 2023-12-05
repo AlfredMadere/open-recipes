@@ -33,7 +33,7 @@ To set up your development environment, follow these steps:
 
 1. **Prettier**: Install Prettier in your code editor and set it as your default formatter to automatically format your code according to our style rules.
 
-Our style guide follows standard Prettier formatting guidelines. See https://prettier.io/docs/en/why-prettier for more information
+Our style guide follows standard Prettier formatting guidelines. See the [Prettier webpage](https://prettier.io/docs/en/why-prettier) for more information
 
 2. **ESLint**: Install ESLint in your code editor to catch and fix code errors and enforce our coding standards. Make sure you npm install because ESLint will have been added to your node modules.
 
@@ -85,12 +85,12 @@ We adhere to the following ESLint standards for our code:
 - Premium features for paying customers.
 
 ## UI Prototype
-See the initial Figma prototype at https://www.figma.com/file/Rjw4vkBVjuUWTl80Z0OY7t/Mobile-App-Wire-Frame?type=design&node-id=0%3A1&mode=design&t=m4IlCNr30s8LjF4p-1 
+See the initial Figma prototype [here](https://www.figma.com/file/Rjw4vkBVjuUWTl80Z0OY7t/Mobile-App-Wire-Frame?type=design&node-id=0%3A1&mode=design&t=m4IlCNr30s8LjF4p-1)
 
 Last Updated: 11/03/2023
 
 ## Diagrams
-See our UML diagram at https://lucid.app/lucidchart/b437832a-2477-4994-b437-7182dd267b0e/edit?viewport_loc=167%2C-285%2C2207%2C1619%2C0_0&invitationId=inv_02032256-aa76-4404-93d9-3ae91e55095d
+See our UML diagram [here](https://github.com/AlfredMadere/open-recipes/wiki/Open-Recipes-UML)
 
 Last Updated: 11/02/2023
 
