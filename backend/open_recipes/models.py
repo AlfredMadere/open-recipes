@@ -72,7 +72,7 @@ class Recipe(BaseModel):
 class PopulatedRecipe(Recipe):
     author: AuthorResponseUser= None
     tags: list[RecepieTag] = []
-    ingredients: list[Ingredient] = []
+    ingredients: list[IngredientWithAmount] = []
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
