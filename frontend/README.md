@@ -1,4 +1,9 @@
-##Quick start instructions - FOR MAC USERS WITH XCODE
+# Open Recipes Frontend
+Welcome to the frontend! When designing the frontend for Open Recipes, we focused on creating something that is intuitive and appealing, unlike those recipe websites that bog you down with ads and are often frustrating to navigate. To view our frontend in action, please follow the quick start instructions below. 
+
+## Quick start instructions 
+
+### For Mac users with Xcode
 
 1. Inside of the `frontend` directory run `npm install`
 2. Run `npm run ios`
@@ -6,7 +11,7 @@
 4. Scan the QR code in your terminal with your Iphone camera
 5. Finished! you should now be able to see the app live update on your emulator and phone
 
-##Quick start instructions - FOR NON MAC USERS OR USERS WITHOUT XCODE
+### For non-Mac users or users without Xcode
 
 1. Inside of the `frontend` directory run `npm install`
 2. Run `npm start`
@@ -24,7 +29,14 @@ React Native: https://reactnative.dev/docs/getting-started
 
 ## Contributing
 
-Thank you for considering contributing to our project! We follow certain coding standards and guidelines to maintain code consistency and quality. Please follow these guidelines when making contributions.
+Thank you for considering contributing to our project! We follow certain coding standards and guidelines to maintain code consistency and quality. Please follow our guidelines when making contributions.
+
+**Contributors:** 
+Alfred Madere,
+Abigayle Mercer,
+Pau Minguet,
+Michael Murray,
+Kassi Winter
 
 ### Coding Standards
 
