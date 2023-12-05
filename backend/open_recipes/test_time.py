@@ -22,7 +22,7 @@ def get_user_test(username: str):
         return None
 
 def get_current_user_test ():
-    return get_user_test("qburns@example.com")
+    return get_user_test("michael29@example.com")
 app.dependency_overrides[get_current_user] = get_current_user_test
 def time_endpoint(method, url, data):
     start_time = time.time()
