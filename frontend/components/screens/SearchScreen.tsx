@@ -51,6 +51,7 @@ type RecipeProps = {
 type onPressButtonProps = {
   key: string;
   value: string;
+  id: number;
 };
 
 type tagProps = {
@@ -67,6 +68,7 @@ type runQueryProps = {
   searchText: String;
   filterKey: String;
   filterValue: String;
+  pressed: boolean;
 };
 
 export default function SearchScreen() {
@@ -77,17 +79,34 @@ export default function SearchScreen() {
   const [filterValue, setFilterValue] = useState("");
   const [pressed, setPressed] = useState(false);
   const [inventory, setInventory] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState(-1); // New state to track the selected filter
+  const [inventoryButtonPressed, setInventoryButtonPressed] = useState(false);
 
   const onPressButton = (props: onPressButtonProps) => {
     // Code for the first action
-    setFilterKey(props.key);
-    setFilterValue(props.value);
-    setInventory(false);
+
+    if (selectedFilter === props.id) {
+      // If the tapped filter is already selected, deselect it
+      setFilterKey("");
+      setFilterValue("");
+      setInventory(false);
+      setSelectedFilter(-1);
+      setInventoryButtonPressed(false);
+    } else {
+      // Otherwise, select the filter
+      setFilterKey(props.key);
+      setFilterValue(props.value);
+      setInventory(false);
+      setSelectedFilter(props.id);
+      setInventoryButtonPressed(false);
+    }
   };
 
   function onUseInventory() {
     setPressed(false);
     setInventory(true);
+    setSelectedFilter(-1);
+    setInventoryButtonPressed(!inventoryButtonPressed);
   }
 
   const req =
@@ -135,31 +154,42 @@ export default function SearchScreen() {
                 size="$3"
                 key={tag.id}
                 onPress={() => onPressButton(tag)}
+                // Apply different styles based on whether the button is selected
+                style={{
+                  backgroundColor:
+                    tag.id === selectedFilter ? "orange" : "black",
+                }}
               >
                 {tag.value}
               </Button>
             );
           })}
-          <Button themeInverse size="$3" onPress={() => onUseInventory()}>
+          <Button
+            themeInverse
+            size="$3"
+            onPress={() => onUseInventory()}
+            style={{
+              backgroundColor: inventoryButtonPressed ? "orange" : "black",
+            }}
+          >
             Use Inventory!
           </Button>
         </XStack>
       </ScrollView>
 
       <ScrollView>
-        {((pressed &&
-          searchText.length > 0 &&
-          filterKey.length > 0 &&
-          filterValue.length > 0) ||
-          inventory) && (
+        {(pressed ||
+          (filterKey.length > 0 && filterValue.length > 0) ||
+          inventoryButtonPressed) && (
           <ComputeResults
             searchText={searchText}
             filterKey={filterKey}
             filterValue={filterValue}
-            inventory={inventory}
+            inventory={inventoryButtonPressed}
             setInventory={setInventory}
             setPress={setPressed}
             req={req}
+            pressed={pressed}
           />
         )}
       </ScrollView>
@@ -199,10 +229,69 @@ function ComputeResults(props: runQueryProps) {
         Accept: "application/json",
       },
     });
-
     console.log("response.data", response.data);
-    const datares = JSON.stringify(response.data, null, 2);
+    //const datares = JSON.stringify(response.data, null, 2);
+    //Alert.alert("response.data: " + datares);
+    return response.data;
+  }
 
+  async function getTagResults() {
+    const authToken = await getValueFor("authtoken");
+    //alert("HI" + props.filterKey);
+    //alert("inside of get results");
+    const response = await axios.get(
+      "https://open-recipes.onrender.com/recipes?cursor=0&tag_key=meal-type&tag_value=" +
+        props.filterValue +
+        "&order_by=name",
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      },
+    );
+    console.log("response.data for Tag: ", response.data);
+    //const datares = JSON.stringify(response.data, null, 2);
+    //Alert.alert("response.data: " + datares);
+    return response.data;
+  }
+
+  async function getAllResults() {
+    const authToken = await getValueFor("authtoken");
+    //alert("HI" + props.searchText);
+    //alert("inside of get results");
+    const response = await axios.get(
+      "https://open-recipes.onrender.com/recipes?cursor=0&order_by=name",
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      },
+    );
+    console.log("response.data for Tag: ", response.data);
+    //const datares = JSON.stringify(response.data, null, 2);
+    //Alert.alert("response.data: " + datares);
+    return response.data;
+  }
+
+  async function getNameResults() {
+    const authToken = await getValueFor("authtoken");
+    //alert("HI" + props.searchText);
+    //alert("inside of get results");
+    const response = await axios.get(
+      "https://open-recipes.onrender.com/recipes?name=" +
+        props.searchText +
+        "&cursor=0&order_by=name",
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      },
+    );
+    console.log("response.data for Tag: ", response.data);
+    //const datares = JSON.stringify(response.data, null, 2);
     //Alert.alert("response.data: " + datares);
     return response.data;
   }
@@ -216,10 +305,36 @@ function ComputeResults(props: runQueryProps) {
     queryFn: getInventoryResults,
   });
 
+  const query4 = useQuery({
+    queryKey: ["recipe", props.filterKey, props.filterValue],
+    queryFn: getTagResults,
+  });
+
+  const query5 = useQuery({
+    queryKey: ["recipe", props.searchText],
+    queryFn: getNameResults,
+  });
+
+  const query6 = useQuery({
+    queryKey: ["recipe"],
+    queryFn: getAllResults,
+  });
+
   let query;
 
   if (props.inventory == true) {
     query = query3;
+    props.setPress(false);
+  } else if (props.filterKey.length != 0 && props.searchText.length == 0) {
+    query = query4;
+  } else if (
+    props.filterKey.length == 0 &&
+    props.searchText.length != 0 &&
+    props.pressed
+  ) {
+    query = query5;
+  } else if (props.filterKey.length == 0 && props.searchText.length == 0) {
+    query = query6;
   } else {
     query = query2;
   }

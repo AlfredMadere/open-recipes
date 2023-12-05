@@ -75,13 +75,15 @@ def create_tag(tag: CreateTagRequest ,engine : Annotated[Engine, Depends(get_eng
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get('/{tag_id}', response_model=List[Tag])
-def get_tag_by_id(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> List[Tag]:
+@router.get('/{tag_id}')
+def get_tag_by_id(tag_id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Tag:
     try:
         with engine.begin() as conn:
-            result = conn.execute(text("""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":id})
+            result = conn.execute(text("""SELECT id, key, value FROM "recipe_tag" WHERE id = :id"""),{"id":tag_id})
             id, key, value = result.fetchone()
+            print(id, key, value)
             return Tag(id=id, key=key, value=value)
+        
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error " +  e._message())
     except Exception as e:

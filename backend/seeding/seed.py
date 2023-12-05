@@ -97,6 +97,18 @@ def generate_recipe_ingredients(n, ingredient_ids, recipe_ids):
         })
     return recipe_ingredients
 
+def generate_recipe_x_recipe_lists(n):
+    recipe_x_recipe_lists = []
+    for _ in range(n):
+        recipe_x_recipe_lists.append({
+            'recipe_id': random.randint(1, 100000),
+            'recipe_list_id': random.randint(1, 50000)
+        })
+    return recipe_x_recipe_lists
+
+
+
+
 # Recipe Tags
 def generate_recipe_tags(n):
     recipe_tags = []
@@ -159,7 +171,8 @@ num_ingredients = 50000
 num_recipe_tags = 200
 
 num_recipe_ingredients = 800000
-num_user_x_recipe_lists = 100
+num_user_x_recipe_lists = 100000
+num_recipe_x_recipe_lists = 100000
 
 num_recipe_x__tag = 300000
 
@@ -176,7 +189,7 @@ recipe_tags = generate_recipe_tags(num_recipe_tags)
 recipe_x_tags = generate_recipe_x_tags(num_recipe_x__tag, [r['id'] for r in recipes], [rt['id'] for rt in recipe_tags])
 user_x_recipe_lists = generate_user_x_recipe_lists(num_user_x_recipe_lists, [u['id'] for u in users], [rl['id'] for rl in recipe_lists])
 user_x_ingredients = generate_uver_x_ingredients(num_user_x_ingredients, [u['id'] for u in users], [ing['id'] for ing in ingredients])
-
+recipe_x_rexipe_lists = generate_recipe_x_recipe_lists(num_recipe_x_recipe_lists)
 
 def insert_users():
     with get_engine().connect() as conn:
@@ -266,7 +279,7 @@ def insert_recipe_ingredients():
         query_str = "INSERT INTO recipe_ingredients (ingredient_id, unit, recipe_id, quantity) VALUES "
         for i,recipe_ingredient in enumerate(recipe_ingredients):
             query_str += f"({recipe_ingredient['ingredient_id']}, '{recipe_ingredient['unit']}', {recipe_ingredient['recipe_id']}, {recipe_ingredient['quantity']}),"
-            if (i - 1) % 400000 == 0:
+            if (i +1 ) % 400000 == 0:
                 try:
                     query_str = query_str[:-1] + ";"
                     conn.execute(text(query_str))
@@ -275,6 +288,9 @@ def insert_recipe_ingredients():
                     print(e)
                     break
                 print(i)
+        # query_str = query_str[:-1] + ";"
+        # conn.execute(text(query_str))
+        # query_str = "INSERT INTO recipe_ingredients (ingredient_id, unit, recipe_id, quantity) VALUES "
 
         conn.commit()
 
@@ -343,13 +359,28 @@ def insert_user_x_ingredients():
         conn.execute(text(query_str))
         conn.commit()
 
+def insert_recipe_x_recipe_lists():
+    with get_engine().connect() as conn:
+
+        query_str = "INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES "
+        for i,recipe_x_recipe_list in enumerate(recipe_x_rexipe_lists):
+            query_str += f"({recipe_x_recipe_list['recipe_id']}, {recipe_x_recipe_list['recipe_list_id']}),"
+            # if i % 10000 == 0:
+            #     query_str = query_str[:-1] + ";"
+            #     conn.execute(text(query_str))
+            #     query_str = "INSERT INTO recipe_x_recipe_list (recipe_id, recipe_list_id) VALUES "
+        
+        query_str = query_str[:-1] + ";"
+        conn.execute(text(query_str))
+        conn.commit()
+
 
 def insert_all():
     # truncate all atbles
 
     with get_engine().connect() as conn:
         conn.execute(text(
-            f"""
+            """
             TRUNCATE TABLE "user" RESTART IDENTITY CASCADE;
             TRUNCATE TABLE recipe_list RESTART IDENTITY CASCADE ;
             TRUNCATE TABLE recipe RESTART IDENTITY CASCADE;
@@ -361,7 +392,10 @@ def insert_all():
             TRUNCATE TABLE recipe_x_tag RESTART IDENTITY CASCADE;
             TRUNCATE TABLE user_x_recipe_list RESTART IDENTITY CASCADE;
             TRUNCATE TABLE user_x_ingredient RESTART IDENTITY CASCADE;
+            TRUNCATE TABLE recipe_x_recipe_list RESTART IDENTITY CASCADE;
+
             ALTER SEQUENCE "user_id_seq" RESTART WITH 1;
+
 
             """
         ))
@@ -407,10 +441,14 @@ def insert_all():
     print("done w recipe tags")
     insert_recipe_x_tags()
     print("done w recipe x tags")
-    # insert_user_x_recipe_lists()
-    # print("done w user x recipe lists")
+    insert_user_x_recipe_lists()
+    print("done w user x recipe lists")
     insert_user_x_ingredients()
     print("done w user x ingredients")
+    insert_recipe_x_recipe_lists()
+    print("done w recipe x recipe lists")
+
+
 # print("here")
 insert_all()
 

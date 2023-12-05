@@ -14,22 +14,34 @@ router = APIRouter(
 )
 
 #returns list of all available ingredients
-@router.get('', response_model=List[Ingredient])
-def get_ingredients(engine : Annotated[Engine, Depends(get_engine)], current_user: TokenData = Depends(get_current_user), ) -> List[Ingredient]:
+@router.get('')
+def get_ingredients(engine : Annotated[Engine, Depends(get_engine)], current_user: TokenData = Depends(get_current_user), cursor :int = 0):
     """
     Get all ingredients
     """
     # if user_id is None:
     user_id = current_user.id
     try:
+        page_size = 10
         with engine.begin() as conn:
             result = conn.execute(text("""SELECT id, name, type, storage, category_id 
                                     FROM ingredient
                                 JOIN user_x_ingredient ON ingredient.id = user_x_ingredient.ingredient_id
                                 WHERE user_x_ingredient.user_id = :user
-                                    ORDER BY id"""), {"user": user_id})
+                                    ORDER BY id LIMIT :page_size OFFSET :cursor"""), {"user": user_id, "page_size":page_size + 1,"cursor": cursor})
             rows = result.fetchall()
+
+            next_cursor = None if len(rows) <= page_size else cursor + page_size
+            prev_cursor = cursor - page_size if cursor > 0 else None
+
             ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
+
+            return {
+                "prev_cursor": prev_cursor,
+                "next_cursor": next_cursor,
+                "ingredients": ingredients
+            }
+        
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error " + e._message())
     except Exception as e:
@@ -46,11 +58,11 @@ def get_ingredients(engine : Annotated[Engine, Depends(get_engine)], current_use
     #                                 ORDER BY id"""),{"user":user_id})
     #         rows = result.fetchall()
     #         ingredients = [Ingredient(id=row.id, name=row.name, type=row.type, storage=row.storage, category_id=row.category_id) for row in rows]
-    return ingredients
+    # return ingredients÷
 
 #returns single ingredient with given ingredient_id
 @router.get('/{ingredient_id}', response_model=Ingredient)
-def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
+def get_ingredient_by_id(ingredient_id : int | None,engine : Annotated[Engine, Depends(get_engine)]) -> Ingredient:
     """
     Get an ingredient by id
     """
@@ -58,12 +70,14 @@ def get_ingredient_by_id(id : int | None,engine : Annotated[Engine, Depends(get_
         with engine.begin() as conn:
             result = conn.execute(text("""SELECT id, name, type, storage, category_id 
                                     FROM ingredient
-                                    WHERE id = :id"""))
+                                    WHERE id = :id"""),{"id":ingredient_id})
             id, name, storage, type, category_id = result.fetchone()
             return Ingredient(id=id, name=name, type=type, storage=storage, category_id=category_id) 
     except exc.SQLAlchemyError as e:
+        print(str(e))
         raise HTTPException(status_code=500, detail="Database error " + e._message())
     except Exception as e:
+        print(str(e))
         raise HTTPException(status_code=500, detail=str(e))
     
 # @router.post("/{id}")

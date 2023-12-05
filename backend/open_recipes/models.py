@@ -25,6 +25,10 @@ class User(BaseModel):
 class UserInDB(User):
     hashed_password: str
 
+class AuthorResponseUser(BaseModel):
+    id: int 
+    name: str
+
 
 class SignUpRequest(BaseModel):
     name: Optional[str] = None
@@ -64,68 +68,26 @@ class Recipe(BaseModel):
     procedure: Optional[str] = None
     calories: Optional[int] = None
 
-    def get_author(self, engine):
-        with engine.connect() as conn:
-            result = conn.execute(
-                """
-                SELECT id, name, email, phone FROM users WHERE id = :author_id
-                """, {"author_id": self.author_id}
-            )
-            user = result.fetchone()
-            return User(id=user[0], name=user[1], email=user[2], phone=user[3])
-
-    def get_tags(self, engine):
-        with engine.connect() as conn:
-            result = conn.execute(
-                """
-                SELECT id, key, value 
-                FROM tag
-                JOIN recipe_x_tag as rxt ON tag.id = rxt.tag_id 
-                WHERE recipe_id = :recipe_id
-                """, {"recipe_id": self.id}
-            )
-            rows = result.fetchall()
-            return [RecepieTag(id=row[0], key=row[1], value=row[2]) for row in rows]
-
-    def create_populated(self) -> PopulatedRecipe:
-        author = self.get_author()  # Fetch all recipes
-        tags = self.get_tags()
-        return PopulatedRecipe(
-            id=self.id,
-            name=self.name,
-            mins_prep=self.mins_prep,
-            tags=tags,
-            mins_cook=self.mins_cook,
-            description=self.description,
-            author_id=self.author_id,
-            default_servings=self.default_servings,
-            author=author
-        )
-
 
 class PopulatedRecipe(Recipe):
-    author: User = None
+    author: AuthorResponseUser= None
     tags: list[RecepieTag] = []
+    ingredients: list[IngredientWithAmount] = []
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.author = kwargs.get('author', None)
         self.tags = kwargs.get('tags', [])
 
-    
-
-
 class CreateRecipeListRequest(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-
 
 class RecipeListResponse(BaseModel):
     id: Optional[int] = None
     name: Optional[str] = None
     description: Optional[str] = None
     recipes: list[Recipe] = []
-    
     
 class RecipeList(BaseModel):
     id: Optional[int] = None
@@ -210,7 +172,8 @@ class Ingredient(BaseModel):
     name: Optional[str] = None
     category_id: Optional[int] = None
     type: Optional[str] = None
-    storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
+    storage : Optional[str] = None
+    # storage: Optional[Literal["FRIDGE"] | Literal["FREEZER"] | Literal["PANTRY"]] = None
 
 class CreateIngredientRequest(BaseModel):
     name: Optional[str] = None
@@ -221,6 +184,11 @@ class CreateIngredientRequest(BaseModel):
 class CreateIngredientWithAmount(CreateIngredientRequest):
     quantity: Optional[int] = None
     unit: Optional[str] = None
+
+class IngredientWithAmount(Ingredient):
+    quantity: Optional[int] = None
+    unit: Optional[str] = None
+
     
 
 class Tag(BaseModel):
@@ -231,3 +199,5 @@ class Tag(BaseModel):
 class CreateTagRequest(BaseModel):
     key: Optional[str] = None
     value: Optional[str] = None
+
+PopulatedRecipe.update_forward_refs()

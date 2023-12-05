@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
@@ -10,8 +10,11 @@ import {
   emptyData,
   sampleData,
 } from "../../components/create-recipe-types/create-recipe-helper";
+import { getValueFor } from "../../helpers/auth";
 
 export default function Page() {
+  const [authToken, setAuthToken] = useState("");
+
   const {
     handleSubmit,
     control,
@@ -43,7 +46,12 @@ export default function Page() {
 
   async function postData(data: FormattedRecipe) {
     axios
-      .post("https://open-recipes.onrender.com/recipes", data)
+      .post("https://open-recipes.onrender.com/recipes", data, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+        },
+      })
       .then(function (response) {
         console.log(response, null, 2);
       })
@@ -51,6 +59,23 @@ export default function Page() {
         console.log(error);
       });
   }
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const authToken = await getValueFor("authtoken");
+        if (isMounted) {
+          setAuthToken(authToken);
+        }
+      } catch (error) {
+        Alert.alert("Error", "Couldn't get auth token...");
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const onSubmit = (data: Recipe) => {
     const currentDateTime = Date().toLocaleString();

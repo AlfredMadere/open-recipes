@@ -14,15 +14,24 @@ router = APIRouter(
 )
 
 @router.get("")
-def get_users(engine : Annotated[Engine, Depends(get_engine)]) -> List[User]:
+def get_users( engine : Annotated[Engine, Depends(get_engine)],cursor :int = 0):
     """
     Get all users
     """
     try:
+        page_size = 10
         with engine.begin() as conn:
-            result = conn.execute(text("""SELECT id, name, email, phone FROM "user" ORDER BY id"""))
+            result = conn.execute(text("""SELECT id, name, email, phone FROM "user" ORDER BY id LIMIT :page_size OFFSET :cursor"""),{"page_size":page_size + 1,"cursor": cursor})
             rows= result.fetchall()
-            return [User(id=id, name=name, email=email, phone=phone) for id, name, email, phone in rows]
+
+            next_cursor = None if len(rows) <= page_size else cursor + page_size
+            prev_cursor = cursor - page_size if cursor > 0 else None
+            
+            return {
+                "prev_cursor": prev_cursor,
+                "next_cursor": next_cursor,
+                "users": [User(id=id, name=name, email=email, phone=phone) for id, name, email, phone in rows]
+            }
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error "  + e._message())
     except Exception as e:
