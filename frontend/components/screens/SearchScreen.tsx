@@ -381,7 +381,7 @@ function InputText(props: InputTextProps) {
           onChangeText={(value) => props.setSearchText(value)}
         />
 
-      <FontAwesome.Button name="search" size={16} color="#4B4037" backgroundColor="#E1DCD2" onPress={() => props.onPressGoButton(true)}/>
+      <FontAwesome.Button name="search" size={16} color="#4B4037" backgroundColor="#EBE7E0" onPress={() => props.onPressGoButton(true)}/>
 
       </XStack>
     </View>

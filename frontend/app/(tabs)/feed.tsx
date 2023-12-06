@@ -106,8 +106,8 @@ export default function Feed() {
         </YStack>
       </ScrollView>
 
-      <Foundation.Button name="refresh" size={24} color="#6E6055" backgroundColor="#EBE7E0"
-        style={{ width: "12%", alignSelf: "flex-end"}} onPress={() => query.refetch()}/>
+      <Foundation.Button name="refresh" size={26} color="#6E6055" backgroundColor="#EBE7E0"
+        style={{ width: "100%", alignSelf: "flex-start"}} onPress={() => query.refetch()}/>
 
     </View>
   );

@@ -1,5 +1,6 @@
-import { Button, H2, H5, Card, Paragraph, Text, View, XStack } from "tamagui";
+import { Button, H2, H5, Card, Paragraph, Image, Text, View, XStack } from "tamagui";
 import { useRouter } from "expo-router";
+import {StyleSheet} from "react-native";
 
 type RecipeCardProps = {
   id: number;
@@ -19,13 +20,37 @@ type RecipeCardProps = {
 export default function SearchResult(props: RecipeCardProps) {
   const router = useRouter();
 
+  const styles = StyleSheet.create({
+    circularView: {
+      marginTop: 60,
+      marginLeft:15,
+      width: 200,
+      height: 70,
+      borderRadius: 5,
+      overflow: "hidden",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
+    },
+  });
+
   return (
 <View backgroundColor="#EBE7E0" paddingRight="$8">
-<Card margin="$2" elevate size="$4" width={"100%"} height={200} bordered {...props}>
+<Card margin="$2" elevate size="$4" width={"100%"} height={250} bordered {...props}>
       <Card.Header padded>
         <H2 color="#4B4037">{props.name}</H2>
         <Paragraph theme="alt2">{props.description}</Paragraph>
       </Card.Header>
+      <View style={styles.circularView}>
+            <Image
+              source={require("../../assets/recipie.png")}
+              style={styles.image}
+            />
+          </View>
       <Card.Footer padded>
         <XStack flex={1} />
         <Button

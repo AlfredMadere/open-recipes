@@ -20,7 +20,7 @@ import { removeDuplicateIds } from "../../helpers";
 import * as SecureStore from "expo-secure-store";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../AuthContext";
-import {Foundation} from "@expo/vector-icons";
+import {Foundation, AntDesign, FontAwesome5, MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function Profile() {
   const authContext = useContext(AuthContext);
@@ -65,7 +65,7 @@ export default function Profile() {
       borderRadius: 75, // half of width or height to make it circular
       overflow: "hidden",
       borderWidth: 2,
-      borderColor: "#4B4037",
+      borderColor: "#D7783B",
       justifyContent: "center",
       alignItems: "center",
     },
@@ -77,15 +77,15 @@ export default function Profile() {
   });
 
  
-  
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
 
   return (
     <View style={{ width: "100%", backgroundColor: "#EBE7E0" }}>
-      <Foundation.Button name="refresh" size={24} color="#6E6055" backgroundColor="#EBE7E0"
-        style={{ width: "12%", alignSelf: "flex-end"}}  onPress={() => {
-           query.refetch();
+      <Foundation.Button name="refresh" size={26} color="#6E6055" backgroundColor={"#EBE7E0"}
+        style={{ width: "100%", alignSelf: "flex-start" , backgroundColor:"#EBE7E0"}}  
+        onPress={() => {
+          query.refetch();
         }}/>
 
       <View style={{ alignSelf: "center" }}>
@@ -99,17 +99,23 @@ export default function Profile() {
         </Stack>
 
         <Stack scale={1.2} marginTop={15}>
-          <Text style={{ fontWeight: "bold", fontSize:"18", color:"#4B4037" }}>{userName}</Text>
+          <Text style={{ alignSelf: "center", fontWeight: "bold", fontSize:"18", color:"#4B4037" }}>{userName}</Text>
+          <Text> </Text>
+          <View style={{flexDirection: "row",
+                  justifyContent: "space-between",
+                  }}>
+
+              <AntDesign name="instagram" size={22} color="#6E6055" />
+              <MaterialCommunityIcons name="snapchat" size={22} color="#6E6055" />
+              <FontAwesome5 name="user-friends" size={22} color="#6E6055" />
+      </View>
         </Stack>
       </View>
-      <View style={{ alignSelf: "center" }}>
-
-      </View>
+      
       <View style={{ marginLeft: 10, marginTop: 20, marginBottom: 20 }}>
-
         <Text style={{fontSize:"18", justifyContent: "center", color:"#6E6055" }}>Authored Recipes:</Text>
-
       </View>
+
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
       {query.isFetching && <Spinner size="large" color="$orange10" />}
       <ScrollView style={{ width: "100%", paddingBottom: 500 }}>

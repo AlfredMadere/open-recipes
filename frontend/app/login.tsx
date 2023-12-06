@@ -138,6 +138,12 @@ function LoginPage() {
 
   const renderLoginForm = () => (
     <View style={styles.container}>
+      <View style={styles.circularView}>
+            <Image
+              source={require("../assets/real.png")}
+              style={styles.image}
+            />
+          </View>
       <Text style={styles.title}>Login</Text>
       <Text style={styles.label}>Email</Text>
       <TextInput
