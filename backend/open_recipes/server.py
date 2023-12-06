@@ -30,9 +30,9 @@ from open_recipes.models import Recipe
 #     hashed_password: str
 
 app = FastAPI(
-    title='Recipe Service API',
-    version='1.0.0',
-    description='API for managing recipes, ingredients, users, and reviews.',
+    title="Recipe Service API",
+    version="1.0.0",
+    description="API for managing recipes, ingredients, users, and reviews.",
 )
 
 app.include_router(user_router)
@@ -42,74 +42,24 @@ app.include_router(tag_router)
 app.include_router(
     auth_router,
 )
-app.include_router(
-    recipe_list_router
-)
-
-
-
+app.include_router(recipe_list_router)
 
 
 @app.get("/")
 def read_root(token: Annotated[str, Depends(oauth2_scheme)]):
-    return {"Hello": "World",
-            "token": token
-            }
+    return {"Hello": "World", "token": token}
 
-#SMOKE TESTED
+
+# SMOKE TESTED
 
 
 class SearchResults(BaseModel):
     recipe: List[Recipe]
     next_cursor: Optional[int]
     prev_cursor: Optional[int]
-    
-# @app.get('/reviews', response_model=List[Review])
-# def get_reviews(engine : Annotated[Engine, Depends(get_engine)]) -> List[Review]:
-#     """
-#     Get all reviews
-#     """
-#     with engine.begin() as conn:
-#         result = conn.execute(text(f"SELECT id, stars, author_id, content, recipe_id, FROM reviews ORDER BY created_at"))
-#         id, name, email, phone = result.fetchone()
-#         return User(id=id, name=name, email=email, phone=phone)
-
-# @app.post('/reviews', response_model=None, responses={'201': {'model': Review}})
-# def post_reviews(body: Review,engine : Annotated[Engine, Depends(get_engine)]) -> Union[None, Review]:
-#     """
-#     Create a new review
-#     """
-#     with engine.begin() as conn:
-#         result = conn.execute(text(f"INSERT INTO reviews stars, author_id, content, recipe_id values (:stars,:author_id,:content,:recipe_id)",{"stars":body.stars,"author_id":body.author.id,"content":body.content,"recipe_id":body.recepie.id}))
-#         id, stars, author_id, content, recipe_id = result.fetchone()
-#         return User(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
-
-# @app.get('/reviews/{id}', response_model=Review)
-# def get_review(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> Review:
-#     """
-#     Get a review by id
-#     """
-#     with engine.begin() as conn:
-#         result = conn.execute(text(f"""SELECT stars, author_id, content, recipe_id FROM review WHERE id = :id"""),{"id":id})
-#         id, stars, author_id, content, recipe_id = result.fetchone()
-#         return Review(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
-
-# @app.post("/reviews/{id}")
-# def update_review(id: int, review : Review,engine : Annotated[Engine, Depends(get_engine)]) -> Review:
-#     with engine.begin() as conn:
-#         result = conn.execute(text(f"UPDATE review SET stars = :stars, author_id = :author_id, content = :content, recipe_id = :recipe_id WHERE id = :id",{"stars":review.stars,"author_id":review.author_id, "content":review.content,  "recipe_id":review.recipe_id, "id":id}))
-#         id, stars, author_id, content, recipe_id = result.fetchone()
-#         return Review(id=id, stars = stars, author_id = author_id, content = content, recipe_id = recipe_id)
-
-# @app.delete("/reviews/{id}")
-# def delete_review(id: int,engine : Annotated[Engine, Depends(get_engine)]) -> None:
-#     with engine.begin() as conn:
-#         result = conn.execute(text(f"""DELETE FROM "reviews" WHERE id = :id""",{"id":id}))
-#         id, stars, author_id, content, recipe_id = result.fetchone()
-#         return Review(id=id, stars=stars, author_id=author_id, content=content, recipe_id = recipe_id)
 
 
-@app.post('/test-post')
+@app.post("/test-post")
 async def test_post(request: Request):
     # Access query parameters from the URL
     query_params = dict(request.query_params)
@@ -122,17 +72,14 @@ async def test_post(request: Request):
 
     # Prepare the response data
     response_data = {
-        'request_data': data,
-        'query_parameters': query_params,
+        "request_data": data,
+        "query_parameters": query_params,
     }
 
     return response_data
 
 
-
 if __name__ == "__main__":
-    config = uvicorn.Config(
-        app, port=3000, log_level="info", reload=True
-    )
+    config = uvicorn.Config(app, port=3000, log_level="info", reload=True)
     server = uvicorn.Server(config)
     server.run()
