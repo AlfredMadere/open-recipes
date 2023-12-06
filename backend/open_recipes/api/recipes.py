@@ -44,22 +44,12 @@ def get_recipes(
     """
     Get all recipes
     """
-    # print("Name:", name)  # Debug: Print the value of name
-    # print("Max Time:", max_time)  # Debug: Prin
-    #
+   
     try:
         page_size = 10
 
         if use_inventory_of:
             use_inventory_of = current_user.id
-
-        # metadata_obj = sqlalchemy.MetaData()
-        # recipe = sqlalchemy.Table("recipe", metadata_obj, autoload_with=engine)
-        # recipe_x_tag = sqlalchemy.Table("recipe_x_tag", metadata_obj, autoload_with=engine)
-        # recipe_tag = sqlalchemy.Table("recipe_tag", metadata_obj, autoload_with=engine)
-        # recipe_ingredients= sqlalchemy.Table("recipe_ingredients", metadata_obj, autoload_with=engine)
-        # user_x_ingredient= sqlalchemy.Table("user_x_ingredient", metadata_obj, autoload_with=engine)
-        # page_size = 10
 
         stmt = sqlalchemy.select(
             recipe.c.id,
@@ -89,35 +79,35 @@ def get_recipes(
         if authored_by is not None:
             stmt = stmt.where(recipe.c.author_id == authored_by)
         if use_inventory_of is not None:
-            print("using inventory of user with id", use_inventory_of)
-            stmt = (
-                stmt.join(
-                    recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id
-                )
-                .outerjoin(
-                    user_x_ingredient,
-                    (
-                        recipe_ingredients.c.ingredient_id
-                        == user_x_ingredient.c.ingredient_id
-                    )
-                    & (user_x_ingredient.c.user_id == use_inventory_of),
-                )
-                .group_by(
-                    recipe.c.id,
-                    recipe.c.name,
-                    recipe.c.mins_prep,
-                    recipe.c.category_id,
-                    recipe.c.mins_cook,
-                    recipe.c.description,
-                    recipe.c.author_id,
-                    recipe.c.default_servings,
-                    recipe.c.procedure,
-                    recipe.c.calories,
-                )
-                .distinct()
-                .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
-                .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
-            )
+            # print("using inventory of user with id", use_inventory_of)
+            # stmt = (
+            #     stmt.join(
+            #         recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id
+            #     )
+            #     .outerjoin(
+            #         user_x_ingredient,
+            #         (
+            #             recipe_ingredients.c.ingredient_id
+            #             == user_x_ingredient.c.ingredient_id
+            #         )
+            #         & (user_x_ingredient.c.user_id == use_inventory_of),
+            #     )
+            #     .group_by(
+            #         recipe.c.id,
+            #         recipe.c.name,
+            #         recipe.c.mins_prep,
+            #         recipe.c.category_id,
+            #         recipe.c.mins_cook,
+            #         recipe.c.description,
+            #         recipe.c.author_id,
+            #         recipe.c.default_servings,
+            #         recipe.c.procedure,
+            #         recipe.c.calories,
+            #     )
+            #     .distinct()
+            #     .outerjoin(recipe_x_tag, recipe.c.id == recipe_x_tag.c.recipe_id)
+            #     .outerjoin(recipe_tag, recipe_x_tag.c.tag_id == recipe_tag.c.id)
+            # )
 
             stmt = stmt.outerjoin(
                 recipe_ingredients, recipe_ingredients.c.recipe_id == recipe.c.id
