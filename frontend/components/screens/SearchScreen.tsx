@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 //import { useRouter } from "expo-router";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import { FontAwesome } from '@expo/vector-icons'; 
 
 async function getValueFor(key: string) {
   const result = await SecureStore.getItemAsync(key);
@@ -152,6 +153,8 @@ export default function SearchScreen() {
             return (
               <Button
                 themeInverse
+                borderWidth="1"
+                borderColor={"white"}
                 size="$3"
                 key={tag.id}
                 onPress={() => onPressButton(tag)}
@@ -170,7 +173,7 @@ export default function SearchScreen() {
             size="$3"
             onPress={() => onUseInventory()}
             style={{
-              backgroundColor: inventoryButtonPressed ? "orange" : "#F4591D",
+              backgroundColor: inventoryButtonPressed ? "#6E6055" : "#D7783B",
             }}
           >
             Use Inventory!
@@ -345,6 +348,7 @@ function ComputeResults(props: runQueryProps) {
 
   result = query.data?.recipe.map((recipe: RecipeProps) => {
     return (
+      
       <SearchResult
         key={recipe.id} // Use a combination of recipe.id and index
         name={recipe.name}
@@ -377,9 +381,8 @@ function InputText(props: InputTextProps) {
           onChangeText={(value) => props.setSearchText(value)}
         />
 
-        <Button onPress={() => props.onPressGoButton(true)} size={props.size}>
-          Go
-        </Button>
+      <FontAwesome.Button name="search" size={16} color="#4B4037" backgroundColor="#E1DCD2" onPress={() => props.onPressGoButton(true)}/>
+
       </XStack>
     </View>
   );

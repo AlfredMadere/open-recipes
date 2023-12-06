@@ -180,9 +180,9 @@ const Register = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#EBE7E0",
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 20,
   },
   recipeDetails: {
     backgroundColor: "#fff",

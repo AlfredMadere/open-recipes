@@ -22,6 +22,7 @@ import { removeDuplicateIds } from "../../helpers";
 import { useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { AuthContext } from "../AuthContext";
+import {Foundation} from "@expo/vector-icons";
 
 export default function Feed() {
   const router = useRouter();
@@ -65,7 +66,7 @@ export default function Feed() {
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", height:"100%", backgroundColor:"#EBE7E0"}}>
       <View style={{ padding: 10 , display: "flex", flexDirection: "column", gap: 10}}>
         <Button
           onPress={() => router.push("update-inventory")}
@@ -82,22 +83,6 @@ export default function Feed() {
           fontWeight="bold" // Make the text bold
         >
           Update Inventory
-        </Button>
-        <Button
-          onPress={() => query.refetch()}
-          size="$4" // Adjust the size
-          color="$blue10" // Set the button color
-          borderRadius="$6" // Round the corners
-          // shadowColor="$shadow" // Add a shadow
-          shadowRadius={10} // Shadow radius
-          elevation={2} // Elevation for a 3D effect
-          hoverStyle={{ backgroundColor: "$blue8" }} // Change color on hover
-          pressStyle={{ backgroundColor: "$blue12" }} // Change color on press
-          fontFamily="$body" // Set the font family
-          fontSize="$4" // Set the font size
-          fontWeight="bold" // Make the text bold
-        >
-          Refresh
         </Button>
       </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
@@ -120,6 +105,10 @@ export default function Feed() {
           <View style={{ height: 100 }} />
         </YStack>
       </ScrollView>
+
+      <Foundation.Button name="refresh" size={24} color="#6E6055" backgroundColor="#EBE7E0"
+        style={{ width: "12%", alignSelf: "flex-end"}} onPress={() => query.refetch()}/>
+
     </View>
   );
 }

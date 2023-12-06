@@ -457,16 +457,13 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     height: 40,
     padding: 10,
-    borderWidth: 1,
-    borderRadius: 4,
-    color:"#6E6055",
-    borderColor: "#4B4037",
+    color:"#6E6055"
+
   },
   small_input: {
     backgroundColor: "white",
     height: 40,
     width: 80,
-    borderRadius: 4,
     padding: 10,
   },
   large_input: {
@@ -474,10 +471,8 @@ const styles = StyleSheet.create({
     textAlign: "left",
     backgroundColor: "white",
     height: 400,
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 4,
-    borderColor: "#6E6055",
+    padding: 10
+
   },
   error: {
     borderColor: "red",

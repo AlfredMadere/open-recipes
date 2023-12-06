@@ -49,7 +49,7 @@ export default function Page() {
 
   console.log("query.data", query?.data?.recipes);
   return (
-    <View style={{ width: "100%", flex: 1,  backgroundColor: "#EBE7E0" }}>
+    <View style={{ width: "100%", flex: 1,  backgroundColor: "#E1DCD2" }}>
       {query.isFetching && (
         <Spinner style={{ alignSelf: "center", marginTop: 20 }} size="large" />
       )}

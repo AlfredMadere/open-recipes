@@ -83,6 +83,11 @@ export default function Profile() {
 
   return (
     <View style={{ width: "100%", backgroundColor: "#EBE7E0" }}>
+      <Foundation.Button name="refresh" size={24} color="#6E6055" backgroundColor="#EBE7E0"
+        style={{ width: "12%", alignSelf: "flex-end"}}  onPress={() => {
+           query.refetch();
+        }}/>
+
       <View style={{ alignSelf: "center" }}>
         <Stack scale={1.2} marginTop={15}>
           <View style={styles.circularView}>
@@ -94,17 +99,10 @@ export default function Profile() {
         </Stack>
 
         <Stack scale={1.2} marginTop={15}>
-          <Text style={{ fontWeight: "bold", fontSize:"18", justifyContent: "center", color:"#4B4037" }}>{userName}</Text>
+          <Text style={{ fontWeight: "bold", fontSize:"18", color:"#4B4037" }}>{userName}</Text>
         </Stack>
       </View>
       <View style={{ alignSelf: "center" }}>
-
- 
-
-      <Foundation.Button name="refresh" size={24} color="#6E6055" backgroundColor="#EBE7E0"
-        style={{ width: "100%", alignSelf: "center"}} onPress={() => {
-           query.refetch();
-        }}/>
 
       </View>
       <View style={{ marginLeft: 10, marginTop: 20, marginBottom: 20 }}>
@@ -131,8 +129,9 @@ export default function Profile() {
           })}
           <View style={{ height: 300 }} />
         </YStack>
+        
       </ScrollView>
-      <View style={{ height: 200 }} />
+      
     </View>
   );
 }

@@ -91,8 +91,7 @@ export default function One() {
 
 
   return (
-    <View style={{ width: "100%", backgroundColor: "#EBE7E0",}}>
-      <View style={{ padding: 10 }}>
+    <View style={{ width: "100%", backgroundColor: "#EBE7E0",  gap: 10, padding: 10}}>
       <Button
               bordered
               size="$3"
@@ -108,7 +107,6 @@ export default function One() {
               }} >
           New List
           </Button>
-      </View>
 
           <ListComponent data={lists} />
 
@@ -362,7 +360,7 @@ export function ListCard(props: {
       <Card.Footer padded>
         <XStack flex={1} />
         <Button
-                size="$2"
+                size="$3"
                 borderRadius="$6"
                 backgroundColor="$red10"
                 color="white"
@@ -379,7 +377,7 @@ export function ListCard(props: {
           color="#6E6055"
           hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
           pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
-          size="$2" 
+          size="$3" 
           borderRadius="$6" // Round the corners
           onPress={() => {
             router.push(`/lists/${id}`);
