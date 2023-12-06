@@ -86,7 +86,7 @@
 #             on delete cascade,
 #     quantity      integer not null
 # );""")
-        
+
 
 #         conn.execute("""create table recipe_tag
 # (
@@ -96,7 +96,7 @@
 #     key   text    not null,
 #     value text
 # );""")
-        
+
 #         conn.execute("""create table recipe_x_tag
 # (
 #     recipe_id integer not null
@@ -106,7 +106,7 @@
 #         constraint recipe_x_tag_recipe_tag_id_fk
 #             references recipe_tag
 # );""")
-        
+
 #         conn.execute("""create table recipe_x_recipe_list
 # (
 #     recipe_id      integer not null
@@ -116,7 +116,6 @@
 #         constraint recipe_x_recipe_list_recipe_list_id_fk
 #             references recipe_list
 # );""")
-        
 
 
 # def teardown_module():
@@ -139,8 +138,5 @@
 #             }
 #         ]}
 #         )
-  
-    
 
-   
-    
+

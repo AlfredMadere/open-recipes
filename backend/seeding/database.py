@@ -7,7 +7,10 @@ from sqlalchemy import create_engine
 def database_connection_url():
     dotenv.load_dotenv()
     return os.environ.get("POSTGRES_URI")
+
+
 print(database_connection_url())
+
 
 def get_engine():
     return create_engine(database_connection_url(), pool_pre_ping=True)
