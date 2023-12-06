@@ -17,6 +17,27 @@ export type Recipe = {
   }[];
 };
 
+export type PopulatedRecipeList = {
+  description: string;
+  id: number;
+  name: string;
+  recipes: BaseRecipe[];
+}
+ 
+export type BaseRecipe = {
+  name: string;
+  mins_prep: number;
+  mins_cook: number;
+  description: string;
+  default_servings: number;
+  procedure: string;
+  created_at: string;
+  author_id: number;
+  category_id: number;
+
+  id: number;
+};
+
 export type FormattedRecipe = {
   name: string;
   mins_prep: number;
