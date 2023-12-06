@@ -468,12 +468,12 @@ function RecipeListModal(params: recipeModalInputs) {
           </View>
         </Modal>
 
-        <Button
+        {/* <Button
           onPress={() => {
             setVisible(true);
           }}
           color="blue"
-        />
+        /> */}
       </Stack>
     </View>
   );
