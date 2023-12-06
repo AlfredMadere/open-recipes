@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from "tamagui";
-import { Alert, Text } from "react-native";
+import { Alert, Text, Image, StyleSheet } from "react-native";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
@@ -21,16 +21,14 @@ import * as SecureStore from "expo-secure-store";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../AuthContext";
 
-
 export default function Profile() {
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+  const { authToken, userId } = authContext;
 
-    const authContext = useContext(AuthContext);
-    if (!authContext) {
-      throw new Error("AuthContext must be used within an AuthProvider");
-    }
-    const { authToken, userId } = authContext;
-
-    async function getRecipesFeed(): Promise<SearchResult<PopulatedRecipe>> {
+  async function getRecipesFeed(): Promise<SearchResult<PopulatedRecipe>> {
     if (!authToken) {
       throw new Error("No auth token");
     }
@@ -39,7 +37,9 @@ export default function Profile() {
     }
     //console.log("myId: ", myId)
     const response = await axios.get(
-      "https://open-recipes.onrender.com/recipes?cursor=0&authored_by=" + userId + "&order_by=name",
+      "https://open-recipes.onrender.com/recipes?cursor=0&authored_by=" +
+        userId +
+        "&order_by=name",
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -57,39 +57,55 @@ export default function Profile() {
     enabled: authToken && userId ? true : false, // Only run the query if authToken is not empty
   });
 
-  
-
+  const styles = StyleSheet.create({
+    circularView: {
+      width: 150,
+      height: 150,
+      borderRadius: 75, // half of width or height to make it circular
+      overflow: "hidden",
+      borderWidth: 2,
+      borderColor: "black",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
+    },
+  });
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
 
-
-
-  const username = 'John'
-
+  const username = "John";
 
   return (
     <View style={{ width: "100%" }}>
       <View style={{ alignSelf: "center" }}>
         <Stack scale={1.2} marginTop={15}>
-          <Circle size={100} backgroundColor="$color" elevation="$4" />
+          <View style={styles.circularView}>
+            <Image
+              source={require("../../assets/hdken.png")}
+              style={styles.image}
+            />
+          </View>
         </Stack>
-        <Stack scale={1.2} marginTop={15}>
+        <Stack scale={1.2} marginTop={15} alignItems="center">
           <Text>{username}</Text>
         </Stack>
       </View>
-      <View style={{ alignSelf: "center" }}>
-      <Button
-        onPress={() => {
-          query.refetch();
-        }}
-        bordered
-        style={{ width: "50%" }}
-      >
-        Refresh
-      </Button>
+      <View alignItems="center">
+        <Button
+          onPress={() => {
+            query.refetch();
+          }}
+          bordered
+          style={{ width: "50%" }}
+        >
+          Refresh
+        </Button>
       </View>
       <View style={{ marginLeft: 10, marginTop: 20, marginBottom: 20 }}>
-
         <Text>Authored Recipes:</Text>
       </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
@@ -117,7 +133,6 @@ export default function Profile() {
   );
 }
 
-
 type RecipeCardProps = {
   recipe: {
     name: string;
@@ -143,9 +158,9 @@ export function RecipeCard(props: RecipeCardProps) {
 
   return (
     <Card elevate size="$4" width={"100%"} height={70} bordered {...props}>
-      <Card.Header padded width={'83%'}>
+      <Card.Header padded width={"83%"}>
         <Text>{recipe.name}</Text>
-        <XStack width={'83%'}>
+        <XStack width={"83%"}>
           <Paragraph theme="alt2">{recipe.description}</Paragraph>
         </XStack>
       </Card.Header>
@@ -154,7 +169,7 @@ export function RecipeCard(props: RecipeCardProps) {
         <Button
           borderRadius="$10"
           onPress={() => {
-            goToRecipe(recipe.id)
+            goToRecipe(recipe.id);
           }}
         >
           View
