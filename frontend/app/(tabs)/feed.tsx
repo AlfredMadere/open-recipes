@@ -14,7 +14,7 @@ import {
   XStack,
   YStack,
 } from "tamagui";
-import { Alert } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Recipe } from "../interfaces/models";
@@ -22,6 +22,7 @@ import { removeDuplicateIds } from "../../helpers";
 import { useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { AuthContext } from "../AuthContext";
+import {Foundation} from "@expo/vector-icons";
 
 export default function Feed() {
   const router = useRouter();
@@ -65,39 +66,23 @@ export default function Feed() {
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", height:"100%", backgroundColor:"#EBE7E0"}}>
       <View style={{ padding: 10 , display: "flex", flexDirection: "column", gap: 10}}>
         <Button
           onPress={() => router.push("update-inventory")}
-          size="$4" // Adjust the size
-          color="$blue10" // Set the button color
-          borderRadius="$6" // Round the corners
-          // shadowColor="$shadow" // Add a shadow
+          bordered
+          size="$3" // Adjust the size
+          color="white" // Set the word color
+          backgroundColor="#D7783B"
+          //shadowColor="$shadow" // Add a shadow
           shadowRadius={10} // Shadow radius
           elevation={2} // Elevation for a 3D effect
-          hoverStyle={{ backgroundColor: "$blue8" }} // Change color on hover
-          pressStyle={{ backgroundColor: "$blue12" }} // Change color on press
+          pressStyle={{color: "white", backgroundColor: "#6E6055" }} // Change color on press
           fontFamily="$body" // Set the font family
           fontSize="$4" // Set the font size
           fontWeight="bold" // Make the text bold
         >
           Update Inventory
-        </Button>
-        <Button
-          onPress={() => query.refetch()}
-          size="$4" // Adjust the size
-          color="$blue10" // Set the button color
-          borderRadius="$6" // Round the corners
-          // shadowColor="$shadow" // Add a shadow
-          shadowRadius={10} // Shadow radius
-          elevation={2} // Elevation for a 3D effect
-          hoverStyle={{ backgroundColor: "$blue8" }} // Change color on hover
-          pressStyle={{ backgroundColor: "$blue12" }} // Change color on press
-          fontFamily="$body" // Set the font family
-          fontSize="$4" // Set the font size
-          fontWeight="bold" // Make the text bold
-        >
-          Refresh
         </Button>
       </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
@@ -120,6 +105,10 @@ export default function Feed() {
           <View style={{ height: 100 }} />
         </YStack>
       </ScrollView>
+
+      <Foundation.Button name="refresh" size={26} color="#6E6055" backgroundColor="#EBE7E0"
+        style={{ width: "100%", alignSelf: "flex-start"}} onPress={() => query.refetch()}/>
+
     </View>
   );
 }
@@ -142,17 +131,46 @@ type RecipeCardProps = {
 export function RecipeCard(props: RecipeCardProps) {
   const recipe = props.recipe;
   const router = useRouter();
+  const styles = StyleSheet.create({
+    circularView: {
+      marginTop: 60,
+      marginLeft:15,
+      width: 200,
+      height: 70,
+      borderRadius: 5,
+      overflow: "hidden",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
+    },
+  });
 
   return (
-    <Card elevate size="$4" width={"100%"} height={300} bordered {...props}>
+    <Card elevate size="$4" width={"100%"} height={200} bordered {...props}>
       <Card.Header padded>
-        <H2>{recipe.name}</H2>
+        <H2 color="#4B4037">{recipe.name}</H2>
         <Paragraph theme="alt2">{recipe.description}</Paragraph>
       </Card.Header>
+      <View style={styles.circularView}>
+            <Image
+              source={require("../../assets/recipie.png")}
+              style={styles.image}
+            />
+          </View>
       <Card.Footer padded>
         <XStack flex={1} />
         <Button
-          borderRadius="$10"
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          color="#6E6055"
+          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+          pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
+          size="$3" 
+          borderRadius="$6" // Round the corners
           onPress={() => {
             router.push(`/recipes/${recipe.id}`);
           }}

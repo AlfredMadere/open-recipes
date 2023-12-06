@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
-import { ScrollView } from "tamagui";
+import { Text, View, StyleSheet, TextInput, Alert } from "react-native";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import { ScrollView, Button} from "tamagui";
 import axios from "axios";
 import {
   Recipe,
@@ -92,12 +93,13 @@ export default function Page() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollViewContent}>
         {/* Name */}
-        <Text style={styles.label}>Name</Text>
+          <Text style={styles.label}>Recipe Name:</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["name"] ? styles.error : styles.input}
+              placeholder={`Enter here...`}
+              style={errors["name"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -108,12 +110,13 @@ export default function Page() {
         />
 
         {/* Description */}
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>Description:</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["description"] ? styles.error : styles.input}
+              placeholder={`Enter here...`}
+              style={errors["description"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -124,12 +127,14 @@ export default function Page() {
         />
 
         {/* Servings */}
-        <Text style={styles.label}>Servings</Text>
+        <Text style={styles.label}>Servings:                Times:         </Text>
+        <View style={styles.ingredient}>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["default_servings"] ? styles.error : styles.input}
+              placeholder={`Servings...`}
+              style={errors["default_servings"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -140,16 +145,14 @@ export default function Page() {
           rules={{ required: true }}
         />
 
+       
         {/* Prep and Cooking Time */}
-        <Text style={styles.label}>Time</Text>
-        <View style={styles.ingredient}>
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                placeholder={`Prep Time`}
-                placeholderTextColor={"gray"}
-                style={errors["mins_prep"] ? styles.error : styles.input}
+                placeholder={`Prep Time...`}
+                style={errors["mins_prep"] ? styles.error : styles.regular_input}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -159,13 +162,13 @@ export default function Page() {
             name="mins_prep"
             rules={{ required: true }}
           />
+     
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                placeholder={`Cook Time`}
-                placeholderTextColor={"gray"}
-                style={errors["mins_cook"] ? styles.error : styles.input}
+                placeholder={`Cook Time...`}
+                style={errors["mins_cook"] ? styles.error : styles.regular_input}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -175,10 +178,12 @@ export default function Page() {
             name="mins_cook"
             rules={{ required: true }}
           />
-        </View>
+          </View>
+       
+
 
         {/* Tags */}
-        <Text style={styles.label}>Tags</Text>
+        <Text style={styles.label}>Tags:</Text>
         {fieldsTag.map((field, index) => (
           <View key={field.id} style={styles.container}>
             <View style={styles.ingredient}>
@@ -190,10 +195,9 @@ export default function Page() {
                     style={
                       errors["tags"]?.[index]?.["key"]
                         ? styles.error
-                        : styles.input
+                        : styles.regular_input
                     }
-                    placeholder={`Key`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Key...        `}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -209,10 +213,9 @@ export default function Page() {
                     style={
                       errors["tags"]?.[index]?.["value"]
                         ? styles.error
-                        : styles.input
+                        : styles.regular_input
                     }
-                    placeholder={`Value`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Value...        `}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -222,31 +225,27 @@ export default function Page() {
                 defaultValue=""
               />
               {/* remove tag */}
-              <View style={styles.smallButton}>
-                <Button
-                  onPress={() => {
+              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#EBE7E0" onPress={() => {
                     removeTag(index);
-                  }}
-                  title="Remove"
-                  color="white"
-                />
-              </View>
+                  }}/>
             </View>
           </View>
         ))}
+        <View style={{flexDirection: "row",
+                flex: 1,
+                justifyContent: "flex-end",
+                margin: 0,
+                padding: 0,}}>
+             
         {/* add tag */}
-        <View style={styles.smallButton}>
-          <Button
-            title="Add Tag"
-            color="white"
-            onPress={() => {
-              appendTag({ key: "", value: "" });
-            }}
-          />
+        <Ionicons.Button name="md-add" size={30} color="green" backgroundColor="#EBE7E0" onPress={() => {
+                    appendTag({ key: "", value: "" });
+         }}/>
         </View>
 
+        
         {/* Ingredients */}
-        <Text style={styles.label}>Ingredients</Text>
+        <Text style={styles.label}>Ingredients:</Text>
         {fieldsIngredient.map((field, index) => (
           <View key={field.id} style={styles.container}>
             <View style={styles.ingredient}>
@@ -258,10 +257,9 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["quantity"]
                         ? styles.error
-                        : styles.input
+                        : styles.regular_input
                     }
-                    placeholder={`Quantity`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Quantity...`}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -277,10 +275,9 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["unit"]
                         ? styles.error
-                        : styles.input
+                        : styles.regular_input
                     }
-                    placeholder={`Unit`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Unit...`}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -296,10 +293,9 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["name"]
                         ? styles.error
-                        : styles.input
+                        : styles.regular_input
                     }
-                    placeholder={`Ingredient`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Ingredient...`}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -308,41 +304,38 @@ export default function Page() {
                 rules={{ required: true }}
               />
               {/* remove ingredient */}
-              <View style={styles.smallButton}>
-                <Button
-                  onPress={() => {
+              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#EBE7E0" onPress={() => {
                     removeIngredient(index);
                   }}
-                  title="Remove"
-                  color="white"
-                />
-              </View>
+                  />
             </View>
           </View>
         ))}
+
+        <View style={{flexDirection: "row",
+                flex: 1,
+                justifyContent: "flex-end",
+                margin: 0,
+                padding: 0,}}>
+             
         {/* add ingredient */}
-        <View style={styles.smallButton}>
-          <Button
-            title="Add Ingredient"
-            color="white"
-            onPress={() => {
-              appendIngredient({
-                quantity: "",
-                unit: "",
-                name: "",
-                storage: "",
-              });
-            }}
-          />
+        <Ionicons.Button name="md-add" size={30} color="green" backgroundColor="#EBE7E0" onPress={() => {
+                    appendIngredient({
+                      quantity: "",
+                      unit: "",
+                      name: "",
+                      storage: "",
+                    });
+         }}/>
         </View>
 
         {/* Procedure */}
-        <Text style={styles.label}>Procedure</Text>
+        <Text style={styles.label}>Procedure:</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["procedure"] ? styles.error : styles.input}
+              style={errors["procedure"] ? styles.large_error : styles.large_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -355,14 +348,26 @@ export default function Page() {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Button
-          title="Cancel"
-          color="red"
-          onPress={() => {
-            reset(emptyData);
-            Alert.alert("form reset");
-          }}
-        />
+      <Button
+            size="$3" // Adjust the size
+            backgroundColor="$red10" // Set the button color
+            color="white"
+            borderRadius="$4" // Round the corners
+            // shadowColor="$shadow" // Add a shadow
+            shadowRadius={10} // Shadow radius
+            elevation={2} // Elevation for a 3D effect
+            hoverStyle={{ backgroundColor: "red" }} // Change color on hover
+            pressStyle={{ backgroundColor: "red" }} // Change color on press
+            fontFamily="$body" // Set the font family
+            fontSize="$4" // Set the font size
+            fontWeight="bold" // Make the text bold
+            onPress={() => {reset(emptyData);
+              Alert.alert("form reset");}
+            }
+          >
+            Cancel
+          </Button>
+
 
         {/* Button for testing, populates form with sample data */}
         {/*         
@@ -376,12 +381,26 @@ export default function Page() {
     */}
 
         <Button
-          title="Create"
-          color="green"
-          onPress={() => {
-            handleSubmit(onSubmit)();
-          }}
-        />
+            size="$3" // Adjust the size
+            backgroundColor="$green10" // Set the button color
+            color="white"
+            borderRadius="$4" // Round the corners
+            // shadowColor="$shadow" // Add a shadow
+            shadowRadius={10} // Shadow radius
+            elevation={2} // Elevation for a 3D effect
+            hoverStyle={{ backgroundColor: "green" }} // Change color on hover
+            pressStyle={{ backgroundColor: "green" }} // Change color on press
+            fontFamily="$body" // Set the font family
+            fontSize="$4" // Set the font size
+            fontWeight="bold" // Make the text bold
+            onPress={() => {
+              handleSubmit(onSubmit)();
+            }}
+          >
+            Create Recipie
+          </Button>
+
+       
       </View>
     </View>
   );
@@ -393,7 +412,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   label: {
-    color: "white",
+    color: "#4B4037",
+    fontWeight: "500",
+    fontSize: 16,
+    marginTop: 10,
     margin: 20,
     marginLeft: 0,
   },
@@ -401,7 +423,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     color: "white",
     height: 40,
-    backgroundColor: "gray",
+    //backgroundColor: "gray",
     borderRadius: 0,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -416,31 +438,55 @@ const styles = StyleSheet.create({
   smallButton: {
     marginTop: 0,
     color: "white",
-    height: 40,
-    backgroundColor: "gray",
+    height: 30,
+    width: 50,
+    backgroundColor: "green",
     borderRadius: 4,
-    justifyContent: "flex-end",
+    justifyContent: "center",
     flex: 0,
     flexDirection: "row",
   },
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: 20,
+    paddingTop: 10,
     padding: 8,
-    backgroundColor: "gray",
+    backgroundColor: "#EBE7E0",
   },
-  input: {
+  regular_input: {
     backgroundColor: "white",
     height: 40,
-    borderRadius: 4,
     padding: 10,
+    color:"#6E6055"
+
+  },
+  small_input: {
+    backgroundColor: "white",
+    height: 40,
+    width: 80,
+    padding: 10,
+  },
+  large_input: {
+    textAlignVertical: 'top',
+    textAlign: "left",
+    backgroundColor: "white",
+    height: 400,
+    padding: 10
+
   },
   error: {
     borderColor: "red",
     borderWidth: 1,
     backgroundColor: "white",
     height: 40,
+    borderRadius: 4,
+    padding: 10,
+  },
+  large_error: {
+    borderColor: "red",
+    borderWidth: 1,
+    backgroundColor: "white",
+    height: 400,
     borderRadius: 4,
     padding: 10,
   },

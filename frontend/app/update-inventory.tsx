@@ -1,10 +1,11 @@
 import { Text, View } from "react-native";
 import React, { useContext, useEffect } from "react";
-import { Button, Input, Spinner } from "tamagui";
+import { Button, Input, Spinner, getFontSize } from "tamagui";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Control, Controller, useFieldArray, useForm } from "react-hook-form";
 import { AuthContext } from "./AuthContext";
+import { Ionicons, Foundation} from "@expo/vector-icons";
 
 type Ingredient = {
   id: number | null;
@@ -96,23 +97,19 @@ const UpdateInventory = () => {
 
   return (
     <View
+      width={"100%"} 
+      height={"100%"}
       style={{
         padding: 10,
         display: "flex",
         flexDirection: "column",
         gap: 10,
         alignItems: "center",
+        backgroundColor: "#EBE7E0",
+        
       }}
     >
-      <Button
-        onPress={() => {
-          getInventoryQuery.refetch();
-        }}
-        bordered
-        style={{ width: "50%" }}
-      >
-        Refresh
-      </Button>
+
       <View style={{ display: "flex", gap: 10, flexDirection: "column" }}>
         {fields.map((field, index) => (
           <IngredientItem
@@ -133,6 +130,11 @@ const UpdateInventory = () => {
         >
           <Button
             bordered
+            size="$3" theme="active"
+            hoverStyle={{ color: "white", backgroundColor: "green" }} // Change color on hover
+            pressStyle={{ color: "white", backgroundColor: "green" }} // Change color on press
+            color="white"
+             backgroundColor="$green10"
             onPress={() =>
               append({
                 id: null,
@@ -143,11 +145,21 @@ const UpdateInventory = () => {
               })
             }
           >
-            Add Ingredient{" "}
+            Add Ingredient
           </Button>
+
         </View>
       </View>
-      <Button onPress={handleSubmit(onSubmit)} bordered>
+
+      <Text>  </Text>
+      <Button shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          color="#6E6055"
+          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+          pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
+          size="$3" 
+          borderRadius="$6" // Round the corners
+          onPress={handleSubmit(onSubmit)}>
         Update Inventory
         {getInventoryQuery.isFetching ||
         updateInventoryMutation.status === "pending" ? (
@@ -155,7 +167,11 @@ const UpdateInventory = () => {
         ) : (
           ""
         )}
+
       </Button>
+      <Foundation name="refresh" size={24} color="#4B4037" onPress={() => {
+          getInventoryQuery.refetch();
+        }}/>
     </View>
   );
 };
@@ -183,7 +199,9 @@ const IngredientItem: React.FC<IngredientItemProps> = ({
       style={{ display: "flex", gap: 10, flexDirection: "row" }}
     >
       {ingredient.id ? (
-        <Text style={{ width: "70%" }}>{ingredient.name}</Text>
+        <Text style={{ width: "70%", fontSize: 15,
+        fontWeight: 'bold'}}> • {ingredient.name}</Text>
+        
       ) : (
         <Controller
           control={control}
@@ -191,18 +209,17 @@ const IngredientItem: React.FC<IngredientItemProps> = ({
           defaultValue={ingredient.name}
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
-              placeholder="Ingredient Name"
+              placeholder="Ingredient Name..."
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
-              style={{ width: "70%" }}
+              style={{ width: "70%", backgroundColor:"white"}}
             />
           )}
         />
       )}
-      <Button onPress={() => remove(index)} bordered style={{ color: "red" }}>
-        Remove{" "}
-      </Button>
+      
+      <Ionicons.Button name="remove" size={26} color="red" backgroundColor="#EBE7E0" onPress={() => remove(index)}/>
     </View>
   );
 };

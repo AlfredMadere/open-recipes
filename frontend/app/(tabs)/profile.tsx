@@ -20,6 +20,7 @@ import { removeDuplicateIds } from "../../helpers";
 import * as SecureStore from "expo-secure-store";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../AuthContext";
+import {Foundation, AntDesign, FontAwesome5, MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function Profile() {
   const authContext = useContext(AuthContext);
@@ -64,7 +65,7 @@ export default function Profile() {
       borderRadius: 75, // half of width or height to make it circular
       overflow: "hidden",
       borderWidth: 2,
-      borderColor: "black",
+      borderColor: "#D7783B",
       justifyContent: "center",
       alignItems: "center",
     },
@@ -76,12 +77,17 @@ export default function Profile() {
   });
 
  
-  
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
 
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", backgroundColor: "#EBE7E0" }}>
+      <Foundation.Button name="refresh" size={26} color="#6E6055" backgroundColor={"#EBE7E0"}
+        style={{ width: "100%", alignSelf: "flex-start" , backgroundColor:"#EBE7E0"}}  
+        onPress={() => {
+          query.refetch();
+        }}/>
+
       <View style={{ alignSelf: "center" }}>
         <Stack scale={1.2} marginTop={15}>
           <View style={styles.circularView}>
@@ -91,21 +97,25 @@ export default function Profile() {
             />
           </View>
         </Stack>
-        <Stack scale={1.2} marginTop={15} alignItems="center">
-          <Text>{userName}</Text>
+
+        <Stack scale={1.2} marginTop={15}>
+          <Text style={{ alignSelf: "center", fontWeight: "bold", fontSize:"18", color:"#4B4037" }}>{userName}</Text>
+          <Text> </Text>
+          <View style={{flexDirection: "row",
+                  justifyContent: "space-between",
+                  }}>
+
+              <AntDesign name="instagram" size={22} color="#6E6055" />
+              <MaterialCommunityIcons name="snapchat" size={22} color="#6E6055" />
+              <FontAwesome5 name="user-friends" size={22} color="#6E6055" />
+      </View>
         </Stack>
       </View>
-      <View alignItems="center">
-        <Button
-          onPress={() => {
-            query.refetch();
-          }}
-          bordered
-          style={{ width: "50%", marginBottom: 20, marginTop: 20 }}
-        >
-          Refresh
-        </Button>
+      
+      <View style={{ marginLeft: 10, marginTop: 20, marginBottom: 20 }}>
+        <Text style={{fontSize:"18", justifyContent: "center", color:"#6E6055" }}>Authored Recipes:</Text>
       </View>
+
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
       {query.isFetching && <Spinner size="large" color="$orange10" />}
       <ScrollView style={{ width: "100%", paddingBottom: 500 }}>
@@ -125,8 +135,9 @@ export default function Profile() {
           })}
           <View style={{ height: 300 }} />
         </YStack>
+        
       </ScrollView>
-      <View style={{ height: 200 }} />
+      
     </View>
   );
 }
@@ -156,22 +167,29 @@ export function RecipeCard(props: RecipeCardProps) {
 
   return (
     <Card elevate size="$4" width={"100%"} height={70} bordered {...props}>
-      <Card.Header padded width={"83%"}>
-        <Text>{recipe.name}</Text>
-        <XStack width={"83%"}>
+      <Card.Header padded width={'83%'}>
+        <Text style={{fontWeight: "bold", color:"#4B4037"}}>{recipe.name}</Text>
+        <XStack width={'83%'}>
           <Paragraph theme="alt2">{recipe.description}</Paragraph>
         </XStack>
       </Card.Header>
       <Card.Footer padded>
         <XStack flex={1} />
         <Button
-          borderRadius="$10"
+          borderRadius="$6" // Round the corners
+          size="$3"
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          color="#6E6055"
+          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+          pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
           onPress={() => {
             goToRecipe(recipe.id);
           }}
         >
           View
         </Button>
+
       </Card.Footer>
     </Card>
   );

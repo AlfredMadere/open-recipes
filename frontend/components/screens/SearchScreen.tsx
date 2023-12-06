@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 //import { useRouter } from "expo-router";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import { FontAwesome } from '@expo/vector-icons'; 
 
 async function getValueFor(key: string) {
   const result = await SecureStore.getItemAsync(key);
@@ -131,6 +132,7 @@ export default function SearchScreen() {
   });
 
   return (
+    <View width={"100%"} height={800} style={{backgroundColor: "#EBE7E0"}}>
     <YStack
       width={400}
       minHeight={250}
@@ -151,13 +153,15 @@ export default function SearchScreen() {
             return (
               <Button
                 themeInverse
+                borderWidth="1"
+                borderColor={"white"}
                 size="$3"
                 key={tag.id}
                 onPress={() => onPressButton(tag)}
                 // Apply different styles based on whether the button is selected
                 style={{
                   backgroundColor:
-                    tag.id === selectedFilter ? "orange" : "black",
+                    tag.id === selectedFilter ? "#6E6055" : "#D7783B",
                 }}
               >
                 {tag.value}
@@ -169,7 +173,7 @@ export default function SearchScreen() {
             size="$3"
             onPress={() => onUseInventory()}
             style={{
-              backgroundColor: inventoryButtonPressed ? "orange" : "black",
+              backgroundColor: inventoryButtonPressed ? "#6E6055" : "#D7783B",
             }}
           >
             Use Inventory!
@@ -194,6 +198,7 @@ export default function SearchScreen() {
         )}
       </ScrollView>
     </YStack>
+    </View>
   );
 }
 
@@ -343,6 +348,7 @@ function ComputeResults(props: runQueryProps) {
 
   result = query.data?.recipe.map((recipe: RecipeProps) => {
     return (
+      
       <SearchResult
         key={recipe.id} // Use a combination of recipe.id and index
         name={recipe.name}
@@ -375,9 +381,8 @@ function InputText(props: InputTextProps) {
           onChangeText={(value) => props.setSearchText(value)}
         />
 
-        <Button onPress={() => props.onPressGoButton(true)} size={props.size}>
-          Go
-        </Button>
+      <FontAwesome.Button name="search" size={16} color="#4B4037" backgroundColor="#EBE7E0" onPress={() => props.onPressGoButton(true)}/>
+
       </XStack>
     </View>
   );

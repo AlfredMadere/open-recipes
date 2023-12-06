@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import axios from "axios";
+import {Image} from "tamagui";
 
 import * as SecureStore from "expo-secure-store";
 import { getValueFor } from "../helpers/auth";
@@ -137,6 +138,12 @@ function LoginPage() {
 
   const renderLoginForm = () => (
     <View style={styles.container}>
+      <View style={styles.circularView}>
+            <Image
+              source={require("../assets/real.png")}
+              style={styles.image}
+            />
+          </View>
       <Text style={styles.title}>Login</Text>
       <Text style={styles.label}>Email</Text>
       <TextInput
@@ -145,7 +152,7 @@ function LoginPage() {
         onChangeText={(text) => setEmail(text)}
         value={email}
       />
-      <Text style={styles.label}>password</Text>
+      <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -157,7 +164,9 @@ function LoginPage() {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setSignUp(true)}>
+        <View style={{flexDirection: "row", marginTop: 15}}>
         <Text style={styles.toggleText}>Dont have an account? Sign Up</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -165,14 +174,14 @@ function LoginPage() {
   const renderSignUpForm = () => (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-      <Text style={styles.label}>name</Text>
+      <Text style={styles.label}>Name</Text>
       <TextInput
         style={styles.input}
-        placeholder="name"
+        placeholder="Name"
         onChangeText={(text) => setName(text)}
         value={name}
       />
-      <Text style={styles.label}>password</Text>
+      <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -180,17 +189,17 @@ function LoginPage() {
         value={password}
         secureTextEntry
       />
-      <Text style={styles.label}>email</Text>
+      <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
-        placeholder="email"
+        placeholder="Email"
         onChangeText={(text) => setEmail(text)}
         value={email}
       />
-      <Text style={styles.label}>phone number</Text>
+      <Text style={styles.label}>Phone Number</Text>
       <TextInput
         style={styles.input}
-        placeholder="phone"
+        placeholder="Phone"
         onChangeText={(text) => setPhone(text)}
         value={phone}
       />
@@ -208,17 +217,19 @@ function LoginPage() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "#EBE7E0",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   title: {
     fontSize: 24,
+    color:"#4B4037",
     fontWeight: "bold",
     marginBottom: 20,
   },
   label: {
-    color: "grey",
+    color: "#6E6055",
     alignSelf: "flex-start",
     marginLeft: 40,
     marginBottom: 4,
@@ -226,13 +237,15 @@ const styles = StyleSheet.create({
   input: {
     width: "80%",
     height: 40,
-    borderColor: "gray",
+    borderColor: "#6E6055",
+    backgroundColor: "white",
+    color: "#6E6055",
     borderWidth: 1,
     marginBottom: 20,
     padding: 10,
   },
   button: {
-    backgroundColor: "blue",
+    backgroundColor: "#D7783B",
     padding: 10,
     borderRadius: 5,
   },
@@ -242,8 +255,25 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     marginTop: 15,
-    color: "blue",
+    color: "#D7783B",
   },
+  circularView: {
+    marginTop: 60,
+    marginLeft:15,
+    marginBottom: 30,
+    width: 200,
+    height: 80,
+    borderRadius: 5,
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  
 });
 
 export default LoginPage;
