@@ -51,9 +51,12 @@ export default function Feed() {
   }
   const query = useQuery({
     queryKey: ["recipes_feed"],
+    gcTime: 0,
     queryFn: getRecipesFeed,
     enabled: !!authToken, // Only run the query if authToken is not empty
   });
+
+  
 
 
 

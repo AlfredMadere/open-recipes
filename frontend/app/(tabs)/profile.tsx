@@ -26,7 +26,7 @@ export default function Profile() {
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
-  const { authToken, userId } = authContext;
+  const { authToken, userId, userName} = authContext;
 
   async function getRecipesFeed(): Promise<SearchResult<PopulatedRecipe>> {
     if (!authToken) {
@@ -51,7 +51,7 @@ export default function Profile() {
     return response.data;
   }
   const query = useQuery({
-    queryKey: ["recipes_feed"],
+    queryKey: ["recipes_search"],
     gcTime: 0,
     queryFn: getRecipesFeed,
     enabled: authToken && userId ? true : false, // Only run the query if authToken is not empty
@@ -76,7 +76,7 @@ export default function Profile() {
   });
 
  
-  const username = "John";
+  
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
 
@@ -92,7 +92,7 @@ export default function Profile() {
           </View>
         </Stack>
         <Stack scale={1.2} marginTop={15} alignItems="center">
-          <Text>{username}</Text>
+          <Text>{userName}</Text>
         </Stack>
       </View>
       <View alignItems="center">
@@ -101,7 +101,7 @@ export default function Profile() {
             query.refetch();
           }}
           bordered
-          style={{ width: "50%" }}
+          style={{ width: "50%", marginBottom: 20, marginTop: 20 }}
         >
           Refresh
         </Button>
