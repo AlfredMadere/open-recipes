@@ -362,10 +362,9 @@ export function ListCard(props: {
         <Button
                 size="$3"
                 borderRadius="$6"
-                backgroundColor="$red10"
-                color="white"
-                hoverStyle={{ color: "white", backgroundColor: "red" }} // Change color on hover
-                pressStyle={{ color: "white", backgroundColor: "red" }} // Change color on press
+                color="#6E6055"
+                hoverStyle={{ color: "white", backgroundColor: "$red10" }} // Change color on hover
+                pressStyle={{ color: "white", backgroundColor: "$red10" }} // Change color on press
                 onPress={handleDelete}>
               Delete
             </Button>

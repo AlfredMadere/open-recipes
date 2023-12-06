@@ -14,7 +14,7 @@ import {
   XStack,
   YStack,
 } from "tamagui";
-import { Alert } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Recipe } from "../interfaces/models";
@@ -131,6 +131,23 @@ type RecipeCardProps = {
 export function RecipeCard(props: RecipeCardProps) {
   const recipe = props.recipe;
   const router = useRouter();
+  const styles = StyleSheet.create({
+    circularView: {
+      marginTop: 60,
+      marginLeft:15,
+      width: 200,
+      height: 70,
+      borderRadius: 5,
+      overflow: "hidden",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
+    },
+  });
 
   return (
     <Card elevate size="$4" width={"100%"} height={200} bordered {...props}>
@@ -138,11 +155,12 @@ export function RecipeCard(props: RecipeCardProps) {
         <H2 color="#4B4037">{recipe.name}</H2>
         <Paragraph theme="alt2">{recipe.description}</Paragraph>
       </Card.Header>
-      <Image
-          source={{ width: 20, height: 20, uri: 'https://www.pexels.com/photo/selective-focus-photo-of-bunch-of-bananas-on-black-surface-1093038/://' }}
-          width="100%"
-          height="100%"
-      />
+      <View style={styles.circularView}>
+            <Image
+              source={require("../../assets/recipie.png")}
+              style={styles.image}
+            />
+          </View>
       <Card.Footer padded>
         <XStack flex={1} />
         <Button

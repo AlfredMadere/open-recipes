@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import axios from "axios";
+import {Image} from "tamagui";
 
 import * as SecureStore from "expo-secure-store";
 import { getValueFor } from "../helpers/auth";
@@ -249,6 +250,22 @@ const styles = StyleSheet.create({
   toggleText: {
     marginTop: 15,
     color: "#D7783B",
+  },
+  circularView: {
+    marginTop: 60,
+    marginLeft:15,
+    marginBottom: 30,
+    width: 200,
+    height: 80,
+    borderRadius: 5,
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   
 });

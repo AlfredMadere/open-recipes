@@ -65,7 +65,7 @@ export default function Profile() {
       borderRadius: 75, // half of width or height to make it circular
       overflow: "hidden",
       borderWidth: 2,
-      borderColor: "black",
+      borderColor: "#4B4037",
       justifyContent: "center",
       alignItems: "center",
     },

@@ -20,7 +20,7 @@ export default function SearchResult(props: RecipeCardProps) {
   const router = useRouter();
 
   return (
-<View backgroundColor="#EBE7E0">
+<View backgroundColor="#EBE7E0" paddingRight="$8">
 <Card margin="$2" elevate size="$4" width={"100%"} height={200} bordered {...props}>
       <Card.Header padded>
         <H2 color="#4B4037">{props.name}</H2>

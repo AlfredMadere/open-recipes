@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, FlatList } from "react-native";
-import { View, Card, XStack, Stack, Spinner, ScrollView, Button } from "tamagui";
+import { Text, FlatList, StyleSheet } from "react-native";
+import { View, Card, H2, Image, Paragraph, XStack, Stack, Spinner, ScrollView, Button } from "tamagui";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -67,7 +67,8 @@ const RecipeComponent = ({ recipes }: { recipes: BaseRecipe[] }) => {
   return (
     <ScrollView style={{ height: "100%", width: "100%" }}>
       <View style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <View style={{ display: "flex", flexDirection: "column", flexWrap: "wrap", gap: 10, alignItems: "center", justifyContent: "center" }}>
+        <View style={{ display: "flex", flexDirection: "column", flexWrap: "wrap", gap: 10, alignItems: "center", justifyContent: "center" 
+      ,marginTop: 20, marginLeft: 15, width:"92%"}}>
           <View style={{height: "10px"}}></View>
           {recipes?.map((recipe: BaseRecipe) => {
             return <RecipeCard key={recipe.id} recipe={recipe} />;
@@ -82,19 +83,42 @@ export function RecipeCard(props: RecipeCardProps) {
   const recipe = props.recipe;
   const router = useRouter();
 
+  const styles = StyleSheet.create({
+    circularView: {
+      marginTop: 60,
+      marginLeft:15,
+      marginBottom: 30,
+      width: 200,
+      height: 80,
+      borderRadius: 5,
+      overflow: "hidden",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
+    },
+  });
+
   return (
-    <Card elevate size="4" width={305} height={120} bordered {...props}>
+    <Card elevate size="4" width={"100%"} height={300} bordered {...props}>
       <Card.Header padded>
-        <Text style={{ fontSize: 16,fontWeight: "bold", color:"#4B4037"}}>{recipe.name}</Text>
+      <H2 color="#4B4037">{recipe.name}</H2>
+      <Paragraph theme="alt2">{recipe.description}</Paragraph>
       </Card.Header>
       <Stack margin={20}>
-        <Text style={{ fontSize: 12, height: 20, color:"#6E6055"}}>{recipe.description}</Text>
       </Stack>
 
+      <View style={styles.circularView}>
+            <Image
+              source={require("../../../assets/recipie.png")}
+              style={styles.image}
+            />
+          </View>
       <Card.Footer padded>
-        <XStack flex={1} maxWidth={1} />
-
-        <Text>                                                          </Text>
+        <XStack flex={1}/>
         <Button
                 borderRadius="$6" // Round the corners
                 size="$3"
@@ -108,7 +132,6 @@ export function RecipeCard(props: RecipeCardProps) {
               }}>
               View
             </Button>
-
       </Card.Footer>
     </Card>
   );
