@@ -18,7 +18,7 @@ export default function Page() {
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
-  const { authToken } = authContext;
+  const { authToken, userId } = authContext;
 
   const {
     handleSubmit,
@@ -72,7 +72,7 @@ export default function Page() {
       default_servings: parseInt(data.default_servings),
       mins_prep: parseInt(data.mins_prep),
       mins_cook: parseInt(data.mins_cook),
-      author_id: null,
+      author_id: userId,
       created_at: currentDateTime,
       ingredients: data.ingredients.map((ingredient) => {
         return {
