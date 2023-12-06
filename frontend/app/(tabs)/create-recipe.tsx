@@ -304,7 +304,7 @@ export default function Page() {
                 rules={{ required: true }}
               />
               {/* remove ingredient */}
-              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="##EBE7E0" onPress={() => {
+              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#EBE7E0" onPress={() => {
                     removeIngredient(index);
                   }}
                   />
@@ -349,9 +349,18 @@ export default function Page() {
       {/* Footer */}
       <View style={styles.footer}>
       <Button
-            bordered
-            size="$3" theme="active"
-            style={{backgroundColor: "red", color: "white"}}
+            size="$3" // Adjust the size
+            backgroundColor="$red10" // Set the button color
+            color="white"
+            borderRadius="$4" // Round the corners
+            // shadowColor="$shadow" // Add a shadow
+            shadowRadius={10} // Shadow radius
+            elevation={2} // Elevation for a 3D effect
+            hoverStyle={{ backgroundColor: "red" }} // Change color on hover
+            pressStyle={{ backgroundColor: "red" }} // Change color on press
+            fontFamily="$body" // Set the font family
+            fontSize="$4" // Set the font size
+            fontWeight="bold" // Make the text bold
             onPress={() => {reset(emptyData);
               Alert.alert("form reset");}
             }
@@ -372,9 +381,18 @@ export default function Page() {
     */}
 
         <Button
-            bordered
-            style={{backgroundColor: "green", color: "white"}}
-            size="$3" theme="active"
+            size="$3" // Adjust the size
+            backgroundColor="$green10" // Set the button color
+            color="white"
+            borderRadius="$4" // Round the corners
+            // shadowColor="$shadow" // Add a shadow
+            shadowRadius={10} // Shadow radius
+            elevation={2} // Elevation for a 3D effect
+            hoverStyle={{ backgroundColor: "green" }} // Change color on hover
+            pressStyle={{ backgroundColor: "green" }} // Change color on press
+            fontFamily="$body" // Set the font family
+            fontSize="$4" // Set the font size
+            fontWeight="bold" // Make the text bold
             onPress={() => {
               handleSubmit(onSubmit)();
             }}
@@ -394,7 +412,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   label: {
-    color: "black",
+    color: "#4B4037",
     fontWeight: "500",
     fontSize: 16,
     marginTop: 10,
@@ -438,8 +456,11 @@ const styles = StyleSheet.create({
   regular_input: {
     backgroundColor: "white",
     height: 40,
-    borderRadius: 4,
     padding: 10,
+    borderWidth: 1,
+    borderRadius: 4,
+    color:"#6E6055",
+    borderColor: "#4B4037",
   },
   small_input: {
     backgroundColor: "white",
@@ -453,8 +474,10 @@ const styles = StyleSheet.create({
     textAlign: "left",
     backgroundColor: "white",
     height: 400,
-    borderRadius: 4,
     padding: 10,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: "#6E6055",
   },
   error: {
     borderColor: "red",

@@ -204,12 +204,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color:"#4C4B49",
+    color:"#4B4037",
     fontWeight: "bold",
     marginBottom: 20,
   },
   label: {
-    color: "grey",
+    color: "#6E6055",
     alignSelf: "flex-start",
     marginLeft: 40,
     marginBottom: 4,
@@ -217,14 +217,15 @@ const styles = StyleSheet.create({
   input: {
     width: "80%",
     height: 40,
-    borderColor: "gray",
+    borderColor: "#6E6055",
     backgroundColor: "white",
+    color: "#6E6055",
     borderWidth: 1,
     marginBottom: 20,
     padding: 10,
   },
   button: {
-    backgroundColor: "#F3652F",
+    backgroundColor: "#D7783B",
     padding: 10,
     borderRadius: 5,
   },
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     marginTop: 15,
-    color: "#F4591D",
+    color: "#D7783B",
   },
   
 });

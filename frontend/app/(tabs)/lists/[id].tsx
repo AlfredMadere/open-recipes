@@ -85,10 +85,10 @@ export function RecipeCard(props: RecipeCardProps) {
   return (
     <Card elevate size="4" width={305} height={120} bordered {...props}>
       <Card.Header padded>
-        <Text style={{ fontWeight: "bold" }}>{recipe.name}</Text>
+        <Text style={{ fontSize: 16,fontWeight: "bold", color:"#4B4037"}}>{recipe.name}</Text>
       </Card.Header>
       <Stack margin={20}>
-        <Text style={{ fontSize: 12, height: 20}}>{recipe.description}</Text>
+        <Text style={{ fontSize: 12, height: 20, color:"#6E6055"}}>{recipe.description}</Text>
       </Stack>
 
       <Card.Footer padded>
@@ -96,8 +96,13 @@ export function RecipeCard(props: RecipeCardProps) {
 
         <Text>                                                          </Text>
         <Button
-                bordered
-                size="$2" 
+                borderRadius="$6" // Round the corners
+                size="$3"
+                shadowRadius={10} // Shadow radius
+                elevation={2} // Elevation for a 3D effect
+                color="#6E6055"
+                hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+                pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
                 onPress={() => {
                   router.push(`/recipes/${recipe.id}`);
               }}>

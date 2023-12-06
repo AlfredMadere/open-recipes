@@ -116,7 +116,7 @@ const Register = () => {
 
       <View style={styles.recipeDetails}>
         <Text style={styles.title}>{data?.name}</Text>
-        <Text style={styles.infoItem}>Author id: {data?.author_id}</Text>
+
         <Text style={styles.description}>{data?.description}</Text>
 
         <View style={styles.info}>
@@ -127,21 +127,24 @@ const Register = () => {
           </Text>
         </View>
 
-        <Text style={styles.description}>Procedure: {data?.procedure}</Text>
+        <View style={styles.section}>
+          <Text style={styles.descriptionHeader}>Procedure:</Text>
+          <Text style={styles.description}>{data?.procedure}</Text>
+        </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ingredients:</Text>
+          <Text style={styles.descriptionHeader}>Ingredients:</Text>
           {ingredients?.map((ingredient, index) => (
-            <Text key={index} style={styles.infoItem}>
+            <Text key={index} style={styles.ingredientsItem}>
               - {ingredient.quantity} {ingredient.unit} {ingredient.name}:
             </Text>
           ))}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Tags:</Text>
+          <Text style={styles.descriptionHeader}>Tags:</Text>
           {tags?.map((tag, index) => (
-            <Text key={index} style={styles.infoItem}>
+            <Text key={index} style={styles.ingredientsItem}>
               - {tag.key}: {tag.value}
             </Text>
           ))}
@@ -155,7 +158,7 @@ const Register = () => {
           }}
           size="$4" // Adjust the size
           color="white" // Set the button color
-          backgroundColor="$green8"
+          backgroundColor="$green10"
           borderRadius="$6" // Round the corners
           // shadowColor="$shadow" // Add a shadow
           shadowRadius={10} // Shadow radius
@@ -179,7 +182,7 @@ const Register = () => {
             size="$4" // Adjust the size
             color="white" // Set the button color
             borderRadius="$6" // Round the corners
-            backgroundColor= "$red8"
+            backgroundColor= "$red10"
             // shadowColor="$shadow" // Add a shadow
             shadowRadius={10} // Shadow radius
             elevation={2} // Elevation for a 3D effect
@@ -219,12 +222,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    color:"#4B4037",
     marginBottom: 10,
   },
   description: {
     fontSize: 18,
+    color:"#6E6055",
     marginBottom: 10,
     marginTop: 10,
+  },
+  descriptionHeader: {
+    fontSize: 18,
+    color:"#4B4037",
+    marginBottom: 10,
+    marginTop: 10,
+    fontWeight: "bold",
   },
   info: {
     justifyContent: "space-between",
@@ -234,6 +246,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginTop: 5,
+    color:"#4B4037",
+  },
+  ingredientsItem: {
+    fontSize: 16,
+    marginTop: 5,
+    color:"#6E6055",
   },
   section: {
     marginTop: 15,
@@ -371,7 +389,7 @@ function RecipeListModal(params: recipeModalInputs) {
                   style={{ justifyContent: "center", alignItems: "center",  }}
                 >
                   <View>
-                    <Text style={{ fontWeight: "bold", fontSize: 20}}>
+                    <Text style={{ fontWeight: "bold", fontSize: 20, color:"#4B4037",}}>
                       Add to List
                     </Text>
                   </View>
@@ -400,7 +418,8 @@ function RecipeListModal(params: recipeModalInputs) {
                       return (
                         <Card key={recipelist.id} elevate size="$4" width={"100%"} height={70} bordered marginLeft={20} >
                           <Card.Header padded width={"83%"}>
-                            <Text>{recipelist.name}</Text>
+                            <Text style={{
+                                  color:"#4B4037", fontWeight: "bold",}}>{recipelist.name}</Text>
                             <XStack width={"83%"}>
                               <Paragraph theme="alt2">
                                 {recipelist.description}
@@ -410,6 +429,7 @@ function RecipeListModal(params: recipeModalInputs) {
                           <Card.Footer padded>
                             <XStack flex={1} />
                             <Button
+                              color="#6E6055"
                               borderRadius="$10"
                               hoverStyle={{ color: "white", backgroundColor: "#F4591D" }} // Change color on hover
                               pressStyle={{ color: "white", backgroundColor: "#F4591D" }} // Change color on press
@@ -437,8 +457,8 @@ function RecipeListModal(params: recipeModalInputs) {
                     }}
                     hoverStyle={{ color: "white", backgroundColor: "red" }} // Change color on hover
                     pressStyle={{ color: "white", backgroundColor: "red" }} // Change color on press
-                    color="$red8"
-                    backgroundColor="lightgrey"
+                    color="white"
+                    backgroundColor="$red10"
                   >
                     Cancel
                   </Button>

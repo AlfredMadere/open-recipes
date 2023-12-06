@@ -131,7 +131,7 @@ export default function SearchScreen() {
   });
 
   return (
-    <View width={"100%"} height={"100%"} style={{backgroundColor: "#EBE7E0"}}>
+    <View width={"100%"} height={800} style={{backgroundColor: "#EBE7E0"}}>
     <YStack
       width={400}
       minHeight={250}
@@ -158,7 +158,7 @@ export default function SearchScreen() {
                 // Apply different styles based on whether the button is selected
                 style={{
                   backgroundColor:
-                    tag.id === selectedFilter ? "orange" : "#F4591D",
+                    tag.id === selectedFilter ? "#6E6055" : "#D7783B",
                 }}
               >
                 {tag.value}

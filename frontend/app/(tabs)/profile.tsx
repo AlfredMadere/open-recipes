@@ -75,14 +75,14 @@ export default function Profile() {
           <Circle size={100} backgroundColor="$color" elevation="$4" />
         </Stack>
         <Stack scale={1.2} marginTop={15}>
-          <Text style={{ fontWeight: "bold", fontSize:"18", justifyContent: "center" }}>{username}</Text>
+          <Text style={{ fontWeight: "bold", fontSize:"18", justifyContent: "center", color:"#4B4037" }}>{username}</Text>
         </Stack>
       </View>
       <View style={{ alignSelf: "center" }}>
 
  
 
-      <Foundation.Button name="refresh" size={24} color="black" backgroundColor="#EBE7E0"
+      <Foundation.Button name="refresh" size={24} color="#6E6055" backgroundColor="#EBE7E0"
         style={{ width: "100%", alignSelf: "center"}} onPress={() => {
            query.refetch();
         }}/>
@@ -90,7 +90,7 @@ export default function Profile() {
       </View>
       <View style={{ marginLeft: 10, marginTop: 20, marginBottom: 20 }}>
 
-        <Text>Authored Recipes:</Text>
+        <Text style={{fontSize:"18", justifyContent: "center", color:"#6E6055" }}>Authored Recipes:</Text>
       </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
       {query.isFetching && <Spinner size="large" color="$orange10" />}
@@ -144,7 +144,7 @@ export function RecipeCard(props: RecipeCardProps) {
   return (
     <Card elevate size="$4" width={"100%"} height={70} bordered {...props}>
       <Card.Header padded width={'83%'}>
-        <Text style={{fontWeight: "bold"}}>{recipe.name}</Text>
+        <Text style={{fontWeight: "bold", color:"#4B4037"}}>{recipe.name}</Text>
         <XStack width={'83%'}>
           <Paragraph theme="alt2">{recipe.description}</Paragraph>
         </XStack>
@@ -152,8 +152,13 @@ export function RecipeCard(props: RecipeCardProps) {
       <Card.Footer padded>
         <XStack flex={1} />
         <Button
-          bordered
+          borderRadius="$6" // Round the corners
           size="$3"
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          color="#6E6055"
+          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+          pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
           onPress={() => {
             goToRecipe(recipe.id)
           }}

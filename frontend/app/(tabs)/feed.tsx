@@ -63,14 +63,14 @@ export default function Feed() {
       <View style={{ padding: 10 }}>
         <Button
           onPress={() => router.push("update-inventory")}
-          size="$4" // Adjust the size
+          bordered
+          size="$3" // Adjust the size
           color="white" // Set the word color
-          borderRadius="$6" // Round the corners
-          backgroundColor="orange"
+          backgroundColor="#D7783B"
           //shadowColor="$shadow" // Add a shadow
           shadowRadius={10} // Shadow radius
           elevation={2} // Elevation for a 3D effect
-          pressStyle={{color: "white", backgroundColor: "#F4591D" }} // Change color on press
+          pressStyle={{color: "white", backgroundColor: "#6E6055" }} // Change color on press
           fontFamily="$body" // Set the font family
           fontSize="$4" // Set the font size
           fontWeight="bold" // Make the text bold
@@ -122,9 +122,9 @@ export function RecipeCard(props: RecipeCardProps) {
   const router = useRouter();
 
   return (
-    <Card elevate size="$4" width={"100%"} height={300} bordered {...props}>
+    <Card elevate size="$4" width={"100%"} height={200} bordered {...props}>
       <Card.Header padded>
-        <H2>{recipe.name}</H2>
+        <H2 color="#4B4037">{recipe.name}</H2>
         <Paragraph theme="alt2">{recipe.description}</Paragraph>
       </Card.Header>
       <Image
@@ -137,8 +137,9 @@ export function RecipeCard(props: RecipeCardProps) {
         <Button
           shadowRadius={10} // Shadow radius
           elevation={2} // Elevation for a 3D effect
-          hoverStyle={{color: "white", backgroundColor: "#F4591D" }} // Change color on hover
-          pressStyle={{color: "white", backgroundColor: "#F4591D" }} // Change color on press
+          color="#6E6055"
+          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+          pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
           size="$3" 
           borderRadius="$6" // Round the corners
           onPress={() => {

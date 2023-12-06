@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useRouter } from "expo-router";
-import { View, Stack, Card, XStack, Button } from "tamagui";
+import { View, Stack, Card, XStack, Button, Paragraph, YStack, H2, ScrollView } from "tamagui";
 import { useForm, Controller } from "react-hook-form";
 import {
   Text,
@@ -91,12 +91,27 @@ export default function One() {
 
 
   return (
-    <View style={{ width: "100%", flex: 1 , backgroundColor: "#EBE7E0",}}>
-      <View style={{ flex: 1, marginVertical: 20 }}>
-        <View style={{ flex: 1 }}>
-          <ListComponent data={lists} />
-        </View>
+    <View style={{ width: "100%", backgroundColor: "#EBE7E0",}}>
+      <View style={{ padding: 10 }}>
+      <Button
+              bordered
+              size="$3"
+              backgroundColor= "#D7783B"
+              color= "white"
+              pressStyle={{color: "white", backgroundColor: "#6E6055" }} // Change color on press
+              onPress={() => {
+                setModalVisible(true);
+                reset({
+                  name: "",
+                  description: "",
+                });
+              }} >
+          New List
+          </Button>
       </View>
+
+          <ListComponent data={lists} />
+
       <View style={{ alignSelf: "flex-end" }}>
         <Stack scale={1.2} marginTop={15}>
           <Modal
@@ -136,16 +151,16 @@ export default function One() {
               >
                 <View>
                   <View
-                    style={{ justifyContent: "center", alignItems: "center" }}
+                    style={{ justifyContent: "center", alignItems: "center", color:"#E1DCD2" }}
                   >
                     <View>
-                      <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                      <Text style={{ fontWeight: "bold", fontSize: 20, color: "#4B4037" }}>
                         Create New List
                       </Text>
                     </View>
 
                     <View style={{ height: 300, paddingTop: 25 }}>
-                      <Text>Title:</Text>
+                      <Text style={{color: "#6E6055" }}>Title:</Text>
                       <Controller
                         control={control}
                         render={({ field: { onChange, onBlur, value } }) => (
@@ -171,8 +186,8 @@ export default function One() {
                           This is required.
                         </Text>
                       )}
-                      <Text> </Text>
-                      <Text>Description</Text>
+                     
+                      <Text style={{color: "#6E6055" }}>Description</Text>
                       <Controller
                         control={control}
                         render={({ field: { onChange, onBlur, value } }) => (
@@ -206,18 +221,37 @@ export default function One() {
                       <View style={{ padding: 3 }}>
 
                       <Button
-                          bordered
-                          size="$3" theme="active"
-                          style={{backgroundColor: "green", color: "white"}}
+                          size="$3" // Adjust the size
+                          backgroundColor="$green10" // Set the button color
+                          color="white"
+                          borderRadius="$6" // Round the corners
+                          // shadowColor="$shadow" // Add a shadow
+                          shadowRadius={10} // Shadow radius
+                          elevation={2} // Elevation for a 3D effect
+                          hoverStyle={{ backgroundColor: "green" }} // Change color on hover
+                          pressStyle={{ backgroundColor: "green" }} // Change color on press
+                          fontFamily="$body" // Set the font family
+                          fontSize="$4" // Set the font size
+                          fontWeight="bold" // Make the text bold
                           onPress={handleSubmit(onSubmit)}
                         >
                         Create
                         </Button>
+                        <Text> </Text>
 
                         <Button
-                          bordered
-                          size="$3" theme="active"
-                          style={{backgroundColor: "red", color: "white"}}
+                          size="$3" // Adjust the size
+                          backgroundColor="$red10" // Set the button color
+                          color="white"
+                          borderRadius="$6" // Round the corners
+                          // shadowColor="$shadow" // Add a shadow
+                          shadowRadius={10} // Shadow radius
+                          elevation={2} // Elevation for a 3D effect
+                          hoverStyle={{ backgroundColor: "red" }} // Change color on hover
+                          pressStyle={{ backgroundColor: "red" }} // Change color on press
+                          fontFamily="$body" // Set the font family
+                          fontSize="$4" // Set the font size
+                          fontWeight="bold" // Make the text bold
                           onPress={() => {
                             setModalVisible(!modalVisible);
                             reset({
@@ -237,30 +271,6 @@ export default function One() {
             </View>
           </Modal>
 
-
-        <View style={{marginTop: 40,
-    color: "white",
-    height: 40,
-    //backgroundColor: "gray",
-    borderRadius: 0,
-    flexDirection: "row",
-    justifyContent: "space-between",}}>
-          <Button
-              bordered
-              size="$3" theme="active"
-              style={{backgroundColor: "#F4591D", color: "white"}}
-              onPress={() => {
-                setModalVisible(true);
-                reset({
-                  name: "",
-                  description: "",
-                });
-              }} >
-          New List
-          </Button>
-          <Text> </Text>
-          </View>
-
         </Stack>
       </View>
     </View>
@@ -277,10 +287,10 @@ const ListComponent = ({ data }) => {
         <View
           style={{
             flex: 1,
-            marginLeft: 45,
-            marginRight: 45,
+            
             marginTop: 20,
-            width: "100%",
+            marginLeft: 15,
+            width: "92%",
             alignItems: "stretch",
             justifyContent: "center",
           }}
@@ -333,37 +343,55 @@ export function ListCard(props: {
   return (
     <>
       {!isDeleted && (
-        <Card elevate size="4" width={305} height={120} bordered>
-          <Card.Header padded>
-            <Text style={{ fontWeight: "bold" }}>{name}</Text>
-          </Card.Header>
-          <Stack margin={20}>
-            <Text style={{ fontSize: 10, height: 10, overflow: "hidden" }}>{description }</Text>
-          </Stack>
+      <ScrollView style={{ width: "100%" }}>
+      <YStack
+      $sm={{
+        flexDirection: "column",
+        width: "100%",
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
 
-          <Card.Footer padded>
-            <XStack maxWidth={1} flex={10} />
-
-            <Button
-                bordered
-                size="$2" theme="active"
-                style={{backgroundColor:"red", color:"white"}}
+    >
+      <Card elevate size="$4" width={"100%"} height={200} bordered {...props}>
+      <Card.Header padded>
+        <H2 color="#4B4037">{name}</H2>
+        <Paragraph theme="alt2">{description}</Paragraph>
+      </Card.Header>
+      <Card.Footer padded>
+        <XStack flex={1} />
+        <Button
+                size="$2"
+                borderRadius="$6"
+                backgroundColor="$red10"
+                color="white"
+                hoverStyle={{ color: "white", backgroundColor: "red" }} // Change color on hover
+                pressStyle={{ color: "white", backgroundColor: "red" }} // Change color on press
                 onPress={handleDelete}>
               Delete
             </Button>
-            
-          <Text>                                           </Text>
-           <Button
-                bordered
-                size="$2"
-                onPress={() => {
-                router.push(`/lists/${id}`);
-              }}>
-              View
-            </Button>
+        <Text>    </Text>
 
-          </Card.Footer>
-        </Card>
+        <Button
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          color="#6E6055"
+          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+          pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
+          size="$2" 
+          borderRadius="$6" // Round the corners
+          onPress={() => {
+            router.push(`/lists/${id}`);
+          }}
+        >
+          View
+        </Button>
+
+      </Card.Footer>
+    </Card>
+    </YStack>
+    </ScrollView>
       )}
     </>
   );
@@ -376,6 +404,8 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+    borderColor:"#4B4037",
+    color:"#6E6055"
   },
   error: {
     borderColor: "red",

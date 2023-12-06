@@ -131,7 +131,10 @@ const UpdateInventory = () => {
           <Button
             bordered
             size="$3" theme="active"
-            style={{backgroundColor: "green", color: "white"}}
+            hoverStyle={{ color: "white", backgroundColor: "green" }} // Change color on hover
+            pressStyle={{ color: "white", backgroundColor: "green" }} // Change color on press
+            color="white"
+             backgroundColor="$green10"
             onPress={() =>
               append({
                 id: null,
@@ -149,7 +152,14 @@ const UpdateInventory = () => {
       </View>
 
       <Text>  </Text>
-      <Button onPress={handleSubmit(onSubmit)} bordered>
+      <Button shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          color="#6E6055"
+          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+          pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
+          size="$3" 
+          borderRadius="$6" // Round the corners
+          onPress={handleSubmit(onSubmit)}>
         Update Inventory
         {getInventoryQuery.isFetching ||
         updateInventoryMutation.status === "pending" ? (
@@ -159,7 +169,7 @@ const UpdateInventory = () => {
         )}
 
       </Button>
-      <Foundation name="refresh" size={24} color="black" onPress={() => {
+      <Foundation name="refresh" size={24} color="#4B4037" onPress={() => {
           getInventoryQuery.refetch();
         }}/>
     </View>
