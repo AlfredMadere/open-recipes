@@ -20,6 +20,7 @@ import { removeDuplicateIds } from "../../helpers";
 import * as SecureStore from "expo-secure-store";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../AuthContext";
+import {Foundation} from "@expo/vector-icons";
 
 
 export default function Profile() {
@@ -68,25 +69,24 @@ export default function Profile() {
 
 
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", backgroundColor: "#EBE7E0" }}>
       <View style={{ alignSelf: "center" }}>
         <Stack scale={1.2} marginTop={15}>
           <Circle size={100} backgroundColor="$color" elevation="$4" />
         </Stack>
         <Stack scale={1.2} marginTop={15}>
-          <Text>{username}</Text>
+          <Text style={{ fontWeight: "bold", fontSize:"18", justifyContent: "center" }}>{username}</Text>
         </Stack>
       </View>
       <View style={{ alignSelf: "center" }}>
-      <Button
-        onPress={() => {
-          query.refetch();
-        }}
-        bordered
-        style={{ width: "50%" }}
-      >
-        Refresh
-      </Button>
+
+ 
+
+      <Foundation.Button name="refresh" size={24} color="black" backgroundColor="#EBE7E0"
+        style={{ width: "100%", alignSelf: "center"}} onPress={() => {
+           query.refetch();
+        }}/>
+
       </View>
       <View style={{ marginLeft: 10, marginTop: 20, marginBottom: 20 }}>
 
@@ -144,7 +144,7 @@ export function RecipeCard(props: RecipeCardProps) {
   return (
     <Card elevate size="$4" width={"100%"} height={70} bordered {...props}>
       <Card.Header padded width={'83%'}>
-        <Text>{recipe.name}</Text>
+        <Text style={{fontWeight: "bold"}}>{recipe.name}</Text>
         <XStack width={'83%'}>
           <Paragraph theme="alt2">{recipe.description}</Paragraph>
         </XStack>
@@ -152,13 +152,15 @@ export function RecipeCard(props: RecipeCardProps) {
       <Card.Footer padded>
         <XStack flex={1} />
         <Button
-          borderRadius="$10"
+          bordered
+          size="$3"
           onPress={() => {
             goToRecipe(recipe.id)
           }}
         >
           View
         </Button>
+
       </Card.Footer>
     </Card>
   );

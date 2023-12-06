@@ -66,11 +66,11 @@ export default function Feed() {
           size="$4" // Adjust the size
           color="white" // Set the word color
           borderRadius="$6" // Round the corners
-          backgroundColor="#F4591D"
+          backgroundColor="orange"
           //shadowColor="$shadow" // Add a shadow
           shadowRadius={10} // Shadow radius
           elevation={2} // Elevation for a 3D effect
-          pressStyle={{color: "white", backgroundColor: "orange" }} // Change color on press
+          pressStyle={{color: "white", backgroundColor: "#F4591D" }} // Change color on press
           fontFamily="$body" // Set the font family
           fontSize="$4" // Set the font size
           fontWeight="bold" // Make the text bold
@@ -135,7 +135,12 @@ export function RecipeCard(props: RecipeCardProps) {
       <Card.Footer padded>
         <XStack flex={1} />
         <Button
-          borderRadius="$10"
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          hoverStyle={{color: "white", backgroundColor: "#F4591D" }} // Change color on hover
+          pressStyle={{color: "white", backgroundColor: "#F4591D" }} // Change color on press
+          size="$3" 
+          borderRadius="$6" // Round the corners
           onPress={() => {
             router.push(`/recipes/${recipe.id}`);
           }}

@@ -154,13 +154,14 @@ const Register = () => {
             addToRecipeList(id);
           }}
           size="$4" // Adjust the size
-          color="$green" // Set the button color
+          color="white" // Set the button color
+          backgroundColor="$green8"
           borderRadius="$6" // Round the corners
           // shadowColor="$shadow" // Add a shadow
           shadowRadius={10} // Shadow radius
           elevation={2} // Elevation for a 3D effect
-          hoverStyle={{ backgroundColor: "$green8" }} // Change color on hover
-          pressStyle={{ backgroundColor: "$green8" }} // Change color on press
+          hoverStyle={{ backgroundColor: "green" }} // Change color on hover
+          pressStyle={{ backgroundColor: "green" }} // Change color on press
           fontFamily="$body" // Set the font family
           fontSize="$4" // Set the font size
           fontWeight="bold" // Make the text bold
@@ -176,13 +177,14 @@ const Register = () => {
               deleteRecipe(id);
             }}
             size="$4" // Adjust the size
-            color="$red" // Set the button color
+            color="white" // Set the button color
             borderRadius="$6" // Round the corners
+            backgroundColor= "$red8"
             // shadowColor="$shadow" // Add a shadow
             shadowRadius={10} // Shadow radius
             elevation={2} // Elevation for a 3D effect
-            hoverStyle={{ backgroundColor: "$red8" }} // Change color on hover
-            pressStyle={{ backgroundColor: "$red8" }} // Change color on press
+            hoverStyle={{ backgroundColor: "red" }} // Change color on hover
+            pressStyle={{ backgroundColor: "red" }} // Change color on press
             fontFamily="$body" // Set the font family
             fontSize="$4" // Set the font size
             fontWeight="bold" // Make the text bold
@@ -202,9 +204,10 @@ const Register = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#EBE7E0",
     paddingHorizontal: 20,
     paddingTop: 40,
+
   },
   recipeDetails: {
     backgroundColor: "#fff",
@@ -365,10 +368,10 @@ function RecipeListModal(params: recipeModalInputs) {
             >
               <View>
                 <View
-                  style={{ justifyContent: "center", alignItems: "center" }}
+                  style={{ justifyContent: "center", alignItems: "center",  }}
                 >
                   <View>
-                    <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                    <Text style={{ fontWeight: "bold", fontSize: 20}}>
                       Add to List
                     </Text>
                   </View>
@@ -408,6 +411,8 @@ function RecipeListModal(params: recipeModalInputs) {
                             <XStack flex={1} />
                             <Button
                               borderRadius="$10"
+                              hoverStyle={{ color: "white", backgroundColor: "#F4591D" }} // Change color on hover
+                              pressStyle={{ color: "white", backgroundColor: "#F4591D" }} // Change color on press
                               onPress={() => {
                                 console.log("clickeddd");
                                 addRecipeToList(recipelist.id, recipe_id);
@@ -430,7 +435,9 @@ function RecipeListModal(params: recipeModalInputs) {
                     onPress={() => {
                       setVisible(!visible);
                     }}
-                    color="red"
+                    hoverStyle={{ color: "white", backgroundColor: "red" }} // Change color on hover
+                    pressStyle={{ color: "white", backgroundColor: "red" }} // Change color on press
+                    color="$red8"
                     backgroundColor="lightgrey"
                   >
                     Cancel

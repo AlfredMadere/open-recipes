@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, FlatList, Button } from "react-native";
-import { View, Card, XStack, Stack, Spinner, ScrollView } from "tamagui";
+import { Text, FlatList } from "react-native";
+import { View, Card, XStack, Stack, Spinner, ScrollView, Button } from "tamagui";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -49,7 +49,7 @@ export default function Page() {
 
   console.log("query.data", query?.data?.recipes);
   return (
-    <View style={{ width: "100%", flex: 1 }}>
+    <View style={{ width: "100%", flex: 1,  backgroundColor: "#EBE7E0" }}>
       {query.isFetching && (
         <Spinner style={{ alignSelf: "center", marginTop: 20 }} size="large" />
       )}
@@ -93,12 +93,17 @@ export function RecipeCard(props: RecipeCardProps) {
 
       <Card.Footer padded>
         <XStack flex={1} maxWidth={1} />
+
+        <Text>                                                          </Text>
         <Button
-          title="View"
-          onPress={() => {
-            router.push(`/recipes/${recipe.id}`);
-          }}
-        />
+                bordered
+                size="$2" 
+                onPress={() => {
+                  router.push(`/recipes/${recipe.id}`);
+              }}>
+              View
+            </Button>
+
       </Card.Footer>
     </Card>
   );

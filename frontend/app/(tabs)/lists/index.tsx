@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useRouter } from "expo-router";
-import { View, Stack, Card, XStack } from "tamagui";
+import { View, Stack, Card, XStack, Button } from "tamagui";
 import { useForm, Controller } from "react-hook-form";
 import {
   Text,
@@ -8,7 +8,6 @@ import {
   Modal,
   Alert,
   TextInput,
-  Button,
   StyleSheet,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
@@ -92,7 +91,7 @@ export default function One() {
 
 
   return (
-    <View style={{ width: "100%", flex: 1 }}>
+    <View style={{ width: "100%", flex: 1 , backgroundColor: "#EBE7E0",}}>
       <View style={{ flex: 1, marginVertical: 20 }}>
         <View style={{ flex: 1 }}>
           <ListComponent data={lists} />
@@ -205,23 +204,31 @@ export default function One() {
                       )}
 
                       <View style={{ padding: 3 }}>
-                        <Button
+
+                      <Button
+                          bordered
+                          size="$3" theme="active"
+                          style={{backgroundColor: "green", color: "white"}}
                           onPress={handleSubmit(onSubmit)}
-                          title="Create"
-                          color="green"
-                        />
+                        >
+                        Create
+                        </Button>
 
                         <Button
+                          bordered
+                          size="$3" theme="active"
+                          style={{backgroundColor: "red", color: "white"}}
                           onPress={() => {
                             setModalVisible(!modalVisible);
                             reset({
                               name: "",
                               description: "",
                             });
-                          }}
-                          title="Cancel"
-                          color="red"
-                        />
+                          }} 
+                        >
+                        Cancel
+                        </Button>
+
                       </View>
                     </View>
                   </View>
@@ -230,17 +237,30 @@ export default function One() {
             </View>
           </Modal>
 
+
+        <View style={{marginTop: 40,
+    color: "white",
+    height: 40,
+    //backgroundColor: "gray",
+    borderRadius: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",}}>
           <Button
-            onPress={() => {
-              setModalVisible(true);
-              reset({
-                name: "",
-                description: "",
-              });
-            }}
-            title="New List"
-            color="blue"
-          />
+              bordered
+              size="$3" theme="active"
+              style={{backgroundColor: "#F4591D", color: "white"}}
+              onPress={() => {
+                setModalVisible(true);
+                reset({
+                  name: "",
+                  description: "",
+                });
+              }} >
+          New List
+          </Button>
+          <Text> </Text>
+          </View>
+
         </Stack>
       </View>
     </View>
@@ -324,14 +344,24 @@ export function ListCard(props: {
           <Card.Footer padded>
             <XStack maxWidth={1} flex={10} />
 
-            <Button onPress={handleDelete} title="Delete" color="red" />
-
             <Button
-              onPress={() => {
+                bordered
+                size="$2" theme="active"
+                style={{backgroundColor:"red", color:"white"}}
+                onPress={handleDelete}>
+              Delete
+            </Button>
+            
+          <Text>                                           </Text>
+           <Button
+                bordered
+                size="$2"
+                onPress={() => {
                 router.push(`/lists/${id}`);
-              }}
-              title="View"
-            />
+              }}>
+              View
+            </Button>
+
           </Card.Footer>
         </Card>
       )}
