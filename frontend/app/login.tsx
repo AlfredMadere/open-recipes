@@ -142,7 +142,9 @@ function LoginPage() {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setSignUp(true)}>
+        <View style={{flexDirection: "row", marginTop: 15}}>
         <Text style={styles.toggleText}>Dont have an account? Sign Up</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -150,14 +152,14 @@ function LoginPage() {
   const renderSignUpForm = () => (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-      <Text style={styles.label}>name</Text>
+      <Text style={styles.label}>Name</Text>
       <TextInput
         style={styles.input}
-        placeholder="name"
+        placeholder="Name"
         onChangeText={(text) => setName(text)}
         value={name}
       />
-      <Text style={styles.label}>password</Text>
+      <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -165,18 +167,18 @@ function LoginPage() {
         value={password}
         secureTextEntry
       />
-      <Text style={styles.label}>email</Text>
+      <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
-        placeholder="email"
+        placeholder="Email"
         onChangeText={(text) => setEmail(text)}
         value={email}
         secureTextEntry
       />
-      <Text style={styles.label}>phone number</Text>
+      <Text style={styles.label}>Phone Number</Text>
       <TextInput
         style={styles.input}
-        placeholder="phone"
+        placeholder="Phone"
         onChangeText={(text) => setPhone(text)}
         value={phone}
         secureTextEntry
@@ -195,12 +197,14 @@ function LoginPage() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "#EBE7E0",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   title: {
     fontSize: 24,
+    color:"#4C4B49",
     fontWeight: "bold",
     marginBottom: 20,
   },
@@ -214,6 +218,7 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 40,
     borderColor: "gray",
+    backgroundColor: "white",
     borderWidth: 1,
     marginBottom: 20,
     padding: 10,
@@ -231,6 +236,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     color: "#F4591D",
   },
+  
 });
 
 export default LoginPage;

@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native";
+import { Text, View, StyleSheet, TextInput, Alert } from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
-import { ScrollView } from "tamagui";
+import { ScrollView, Button} from "tamagui";
 import axios from "axios";
 import {
   Recipe,
@@ -93,7 +93,7 @@ export default function Page() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollViewContent}>
         {/* Name */}
-        <Text style={styles.label}>Recipe Name:</Text>
+          <Text style={styles.label}>Recipe Name:</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -197,7 +197,7 @@ export default function Page() {
                         ? styles.error
                         : styles.regular_input
                     }
-                    placeholder={`Key...`}
+                    placeholder={`Key...        `}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -215,8 +215,7 @@ export default function Page() {
                         ? styles.error
                         : styles.regular_input
                     }
-                    placeholder={`Value`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Value...        `}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -232,29 +231,25 @@ export default function Page() {
             </View>
           </View>
         ))}
+        <View style={{flexDirection: "row",
+                flex: 1,
+                justifyContent: "flex-end",
+                margin: 0,
+                padding: 0,}}>
+             
         {/* add tag */}
-        <View style={styles.smallButton}>
-          <Button
-            title="Add"
-            color="white"
-            backgroundColor="green"
-            onPress={() => {
-              appendTag({ key: "", value: "" });
-            }}
-          />
+        <Ionicons.Button name="md-add" size={30} color="green" backgroundColor="#EBE7E0" onPress={() => {
+                    appendTag({ key: "", value: "" });
+         }}/>
         </View>
 
+        
         {/* Ingredients */}
-        <Text style={styles.label}>Ingredients</Text>
+        <Text style={styles.label}>Ingredients:</Text>
         {fieldsIngredient.map((field, index) => (
           <View key={field.id} style={styles.container}>
             <View style={styles.ingredient}>
               {/* quantity */}
-              <Text style={{color: "#F4591D",
-                            fontSize: 12,
-                            marginTop: 10,
-                            margin: 0,
-                            marginLeft: 0,}}>Quantity: </Text>
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -262,14 +257,9 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["quantity"]
                         ? styles.error
-                        : {backgroundColor: "white",
-                            height: 40,
-                            width: 40,
-                            borderRadius: 4,
-                            padding: 10,}
+                        : styles.regular_input
                     }
-                    placeholder={`Quantity`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Quantity...`}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -278,11 +268,6 @@ export default function Page() {
                 rules={{ required: true }}
               />
               {/* unit */}
-              <Text style={{color: "#F4591D",
-                            fontSize: 12,
-                            marginTop: 10,
-                            margin: 0,
-                            marginLeft: 0,}}>Units: </Text>
               <Controller
                 control={control}
                 render={({ field }) => (
@@ -290,10 +275,9 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["unit"]
                         ? styles.error
-                        : styles.small_input
+                        : styles.regular_input
                     }
-                    placeholder={`Unit`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Unit...`}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -309,10 +293,9 @@ export default function Page() {
                     style={
                       errors["ingredients"]?.[index]?.["name"]
                         ? styles.error
-                        : styles.small_input
+                        : styles.regular_input
                     }
-                    placeholder={`Ingredient`}
-                    placeholderTextColor={"gray"}
+                    placeholder={`Ingredient...`}
                     onChangeText={field.onChange}
                     value={typeof field.value === "string" ? field.value : ""}
                   />
@@ -328,29 +311,31 @@ export default function Page() {
             </View>
           </View>
         ))}
+
+        <View style={{flexDirection: "row",
+                flex: 1,
+                justifyContent: "flex-end",
+                margin: 0,
+                padding: 0,}}>
+             
         {/* add ingredient */}
-        <View style={styles.smallButton}>
-          <Button
-            title="Add Ingredient"
-            color="white"
-            onPress={() => {
-              appendIngredient({
-                quantity: "",
-                unit: "",
-                name: "",
-                storage: "",
-              });
-            }}
-          />
+        <Ionicons.Button name="md-add" size={30} color="green" backgroundColor="#EBE7E0" onPress={() => {
+                    appendIngredient({
+                      quantity: "",
+                      unit: "",
+                      name: "",
+                      storage: "",
+                    });
+         }}/>
         </View>
 
         {/* Procedure */}
-        <Text style={styles.label}>Procedure</Text>
+        <Text style={styles.label}>Procedure:</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={errors["procedure"] ? styles.error : styles.large_input}
+              style={errors["procedure"] ? styles.large_error : styles.large_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -363,14 +348,17 @@ export default function Page() {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Button
-          title="Cancel"
-          color="red"
-          onPress={() => {
-            reset(emptyData);
-            Alert.alert("form reset");
-          }}
-        />
+      <Button
+            bordered
+            size="$3" theme="active"
+            style={{backgroundColor: "red", color: "white"}}
+            onPress={() => {reset(emptyData);
+              Alert.alert("form reset");}
+            }
+          >
+            Cancel
+          </Button>
+
 
         {/* Button for testing, populates form with sample data */}
         {/*         
@@ -384,12 +372,17 @@ export default function Page() {
     */}
 
         <Button
-          title="Create"
-          color="green"
-          onPress={() => {
-            handleSubmit(onSubmit)();
-          }}
-        />
+            bordered
+            style={{backgroundColor: "green", color: "white"}}
+            size="$3" theme="active"
+            onPress={() => {
+              handleSubmit(onSubmit)();
+            }}
+          >
+            Create Recipie
+          </Button>
+
+       
       </View>
     </View>
   );
@@ -401,8 +394,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   label: {
-    color: "#F4591D",
-    fontWeight: "bold",
+    color: "black",
+    fontWeight: "500",
     fontSize: 16,
     marginTop: 10,
     margin: 20,
@@ -427,7 +420,7 @@ const styles = StyleSheet.create({
   smallButton: {
     marginTop: 0,
     color: "white",
-    height: 40,
+    height: 30,
     width: 50,
     backgroundColor: "green",
     borderRadius: 4,
@@ -456,8 +449,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   large_input: {
+    textAlignVertical: 'top',
+    textAlign: "left",
     backgroundColor: "white",
-    height: 40,
+    height: 400,
     borderRadius: 4,
     padding: 10,
   },
@@ -466,6 +461,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "white",
     height: 40,
+    borderRadius: 4,
+    padding: 10,
+  },
+  large_error: {
+    borderColor: "red",
+    borderWidth: 1,
+    backgroundColor: "white",
+    height: 400,
     borderRadius: 4,
     padding: 10,
   },

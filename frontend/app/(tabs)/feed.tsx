@@ -59,18 +59,18 @@ export default function Feed() {
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", backgroundColor: "#EBE7E0"}}>
       <View style={{ padding: 10 }}>
         <Button
           onPress={() => router.push("update-inventory")}
           size="$4" // Adjust the size
-          color="$blue10" // Set the button color
+          color="white" // Set the word color
           borderRadius="$6" // Round the corners
-          // shadowColor="$shadow" // Add a shadow
+          backgroundColor="#F4591D"
+          //shadowColor="$shadow" // Add a shadow
           shadowRadius={10} // Shadow radius
           elevation={2} // Elevation for a 3D effect
-          hoverStyle={{ backgroundColor: "$blue8" }} // Change color on hover
-          pressStyle={{ backgroundColor: "$blue12" }} // Change color on press
+          pressStyle={{color: "white", backgroundColor: "orange" }} // Change color on press
           fontFamily="$body" // Set the font family
           fontSize="$4" // Set the font size
           fontWeight="bold" // Make the text bold
@@ -127,6 +127,11 @@ export function RecipeCard(props: RecipeCardProps) {
         <H2>{recipe.name}</H2>
         <Paragraph theme="alt2">{recipe.description}</Paragraph>
       </Card.Header>
+      <Image
+          source={{ width: 20, height: 20, uri: 'https://www.pexels.com/photo/selective-focus-photo-of-bunch-of-bananas-on-black-surface-1093038/://' }}
+          width="100%"
+          height="100%"
+      />
       <Card.Footer padded>
         <XStack flex={1} />
         <Button

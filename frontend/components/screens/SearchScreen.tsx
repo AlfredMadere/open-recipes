@@ -131,6 +131,7 @@ export default function SearchScreen() {
   });
 
   return (
+    <View width={"100%"} height={"100%"} style={{backgroundColor: "#EBE7E0"}}>
     <YStack
       width={400}
       minHeight={250}
@@ -157,7 +158,7 @@ export default function SearchScreen() {
                 // Apply different styles based on whether the button is selected
                 style={{
                   backgroundColor:
-                    tag.id === selectedFilter ? "orange" : "black",
+                    tag.id === selectedFilter ? "orange" : "#F4591D",
                 }}
               >
                 {tag.value}
@@ -169,7 +170,7 @@ export default function SearchScreen() {
             size="$3"
             onPress={() => onUseInventory()}
             style={{
-              backgroundColor: inventoryButtonPressed ? "orange" : "black",
+              backgroundColor: inventoryButtonPressed ? "orange" : "#F4591D",
             }}
           >
             Use Inventory!
@@ -194,6 +195,7 @@ export default function SearchScreen() {
         )}
       </ScrollView>
     </YStack>
+    </View>
   );
 }
 
