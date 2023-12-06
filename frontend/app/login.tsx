@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "expo-router";
 import {
   View,
@@ -10,6 +10,8 @@ import {
 import axios from "axios";
 
 import * as SecureStore from "expo-secure-store";
+import { getValueFor } from "../helpers/auth";
+import { AuthContext } from "./AuthContext";
 
 async function save(key: string, value: string) {
   await SecureStore.setItemAsync(key, value);
@@ -21,13 +23,21 @@ function LoginPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const authProvider = useContext(AuthContext);
   const [phone, setPhone] = useState("");
   const [toggle, setToggle] = useState(false);
   const [key, onChangeKey] = React.useState("authtoken");
   const [value, onChangeValue] = React.useState("Your value here");
 
+  if (!authProvider) {
+    throw new Error("authProvider is not defined");
+  }
+
+  const { authToken, setAuthToken, userId, setUserId, userName, setUserName } = authProvider;
+
   const handleSignUp = async () => {
     //alert("name: " + username + " password: " + password + " email: " + email + " phone: " + phone);
+  
 
     try {
       if (
@@ -90,7 +100,7 @@ function LoginPage() {
           // Save the auth token
           console.log("about to storer auth token", authToken);
           console.log("type of auth token", typeof authToken);
-          save(key, authToken);
+          await save(key, authToken);
 
           const results = await axios.get(
             "https://open-recipes.onrender.com/users/me/",
@@ -101,8 +111,13 @@ function LoginPage() {
               },
             },
           );
-
-          save("userId", `${results.data.id}`);
+          
+          console.log("results.data: ", results.data);
+          await save("userName", `${results.data.name}`);
+          await save("userId", `${results.data.id}`);
+          authProvider.setAuthToken(authToken);
+          authProvider.setUserId(results.data.id);
+          authProvider.setUserName(results.data.name);
 
           // Redirect to the profile page or wherever you need to go
           router.push("/profile");
@@ -173,7 +188,6 @@ function LoginPage() {
         placeholder="Email"
         onChangeText={(text) => setEmail(text)}
         value={email}
-        secureTextEntry
       />
       <Text style={styles.label}>Phone Number</Text>
       <TextInput
@@ -181,7 +195,6 @@ function LoginPage() {
         placeholder="Phone"
         onChangeText={(text) => setPhone(text)}
         value={phone}
-        secureTextEntry
       />
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign up</Text>

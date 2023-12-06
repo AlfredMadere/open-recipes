@@ -38,7 +38,7 @@ export default function Feed() {
       throw new Error("No auth token");
     }
     const response = await axios.get(
-      "https://open-recipes.onrender.com/recipes",
+      "https://open-recipes.onrender.com/recipes?use_inventory_of=1",
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -51,16 +51,22 @@ export default function Feed() {
   }
   const query = useQuery({
     queryKey: ["recipes_feed"],
+    gcTime: 0,
     queryFn: getRecipesFeed,
+    refetchOnMount: true,
     enabled: !!authToken, // Only run the query if authToken is not empty
   });
+
+  
+
+
 
 
 
   const recipes = removeDuplicateIds(query.data?.recipe || []);
   return (
-    <View style={{ width: "100%", backgroundColor: "#EBE7E0"}}>
-      <View style={{ padding: 10 }}>
+    <View style={{ width: "100%" }}>
+      <View style={{ padding: 10 , display: "flex", flexDirection: "column", gap: 10}}>
         <Button
           onPress={() => router.push("update-inventory")}
           bordered
@@ -76,6 +82,22 @@ export default function Feed() {
           fontWeight="bold" // Make the text bold
         >
           Update Inventory
+        </Button>
+        <Button
+          onPress={() => query.refetch()}
+          size="$4" // Adjust the size
+          color="$blue10" // Set the button color
+          borderRadius="$6" // Round the corners
+          // shadowColor="$shadow" // Add a shadow
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          hoverStyle={{ backgroundColor: "$blue8" }} // Change color on hover
+          pressStyle={{ backgroundColor: "$blue12" }} // Change color on press
+          fontFamily="$body" // Set the font family
+          fontSize="$4" // Set the font size
+          fontWeight="bold" // Make the text bold
+        >
+          Refresh
         </Button>
       </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
