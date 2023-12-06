@@ -4,8 +4,11 @@
 
 ## Project Description
 
-Open Recipes is a service for meal planning and recipe management aimed primarily at college students and young adults. The service allows users to create their own recipes or search for others' recipes using the search feature. The app also allows for the creation of recipe lists, which can group recipes together, e.g. "Breakfast". Users can view account information and pinned recipes from the 'profile' page. Finally, on the 'feed' page, popular and relevant recipes from the community are displayed for browsing!
 
+Open Recipes is a service for a meal planning and recipe management aimed primarily at college students and young adults. The service will allow users to manually enter recipes into their personal "cookbook" or add existing recipes from a public library. The user will be able "tag" recipes with anything they want, examples including "Allergy: Gluten" or "Appliance Needed: Air Fryer," which will allow filtering of public recipes based on user needs. We have a "feed" where users can see potential new recipes. You can log in as your user with an auth jwt token. A personal recipes page, more in depth viewing of recipes as a page, and recipe deletion will be available in the very near future. Additional future features like recipe rating, picture uploads, weekly planners, and recipe forking are planned for later versions. The service aims to solve the problem of meal planning and grocery shopping, making it easier and more efficient for people first living on their own to find meals to cook with their given inventories. While the MVP will focus on core functionalities, future iterations could include AI-enabled inventory management and a premium feature set.
+
+### NOTES
+This is a combination project for both csc 307 and csc 365. Only a 10 or fewer endpoints were are required for 365, the rest were created to support our frontend expo application developed in 307. The expo app does not yet use all the endoints available in the backend but if taken to MVP, should use most of them. 
 
 ## Contributing
 
@@ -81,6 +84,7 @@ We adhere to the following ESLint standards for our code:
 - Ability to add images to your own recipes and rate others' recipes
 - AI-enabled "Fridge" feature for inventory management.
 - Average prep time and cost of ingredients.
+- Reviews and ratings of all recipes. 
 - Recipe scaling based on the number of people.
 - Premium features for paying customers.
 
