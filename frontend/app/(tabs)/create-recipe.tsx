@@ -98,6 +98,7 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
+              autoCapitalize="none"
               placeholder={`Enter here...`}
               style={errors["name"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
@@ -115,6 +116,7 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
+              autoCapitalize="none"
               placeholder={`Enter here...`}
               style={errors["description"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
@@ -133,6 +135,7 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
+              autoCapitalize="none"
               placeholder={`Servings...`}
               style={errors["default_servings"] ? styles.error : styles.regular_input}
               onBlur={onBlur}
@@ -151,6 +154,7 @@ export default function Page() {
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
+              autoCapitalize="none"
                 placeholder={`Prep Time...`}
                 style={errors["mins_prep"] ? styles.error : styles.regular_input}
                 onBlur={onBlur}
@@ -167,6 +171,7 @@ export default function Page() {
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
+              autoCapitalize="none"
                 placeholder={`Cook Time...`}
                 style={errors["mins_cook"] ? styles.error : styles.regular_input}
                 onBlur={onBlur}
@@ -192,6 +197,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
+              autoCapitalize="none"
                     style={
                       errors["tags"]?.[index]?.["key"]
                         ? styles.error
@@ -210,6 +216,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
+              autoCapitalize="none"
                     style={
                       errors["tags"]?.[index]?.["value"]
                         ? styles.error
@@ -254,6 +261,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
+              autoCapitalize="none"
                     style={
                       errors["ingredients"]?.[index]?.["quantity"]
                         ? styles.error
@@ -272,6 +280,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
+              autoCapitalize="none"
                     style={
                       errors["ingredients"]?.[index]?.["unit"]
                         ? styles.error
@@ -290,6 +299,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
+              autoCapitalize="none"
                     style={
                       errors["ingredients"]?.[index]?.["name"]
                         ? styles.error
@@ -335,6 +345,7 @@ export default function Page() {
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
+              autoCapitalize="none"
               style={errors["procedure"] ? styles.large_error : styles.large_input}
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
