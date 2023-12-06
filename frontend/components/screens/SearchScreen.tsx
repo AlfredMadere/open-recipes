@@ -132,7 +132,7 @@ export default function SearchScreen() {
   });
 
   return (
-    <View width={"100%"} height={800} style={{backgroundColor: "#EBE7E0"}}>
+    <View width={"100%"} height={"100%"} style={{backgroundColor: "#EBE7E0"}}>
     <YStack
       width={400}
       minHeight={250}
@@ -140,14 +140,18 @@ export default function SearchScreen() {
       space="$2"
       margin="$3"
       padding="$2"
-    >
+      >
+        <View width={"90%"}>
+
+
       <InputText
-        size="$4"
+        size="$5"
         searchText={searchText}
         setSearchText={setSearchText}
         onPressGoButton={setPressed}
       />
-      <ScrollView horizontal={true}>
+        </View>
+      <ScrollView horizontal={true} height={50}>
         <XStack space="$2">
           {query1.data?.tags.map((tag: tagProps) => {
             return (
@@ -168,16 +172,7 @@ export default function SearchScreen() {
               </Button>
             );
           })}
-          <Button
-            themeInverse
-            size="$3"
-            onPress={() => onUseInventory()}
-            style={{
-              backgroundColor: inventoryButtonPressed ? "#6E6055" : "#D7783B",
-            }}
-          >
-            Use Inventory!
-          </Button>
+          
         </XStack>
       </ScrollView>
 
@@ -195,7 +190,8 @@ export default function SearchScreen() {
             req={req}
             pressed={pressed}
           />
-        )}
+            )}
+          <View style={{height: 100}}></View>
       </ScrollView>
     </YStack>
     </View>

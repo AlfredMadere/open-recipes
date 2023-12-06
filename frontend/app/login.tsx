@@ -139,15 +139,13 @@ function LoginPage() {
   const renderLoginForm = () => (
     <View style={styles.container}>
       <View style={styles.circularView}>
-            <Image
-              source={require("../assets/real.png")}
-              style={styles.image}
-            />
-          </View>
+        <Image source={require("../assets/real.png")} style={styles.image} />
+      </View>
       <Text style={styles.title}>Login</Text>
       <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
+        autoCapitalize="none"
         placeholder="Email"
         onChangeText={(text) => setEmail(text)}
         value={email}
@@ -155,6 +153,7 @@ function LoginPage() {
       <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
+        autoCapitalize="none"
         placeholder="Password"
         onChangeText={(text) => setPassword(text)}
         value={password}
@@ -164,8 +163,8 @@ function LoginPage() {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setSignUp(true)}>
-        <View style={{flexDirection: "row", marginTop: 15}}>
-        <Text style={styles.toggleText}>Dont have an account? Sign Up</Text>
+        <View style={{ flexDirection: "row", marginTop: 15 }}>
+          <Text style={styles.toggleText}>Dont have an account? Sign Up</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -178,6 +177,7 @@ function LoginPage() {
       <TextInput
         style={styles.input}
         placeholder="Name"
+        autoCapitalize="none"
         onChangeText={(text) => setName(text)}
         value={name}
       />
@@ -185,6 +185,7 @@ function LoginPage() {
       <TextInput
         style={styles.input}
         placeholder="Password"
+        autoCapitalize="none"
         onChangeText={(text) => setPassword(text)}
         value={password}
         secureTextEntry
@@ -193,6 +194,7 @@ function LoginPage() {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        autoCapitalize="none"
         onChangeText={(text) => setEmail(text)}
         value={email}
       />
@@ -200,6 +202,7 @@ function LoginPage() {
       <TextInput
         style={styles.input}
         placeholder="Phone"
+        autoCapitalize="none"
         onChangeText={(text) => setPhone(text)}
         value={phone}
       />

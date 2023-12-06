@@ -163,6 +163,7 @@ export default function One() {
                         control={control}
                         render={({ field: { onChange, onBlur, value } }) => (
                           <TextInput
+                            autoCapitalize="none"
                             style={errors["name"] ? styles.error : styles.input}
                             placeholder={`Enter name here...`}
                             onBlur={onBlur}
@@ -190,6 +191,7 @@ export default function One() {
                         control={control}
                         render={({ field: { onChange, onBlur, value } }) => (
                           <TextInput
+                            autoCapitalize="none"
                             style={
                               errors["description"]
                                 ? styles.error
@@ -300,6 +302,9 @@ const ListComponent = ({ data }) => {
             description={item.description}
           />
         </View>
+      )}
+      ListFooterComponent={() => (
+        <View style={{height: 20}}></View>
       )}
     />
   );
