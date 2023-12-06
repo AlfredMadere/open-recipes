@@ -45,8 +45,8 @@ export default function One() {
       const response = await axios.post(
         "https://open-recipes.onrender.com/recipe-lists",
         {
-          name: "cd",
-          description: "striasdng",
+          name: data.name,
+          description: data.description,
         },
         {
           headers: {

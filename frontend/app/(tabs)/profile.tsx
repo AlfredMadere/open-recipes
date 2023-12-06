@@ -75,9 +75,10 @@ export default function Profile() {
     },
   });
 
-  const recipes = removeDuplicateIds(query.data?.recipe || []);
-
+ 
   const username = "John";
+
+  const recipes = removeDuplicateIds(query.data?.recipe || []);
 
   return (
     <View style={{ width: "100%" }}>
@@ -104,9 +105,6 @@ export default function Profile() {
         >
           Refresh
         </Button>
-      </View>
-      <View style={{ marginLeft: 10, marginTop: 20, marginBottom: 20 }}>
-        <Text>Authored Recipes:</Text>
       </View>
       {query.error && <Text>{JSON.stringify(query.error)}</Text>}
       {query.isFetching && <Spinner size="large" color="$orange10" />}

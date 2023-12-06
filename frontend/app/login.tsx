@@ -101,7 +101,7 @@ function LoginPage() {
               },
             },
           );
-
+          save("userName", `${results.data.name}`);
           save("userId", `${results.data.id}`);
 
           // Redirect to the profile page or wherever you need to go
