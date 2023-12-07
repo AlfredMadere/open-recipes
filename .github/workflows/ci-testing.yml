@@ -13,6 +13,6 @@ jobs:
         with:
           node-version: 18 
       - run: cd ./frontend && npm ci
-      - run: cd ./frontend && npm run lint
+      - run: cd ./frontend && npm run check
       # - run: npm run -w react-frontend lint 
       # - run: npm run -w react-frontend build
