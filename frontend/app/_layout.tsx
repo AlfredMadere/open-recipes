@@ -1,11 +1,10 @@
-import { Stack, useRouter } from "expo-router";
-import { useFonts } from "expo-font";
-import HomeScreen from "../components/screens/HomeScreen";
-import { Button } from "react-native";
-import tamaguiConfig from "../tamagui.config";
-import { TamaguiProvider, Theme } from "tamagui";
-import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useFonts } from "expo-font";
+import { Stack, useRouter } from "expo-router";
+import { useEffect } from "react";
+import { Button } from "react-native";
+import { TamaguiProvider, Theme } from "tamagui";
+import tamaguiConfig from "../tamagui.config";
 import { AuthProvider } from "./AuthContext";
 
 const queryClient = new QueryClient();

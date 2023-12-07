@@ -1,16 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { Text, View, StyleSheet, TextInput, Alert } from "react-native";
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
-import { ScrollView, Button } from "tamagui";
+import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import { useContext } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, ScrollView } from "tamagui";
 import {
-  Recipe,
   FormattedRecipe,
-  emptyData,
-  sampleData,
+  Recipe,
+  emptyData
 } from "../../components/create-recipe-types/create-recipe-helper";
-import { getValueFor } from "../../helpers/auth";
 import { AuthContext } from "../AuthContext";
 
 export default function Page() {

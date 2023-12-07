@@ -1,11 +1,8 @@
-import { Link, Redirect } from "expo-router";
-import { TamaguiProvider, Theme, Button } from "tamagui";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
 import { useFonts } from "expo-font";
+import { Redirect } from "expo-router";
 import { useEffect } from "react";
+import { View } from "react-native";
 
-import tamaguiConfig from "../tamagui.config";
 import "expo-router/entry";
 
 const StartPage = () => {
