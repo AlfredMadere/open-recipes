@@ -210,6 +210,7 @@ const IngredientItem: React.FC<IngredientItemProps> = ({
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
               placeholder="Ingredient Name..."
+              autoCapitalize="none"
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
