@@ -34,6 +34,8 @@ Molly Sandler - mosandle@calpoly.edu
 We use Prettier and ESLint to maintain code formatting and ensure code quality.
 To set up your development environment, follow these steps:
 
+NOTE: you must run `npm run check` with no errors before merging to main. To fix formatting warnings you can run npx 
+
 1. **Prettier**: Install Prettier in your code editor and set it as your default formatter to automatically format your code according to our style rules.
 
 Our style guide follows standard Prettier formatting guidelines. See the [Prettier webpage](https://prettier.io/docs/en/why-prettier) for more information
