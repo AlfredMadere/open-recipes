@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import axios from "axios";
-import {Image} from "tamagui";
+import { Image } from "tamagui";
 
 import * as SecureStore from "expo-secure-store";
 import { getValueFor } from "../helpers/auth";
@@ -34,11 +34,11 @@ function LoginPage() {
     throw new Error("authProvider is not defined");
   }
 
-  const { authToken, setAuthToken, userId, setUserId, userName, setUserName } = authProvider;
+  const { authToken, setAuthToken, userId, setUserId, userName, setUserName } =
+    authProvider;
 
   const handleSignUp = async () => {
     //alert("name: " + username + " password: " + password + " email: " + email + " phone: " + phone);
-  
 
     try {
       if (
@@ -112,7 +112,7 @@ function LoginPage() {
               },
             },
           );
-          
+
           console.log("results.data: ", results.data);
           await save("userName", `${results.data.name}`);
           await save("userId", `${results.data.id}`);
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color:"#4B4037",
+    color: "#4B4037",
     fontWeight: "bold",
     marginBottom: 20,
   },
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   circularView: {
     marginTop: 60,
-    marginLeft:15,
+    marginLeft: 15,
     marginBottom: 30,
     width: 200,
     height: 80,
@@ -276,7 +276,6 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
-  
 });
 
 export default LoginPage;

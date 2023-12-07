@@ -13,7 +13,12 @@ import {
   Paragraph,
   YStack,
 } from "tamagui";
-import { PopulatedRecipe, Ingredient, Tag, RecipeList } from "../interfaces/models";
+import {
+  PopulatedRecipe,
+  Ingredient,
+  Tag,
+  RecipeList,
+} from "../interfaces/models";
 import { useState } from "react";
 import { getValueFor } from "../../helpers/auth";
 import * as SecureStore from "expo-secure-store";
@@ -37,7 +42,7 @@ const Register = () => {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
       //console.log("response.data", response.data);
       return response.data;
@@ -52,7 +57,6 @@ const Register = () => {
     queryFn: getRecipe,
     enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
   });
-
 
   useEffect(() => {
     let isMounted = true;
@@ -108,11 +112,15 @@ const Register = () => {
       <View>
         <Text>Recipe not found</Text>
       </View>
-     )
+    );
   }
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <RecipeListModal visible={visible} setVisible={setVisible} recipe_id={recipe_id}/>
+      <RecipeListModal
+        visible={visible}
+        setVisible={setVisible}
+        recipe_id={recipe_id}
+      />
 
       <View style={styles.recipeDetails}>
         <Text style={styles.title}>{data?.name}</Text>
@@ -182,7 +190,7 @@ const Register = () => {
             size="$4" // Adjust the size
             color="white" // Set the button color
             borderRadius="$6" // Round the corners
-            backgroundColor= "$red10"
+            backgroundColor="$red10"
             // shadowColor="$shadow" // Add a shadow
             shadowRadius={10} // Shadow radius
             elevation={2} // Elevation for a 3D effect
@@ -210,7 +218,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#EBE7E0",
     paddingHorizontal: 20,
     paddingTop: 40,
-
   },
   recipeDetails: {
     backgroundColor: "#fff",
@@ -222,18 +229,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color:"#4B4037",
+    color: "#4B4037",
     marginBottom: 10,
   },
   description: {
     fontSize: 18,
-    color:"#6E6055",
+    color: "#6E6055",
     marginBottom: 10,
     marginTop: 10,
   },
   descriptionHeader: {
     fontSize: 18,
-    color:"#4B4037",
+    color: "#4B4037",
     marginBottom: 10,
     marginTop: 10,
     fontWeight: "bold",
@@ -246,12 +253,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginTop: 5,
-    color:"#4B4037",
+    color: "#4B4037",
   },
   ingredientsItem: {
     fontSize: 16,
     marginTop: 5,
-    color:"#6E6055",
+    color: "#6E6055",
   },
   section: {
     marginTop: 15,
@@ -307,15 +314,13 @@ function RecipeListModal(params: recipeModalInputs) {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
-  
     } catch (error) {
       console.error("Error adding data:", error.message);
     }
     router.push(`/feed`);
   };
-
 
   async function getRecipeLists(): Promise<RecipeList[]> {
     if (!authToken) {
@@ -329,7 +334,7 @@ function RecipeListModal(params: recipeModalInputs) {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",
         },
-      }
+      },
     );
     console.log("response.data", response.data);
     return response.data;
@@ -339,9 +344,6 @@ function RecipeListModal(params: recipeModalInputs) {
     queryFn: getRecipeLists,
     enabled: !!authToken, // Only run the query if authToken is not empty
   });
-
- 
-
 
   const lists = query.data || [];
   console.log("lists", lists);
@@ -386,10 +388,16 @@ function RecipeListModal(params: recipeModalInputs) {
             >
               <View>
                 <View
-                  style={{ justifyContent: "center", alignItems: "center",  }}
+                  style={{ justifyContent: "center", alignItems: "center" }}
                 >
                   <View>
-                    <Text style={{ fontWeight: "bold", fontSize: 20, color:"#4B4037",}}>
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: 20,
+                        color: "#4B4037",
+                      }}
+                    >
                       Add to List
                     </Text>
                   </View>
@@ -414,37 +422,54 @@ function RecipeListModal(params: recipeModalInputs) {
                       space
                     >
                       {lists.map((recipelist) => {
-
-                      return (
-                        <Card key={recipelist.id} elevate size="$4" width={"100%"} height={70} bordered marginLeft={20} >
-                          <Card.Header padded width={"83%"}>
-                            <Text style={{
-                                  color:"#4B4037", fontWeight: "bold",}}>{recipelist.name}</Text>
-                            <XStack width={"83%"}>
-                              <Paragraph theme="alt2">
-                                {recipelist.description}
-                              </Paragraph>
-                            </XStack>
-                          </Card.Header>
-                          <Card.Footer padded>
-                            <XStack flex={1} />
-                            <Button
-                              color="#6E6055"
-                              borderRadius="$10"
-                              hoverStyle={{ color: "white", backgroundColor: "#F4591D" }} // Change color on hover
-                              pressStyle={{ color: "white", backgroundColor: "#F4591D" }} // Change color on press
-                              onPress={() => {
-                                console.log("clickeddd");
-                                addRecipeToList(recipelist.id, recipe_id);
-                              }}
-                            >
-                              Add
-                            </Button>
-                          </Card.Footer>
-                        </Card>
-                
-                      )
-            
+                        return (
+                          <Card
+                            key={recipelist.id}
+                            elevate
+                            size="$4"
+                            width={"100%"}
+                            height={70}
+                            bordered
+                            marginLeft={20}
+                          >
+                            <Card.Header padded width={"83%"}>
+                              <Text
+                                style={{
+                                  color: "#4B4037",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {recipelist.name}
+                              </Text>
+                              <XStack width={"83%"}>
+                                <Paragraph theme="alt2">
+                                  {recipelist.description}
+                                </Paragraph>
+                              </XStack>
+                            </Card.Header>
+                            <Card.Footer padded>
+                              <XStack flex={1} />
+                              <Button
+                                color="#6E6055"
+                                borderRadius="$10"
+                                hoverStyle={{
+                                  color: "white",
+                                  backgroundColor: "#F4591D",
+                                }} // Change color on hover
+                                pressStyle={{
+                                  color: "white",
+                                  backgroundColor: "#F4591D",
+                                }} // Change color on press
+                                onPress={() => {
+                                  console.log("clickeddd");
+                                  addRecipeToList(recipelist.id, recipe_id);
+                                }}
+                              >
+                                Add
+                              </Button>
+                            </Card.Footer>
+                          </Card>
+                        );
                       })}
                     </YStack>
                   </ScrollView>
@@ -478,7 +503,5 @@ function RecipeListModal(params: recipeModalInputs) {
     </View>
   );
 }
-
-
 
 export default Register;

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { Text, View, StyleSheet, TextInput, Alert } from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
-import { ScrollView, Button} from "tamagui";
+import { ScrollView, Button } from "tamagui";
 import axios from "axios";
 import {
   Recipe,
@@ -14,7 +14,6 @@ import { getValueFor } from "../../helpers/auth";
 import { AuthContext } from "../AuthContext";
 
 export default function Page() {
-
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
@@ -93,7 +92,7 @@ export default function Page() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollViewContent}>
         {/* Name */}
-          <Text style={styles.label}>Recipe Name:</Text>
+        <Text style={styles.label}>Recipe Name:</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -118,7 +117,9 @@ export default function Page() {
             <TextInput
               autoCapitalize="none"
               placeholder={`Enter here...`}
-              style={errors["description"] ? styles.error : styles.regular_input}
+              style={
+                errors["description"] ? styles.error : styles.regular_input
+              }
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -129,34 +130,39 @@ export default function Page() {
         />
 
         {/* Servings */}
-        <Text style={styles.label}>Servings:                Times:         </Text>
+        <Text style={styles.label}>Servings: Times: </Text>
         <View style={styles.ingredient}>
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              autoCapitalize="none"
-              placeholder={`Servings...`}
-              style={errors["default_servings"] ? styles.error : styles.regular_input}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
-              keyboardType="numeric"
-            />
-          )}
-          name="default_servings"
-          rules={{ required: true }}
-        />
-
-       
-        {/* Prep and Cooking Time */}
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-              autoCapitalize="none"
+                autoCapitalize="none"
+                placeholder={`Servings...`}
+                style={
+                  errors["default_servings"]
+                    ? styles.error
+                    : styles.regular_input
+                }
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+                keyboardType="numeric"
+              />
+            )}
+            name="default_servings"
+            rules={{ required: true }}
+          />
+
+          {/* Prep and Cooking Time */}
+          <Controller
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                autoCapitalize="none"
                 placeholder={`Prep Time...`}
-                style={errors["mins_prep"] ? styles.error : styles.regular_input}
+                style={
+                  errors["mins_prep"] ? styles.error : styles.regular_input
+                }
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -166,14 +172,16 @@ export default function Page() {
             name="mins_prep"
             rules={{ required: true }}
           />
-     
+
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-              autoCapitalize="none"
+                autoCapitalize="none"
                 placeholder={`Cook Time...`}
-                style={errors["mins_cook"] ? styles.error : styles.regular_input}
+                style={
+                  errors["mins_cook"] ? styles.error : styles.regular_input
+                }
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -183,9 +191,7 @@ export default function Page() {
             name="mins_cook"
             rules={{ required: true }}
           />
-          </View>
-       
-
+        </View>
 
         {/* Tags */}
         <Text style={styles.label}>Tags:</Text>
@@ -197,7 +203,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
-              autoCapitalize="none"
+                    autoCapitalize="none"
                     style={
                       errors["tags"]?.[index]?.["key"]
                         ? styles.error
@@ -216,7 +222,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
-              autoCapitalize="none"
+                    autoCapitalize="none"
                     style={
                       errors["tags"]?.[index]?.["value"]
                         ? styles.error
@@ -232,25 +238,39 @@ export default function Page() {
                 defaultValue=""
               />
               {/* remove tag */}
-              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#EBE7E0" onPress={() => {
-                    removeTag(index);
-                  }}/>
+              <Ionicons.Button
+                name="remove"
+                size={30}
+                color="red"
+                backgroundColor="#EBE7E0"
+                onPress={() => {
+                  removeTag(index);
+                }}
+              />
             </View>
           </View>
         ))}
-        <View style={{flexDirection: "row",
-                flex: 1,
-                justifyContent: "flex-end",
-                margin: 0,
-                padding: 0,}}>
-             
-        {/* add tag */}
-        <Ionicons.Button name="md-add" size={30} color="green" backgroundColor="#EBE7E0" onPress={() => {
-                    appendTag({ key: "", value: "" });
-         }}/>
+        <View
+          style={{
+            flexDirection: "row",
+            flex: 1,
+            justifyContent: "flex-end",
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          {/* add tag */}
+          <Ionicons.Button
+            name="md-add"
+            size={30}
+            color="green"
+            backgroundColor="#EBE7E0"
+            onPress={() => {
+              appendTag({ key: "", value: "" });
+            }}
+          />
         </View>
 
-        
         {/* Ingredients */}
         <Text style={styles.label}>Ingredients:</Text>
         {fieldsIngredient.map((field, index) => (
@@ -261,7 +281,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
-              autoCapitalize="none"
+                    autoCapitalize="none"
                     style={
                       errors["ingredients"]?.[index]?.["quantity"]
                         ? styles.error
@@ -280,7 +300,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
-              autoCapitalize="none"
+                    autoCapitalize="none"
                     style={
                       errors["ingredients"]?.[index]?.["unit"]
                         ? styles.error
@@ -299,7 +319,7 @@ export default function Page() {
                 control={control}
                 render={({ field }) => (
                   <TextInput
-              autoCapitalize="none"
+                    autoCapitalize="none"
                     style={
                       errors["ingredients"]?.[index]?.["name"]
                         ? styles.error
@@ -314,29 +334,43 @@ export default function Page() {
                 rules={{ required: true }}
               />
               {/* remove ingredient */}
-              <Ionicons.Button name="remove" size={30} color="red" backgroundColor="#EBE7E0" onPress={() => {
-                    removeIngredient(index);
-                  }}
-                  />
+              <Ionicons.Button
+                name="remove"
+                size={30}
+                color="red"
+                backgroundColor="#EBE7E0"
+                onPress={() => {
+                  removeIngredient(index);
+                }}
+              />
             </View>
           </View>
         ))}
 
-        <View style={{flexDirection: "row",
-                flex: 1,
-                justifyContent: "flex-end",
-                margin: 0,
-                padding: 0,}}>
-             
-        {/* add ingredient */}
-        <Ionicons.Button name="md-add" size={30} color="green" backgroundColor="#EBE7E0" onPress={() => {
-                    appendIngredient({
-                      quantity: "",
-                      unit: "",
-                      name: "",
-                      storage: "",
-                    });
-         }}/>
+        <View
+          style={{
+            flexDirection: "row",
+            flex: 1,
+            justifyContent: "flex-end",
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          {/* add ingredient */}
+          <Ionicons.Button
+            name="md-add"
+            size={30}
+            color="green"
+            backgroundColor="#EBE7E0"
+            onPress={() => {
+              appendIngredient({
+                quantity: "",
+                unit: "",
+                name: "",
+                storage: "",
+              });
+            }}
+          />
         </View>
 
         {/* Procedure */}
@@ -346,7 +380,9 @@ export default function Page() {
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               autoCapitalize="none"
-              style={errors["procedure"] ? styles.large_error : styles.large_input}
+              style={
+                errors["procedure"] ? styles.large_error : styles.large_input
+              }
               onBlur={onBlur}
               onChangeText={(value) => onChange(value)}
               value={value}
@@ -359,26 +395,26 @@ export default function Page() {
 
       {/* Footer */}
       <View style={styles.footer}>
-      <Button
-            size="$3" // Adjust the size
-            backgroundColor="$red10" // Set the button color
-            color="white"
-            borderRadius="$4" // Round the corners
-            // shadowColor="$shadow" // Add a shadow
-            shadowRadius={10} // Shadow radius
-            elevation={2} // Elevation for a 3D effect
-            hoverStyle={{ backgroundColor: "red" }} // Change color on hover
-            pressStyle={{ backgroundColor: "red" }} // Change color on press
-            fontFamily="$body" // Set the font family
-            fontSize="$4" // Set the font size
-            fontWeight="bold" // Make the text bold
-            onPress={() => {reset(emptyData);
-              Alert.alert("form reset");}
-            }
-          >
-            Cancel
-          </Button>
-
+        <Button
+          size="$3" // Adjust the size
+          backgroundColor="$red10" // Set the button color
+          color="white"
+          borderRadius="$4" // Round the corners
+          // shadowColor="$shadow" // Add a shadow
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          hoverStyle={{ backgroundColor: "red" }} // Change color on hover
+          pressStyle={{ backgroundColor: "red" }} // Change color on press
+          fontFamily="$body" // Set the font family
+          fontSize="$4" // Set the font size
+          fontWeight="bold" // Make the text bold
+          onPress={() => {
+            reset(emptyData);
+            Alert.alert("form reset");
+          }}
+        >
+          Cancel
+        </Button>
 
         {/* Button for testing, populates form with sample data */}
         {/*         
@@ -392,26 +428,24 @@ export default function Page() {
     */}
 
         <Button
-            size="$3" // Adjust the size
-            backgroundColor="$green10" // Set the button color
-            color="white"
-            borderRadius="$4" // Round the corners
-            // shadowColor="$shadow" // Add a shadow
-            shadowRadius={10} // Shadow radius
-            elevation={2} // Elevation for a 3D effect
-            hoverStyle={{ backgroundColor: "green" }} // Change color on hover
-            pressStyle={{ backgroundColor: "green" }} // Change color on press
-            fontFamily="$body" // Set the font family
-            fontSize="$4" // Set the font size
-            fontWeight="bold" // Make the text bold
-            onPress={() => {
-              handleSubmit(onSubmit)();
-            }}
-          >
-            Create Recipie
-          </Button>
-
-       
+          size="$3" // Adjust the size
+          backgroundColor="$green10" // Set the button color
+          color="white"
+          borderRadius="$4" // Round the corners
+          // shadowColor="$shadow" // Add a shadow
+          shadowRadius={10} // Shadow radius
+          elevation={2} // Elevation for a 3D effect
+          hoverStyle={{ backgroundColor: "green" }} // Change color on hover
+          pressStyle={{ backgroundColor: "green" }} // Change color on press
+          fontFamily="$body" // Set the font family
+          fontSize="$4" // Set the font size
+          fontWeight="bold" // Make the text bold
+          onPress={() => {
+            handleSubmit(onSubmit)();
+          }}
+        >
+          Create Recipie
+        </Button>
       </View>
     </View>
   );
@@ -468,8 +502,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     height: 40,
     padding: 10,
-    color:"#6E6055"
-
+    color: "#6E6055",
   },
   small_input: {
     backgroundColor: "white",
@@ -478,12 +511,11 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   large_input: {
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     textAlign: "left",
     backgroundColor: "white",
     height: 400,
-    padding: 10
-
+    padding: 10,
   },
   error: {
     borderColor: "red",

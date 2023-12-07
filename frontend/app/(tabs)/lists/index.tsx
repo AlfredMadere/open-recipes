@@ -1,6 +1,16 @@
 /* eslint-disable react/prop-types */
 import { useRouter } from "expo-router";
-import { View, Stack, Card, XStack, Button, Paragraph, YStack, H2, ScrollView } from "tamagui";
+import {
+  View,
+  Stack,
+  Card,
+  XStack,
+  Button,
+  Paragraph,
+  YStack,
+  H2,
+  ScrollView,
+} from "tamagui";
 import { useForm, Controller } from "react-hook-form";
 import {
   Text,
@@ -22,8 +32,7 @@ export default function One() {
   if (!authContext) {
     throw new Error("Feedmust be used within an AuthProvider");
   }
-  const { authToken} = authContext;
-
+  const { authToken } = authContext;
 
   const {
     reset,
@@ -52,7 +61,7 @@ export default function One() {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       fetchDataFromBackend();
@@ -69,13 +78,13 @@ export default function One() {
   const fetchDataFromBackend = async () => {
     try {
       const response = await fetch(
-        "https://open-recipes.onrender.com/recipe-lists", 
+        "https://open-recipes.onrender.com/recipe-lists",
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
       if (!response.ok) {
         console.log("response", response);
@@ -89,26 +98,33 @@ export default function One() {
     }
   };
 
-
   return (
-    <View style={{ width: "100%", backgroundColor: "#EBE7E0",  gap: 10, padding: 10}}>
+    <View
+      style={{
+        width: "100%",
+        backgroundColor: "#EBE7E0",
+        gap: 10,
+        padding: 10,
+      }}
+    >
       <Button
-              bordered
-              size="$3"
-              backgroundColor= "#D7783B"
-              color= "white"
-              pressStyle={{color: "white", backgroundColor: "#6E6055" }} // Change color on press
-              onPress={() => {
-                setModalVisible(true);
-                reset({
-                  name: "",
-                  description: "",
-                });
-              }} >
-          New List
-          </Button>
+        bordered
+        size="$3"
+        backgroundColor="#D7783B"
+        color="white"
+        pressStyle={{ color: "white", backgroundColor: "#6E6055" }} // Change color on press
+        onPress={() => {
+          setModalVisible(true);
+          reset({
+            name: "",
+            description: "",
+          });
+        }}
+      >
+        New List
+      </Button>
 
-          <ListComponent data={lists} />
+      <ListComponent data={lists} />
 
       <View style={{ alignSelf: "flex-end" }}>
         <Stack scale={1.2} marginTop={15}>
@@ -149,16 +165,26 @@ export default function One() {
               >
                 <View>
                   <View
-                    style={{ justifyContent: "center", alignItems: "center", color:"#E1DCD2" }}
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      color: "#E1DCD2",
+                    }}
                   >
                     <View>
-                      <Text style={{ fontWeight: "bold", fontSize: 20, color: "#4B4037" }}>
+                      <Text
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: 20,
+                          color: "#4B4037",
+                        }}
+                      >
                         Create New List
                       </Text>
                     </View>
 
                     <View style={{ height: 300, paddingTop: 25 }}>
-                      <Text style={{color: "#6E6055" }}>Title:</Text>
+                      <Text style={{ color: "#6E6055" }}>Title:</Text>
                       <Controller
                         control={control}
                         render={({ field: { onChange, onBlur, value } }) => (
@@ -185,8 +211,8 @@ export default function One() {
                           This is required.
                         </Text>
                       )}
-                     
-                      <Text style={{color: "#6E6055" }}>Description</Text>
+
+                      <Text style={{ color: "#6E6055" }}>Description</Text>
                       <Controller
                         control={control}
                         render={({ field: { onChange, onBlur, value } }) => (
@@ -219,8 +245,7 @@ export default function One() {
                       )}
 
                       <View style={{ padding: 3 }}>
-
-                      <Button
+                        <Button
                           size="$3" // Adjust the size
                           backgroundColor="$green10" // Set the button color
                           color="white"
@@ -235,7 +260,7 @@ export default function One() {
                           fontWeight="bold" // Make the text bold
                           onPress={handleSubmit(onSubmit)}
                         >
-                        Create
+                          Create
                         </Button>
                         <Text> </Text>
 
@@ -258,11 +283,10 @@ export default function One() {
                               name: "",
                               description: "",
                             });
-                          }} 
+                          }}
                         >
-                        Cancel
+                          Cancel
                         </Button>
-
                       </View>
                     </View>
                   </View>
@@ -270,7 +294,6 @@ export default function One() {
               </View>
             </View>
           </Modal>
-
         </Stack>
       </View>
     </View>
@@ -282,12 +305,12 @@ const ListComponent = ({ data }) => {
     <FlatList
       data={data}
       numColumns={1}
-      style={{ width: "100%" , height: "100%" }}
+      style={{ width: "100%", height: "100%" }}
       renderItem={({ item }) => (
         <View
           style={{
             flex: 1,
-            
+
             marginTop: 20,
             marginLeft: 15,
             width: "92%",
@@ -303,9 +326,7 @@ const ListComponent = ({ data }) => {
           />
         </View>
       )}
-      ListFooterComponent={() => (
-        <View style={{height: 20}}></View>
-      )}
+      ListFooterComponent={() => <View style={{ height: 20 }}></View>}
     />
   );
 };
@@ -327,7 +348,7 @@ export function ListCard(props: {
 
   const handleDelete = async () => {
     try {
-      console.log("id to delet is", id)
+      console.log("id to delet is", id);
       const response = await axios.delete(
         `https://open-recipes.onrender.com/recipe-lists/${id}`,
         {
@@ -335,9 +356,9 @@ export function ListCard(props: {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
-        setIsDeleted(true);
+      setIsDeleted(true);
     } catch (error) {
       console.error("Error deleting list:", error.message);
     }
@@ -346,54 +367,60 @@ export function ListCard(props: {
   return (
     <>
       {!isDeleted && (
-      <ScrollView style={{ width: "100%" }}>
-      <YStack
-      $sm={{
-        flexDirection: "column",
-        width: "100%",
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+        <ScrollView style={{ width: "100%" }}>
+          <YStack
+            $sm={{
+              flexDirection: "column",
+              width: "100%",
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Card
+              elevate
+              size="$4"
+              width={"100%"}
+              height={200}
+              bordered
+              {...props}
+            >
+              <Card.Header padded>
+                <H2 color="#4B4037">{name}</H2>
+                <Paragraph theme="alt2">{description}</Paragraph>
+              </Card.Header>
+              <Card.Footer padded>
+                <XStack flex={1} />
+                <Button
+                  size="$3"
+                  borderRadius="$6"
+                  color="#6E6055"
+                  hoverStyle={{ color: "white", backgroundColor: "$red10" }} // Change color on hover
+                  pressStyle={{ color: "white", backgroundColor: "$red10" }} // Change color on press
+                  onPress={handleDelete}
+                >
+                  Delete
+                </Button>
+                <Text> </Text>
 
-    >
-      <Card elevate size="$4" width={"100%"} height={200} bordered {...props}>
-      <Card.Header padded>
-        <H2 color="#4B4037">{name}</H2>
-        <Paragraph theme="alt2">{description}</Paragraph>
-      </Card.Header>
-      <Card.Footer padded>
-        <XStack flex={1} />
-        <Button
-                size="$3"
-                borderRadius="$6"
-                color="#6E6055"
-                hoverStyle={{ color: "white", backgroundColor: "$red10" }} // Change color on hover
-                pressStyle={{ color: "white", backgroundColor: "$red10" }} // Change color on press
-                onPress={handleDelete}>
-              Delete
-            </Button>
-        <Text>    </Text>
-
-        <Button
-          shadowRadius={10} // Shadow radius
-          elevation={2} // Elevation for a 3D effect
-          color="#6E6055"
-          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
-          pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
-          size="$3" 
-          borderRadius="$6" // Round the corners
-          onPress={() => {
-            router.push(`/lists/${id}`);
-          }}
-        >
-          View
-        </Button>
-
-      </Card.Footer>
-    </Card>
-    </YStack>
-    </ScrollView>
+                <Button
+                  shadowRadius={10} // Shadow radius
+                  elevation={2} // Elevation for a 3D effect
+                  color="#6E6055"
+                  hoverStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+                  pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
+                  size="$3"
+                  borderRadius="$6" // Round the corners
+                  onPress={() => {
+                    router.push(`/lists/${id}`);
+                  }}
+                >
+                  View
+                </Button>
+              </Card.Footer>
+            </Card>
+          </YStack>
+        </ScrollView>
       )}
     </>
   );
@@ -406,8 +433,8 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
-    borderColor:"#4B4037",
-    color:"#6E6055"
+    borderColor: "#4B4037",
+    color: "#6E6055",
   },
   error: {
     borderColor: "red",

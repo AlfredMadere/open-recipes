@@ -22,8 +22,8 @@ export type PopulatedRecipeList = {
   id: number;
   name: string;
   recipes: BaseRecipe[];
-}
- 
+};
+
 export type BaseRecipe = {
   name: string;
   mins_prep: number;

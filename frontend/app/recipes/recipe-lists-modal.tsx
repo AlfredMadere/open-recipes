@@ -4,13 +4,13 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { router, useGlobalSearchParams } from "expo-router";
 import axios from "axios";
 import { H1, Spinner, Button } from "tamagui";
-import { PopulatedRecipe, Ingredient, Tag} from "../interfaces/models";
+import { PopulatedRecipe, Ingredient, Tag } from "../interfaces/models";
 import { useState } from "react";
 import { getValueFor } from "../../helpers/auth";
 
 const Register = () => {
   const [authToken, setAuthToken] = useState("");
-  const [myId, setMyId] = useState<number | null >(null);
+  const [myId, setMyId] = useState<number | null>(null);
   const queryClient = useQueryClient();
   const { id } = useGlobalSearchParams();
   console.log("id: ", id);
@@ -19,9 +19,8 @@ const Register = () => {
       throw new Error("No id");
     }
     try {
-
       const response = await axios.get<PopulatedRecipe>(
-        `https://open-recipes.onrender.com/recipe-lists`, 
+        `https://open-recipes.onrender.com/recipe-lists`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -38,7 +37,9 @@ const Register = () => {
   }
 
   const query = useQuery({
-    queryKey: ["recipe", id], queryFn: getRecipe, enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
+    queryKey: ["recipe", id],
+    queryFn: getRecipe,
+    enabled: authToken && myId ? true : false, // Only run the query if authToken is not empty
   });
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const Register = () => {
     (async () => {
       try {
         const authToken = await getValueFor("authtoken");
-        const id = await getValueFor('userId');
+        const id = await getValueFor("userId");
         if (isMounted) {
           setAuthToken(authToken);
           setMyId(parseInt(id));
@@ -71,22 +72,23 @@ const Register = () => {
 
   async function addToList(list_id: number, recipe_id: number) {
     axios
-      .post(`https://open-recipes.onrender.com/recipe-lists/${list_id}/recipe/${recipe_id}`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          Accept: "application/json",
+      .post(
+        `https://open-recipes.onrender.com/recipe-lists/${list_id}/recipe/${recipe_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+          },
         },
-      })
+      )
       .then(function (response) {
         console.log(response, null, 2);
       })
       .catch(function (error) {
         console.log(error);
       });
-      router.push('recipe-lists')
+    router.push("recipe-lists");
   }
-
-
 
   function addToRecipeList(id: string | string[] | undefined) {
     throw new Error("Function not implemented.");
@@ -113,7 +115,7 @@ const Register = () => {
           <Text style={styles.sectionTitle}>Ingredients:</Text>
           {ingredients.map((ingredient, index) => (
             <Text key={index} style={styles.infoItem}>
-              - {ingredient.quantity} {ingredient.unit} {ingredient.name}:              
+              - {ingredient.quantity} {ingredient.unit} {ingredient.name}:
             </Text>
           ))}
         </View>
@@ -127,10 +129,12 @@ const Register = () => {
           ))}
         </View>
       </View>
-      
-      <View style={{padding: 10}}>
+
+      <View style={{ padding: 10 }}>
         <Button
-          onPress={() => {addToRecipeList(id)}}
+          onPress={() => {
+            addToRecipeList(id);
+          }}
           size="$4" // Adjust the size
           color="$green" // Set the button color
           borderRadius="$6" // Round the corners
@@ -147,32 +151,32 @@ const Register = () => {
         </Button>
       </View>
 
-      {data?.author_id == myId ? 
-      (<View style={{padding: 10}}>
-        <Button
-          onPress={() => {deleteRecipe(id)}}
-          size="$4" // Adjust the size
-          color="$red" // Set the button color
-          borderRadius="$6" // Round the corners
-          // shadowColor="$shadow" // Add a shadow
-          shadowRadius={10} // Shadow radius
-          elevation={2} // Elevation for a 3D effect
-          hoverStyle={{ backgroundColor: "$red8" }} // Change color on hover
-          pressStyle={{ backgroundColor: "$red8" }} // Change color on press
-          fontFamily="$body" // Set the font family
-          fontSize="$4" // Set the font size
-          fontWeight="bold" // Make the text bold
-        >
-          Delete Recipe
-        </Button>
-      </View>)
-      
-      : ""}
+      {data?.author_id == myId ? (
+        <View style={{ padding: 10 }}>
+          <Button
+            onPress={() => {
+              deleteRecipe(id);
+            }}
+            size="$4" // Adjust the size
+            color="$red" // Set the button color
+            borderRadius="$6" // Round the corners
+            // shadowColor="$shadow" // Add a shadow
+            shadowRadius={10} // Shadow radius
+            elevation={2} // Elevation for a 3D effect
+            hoverStyle={{ backgroundColor: "$red8" }} // Change color on hover
+            pressStyle={{ backgroundColor: "$red8" }} // Change color on press
+            fontFamily="$body" // Set the font family
+            fontSize="$4" // Set the font size
+            fontWeight="bold" // Make the text bold
+          >
+            Delete Recipe
+          </Button>
+        </View>
+      ) : (
+        ""
+      )}
 
       <View style={{ height: 80 }} />
-      
-
-
     </ScrollView>
   );
 };

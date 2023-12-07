@@ -15,7 +15,7 @@ type AuthContextType = {
 
 // Create the context with an initial undefined value
 export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
+  undefined,
 );
 
 type AuthProviderProps = {
@@ -44,7 +44,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ authToken, userId, userName, setAuthToken, setUserId, setUserName }}>
+    <AuthContext.Provider
+      value={{
+        authToken,
+        userId,
+        userName,
+        setAuthToken,
+        setUserId,
+        setUserName,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

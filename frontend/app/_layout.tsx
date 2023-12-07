@@ -32,40 +32,40 @@ const StackLayout = () => {
     <TamaguiProvider config={tamaguiConfig}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-        <Theme name="light">
-          <Stack>
-            <Stack.Screen name="index" options={{ title: "Home" }} />
-            <Stack.Screen
-              name="register/index"
-              options={{
-                title: "Register",
-                headerRight: () => (
-                  <Button
-                    title="Login"
-                    onPress={() => {
-                      router.push("/login");
-                    }}
-                  />
-                ),
-              }}
-            />
-            <Stack.Screen
-              name="login"
-              options={{ title: "Login Modal", presentation: "modal" }}
-            />
-            <Stack.Screen
-              name="recipes/[id]"
-              options={{ title: "Recipe", presentation: "modal" }}
-            />
-            <Stack.Screen
-              name="update-inventory"
-              options={{ title: "Update Inventory", presentation: "modal" }}
-            />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="[missing]" options={{ title: "404" }} />
-          </Stack>
-        </Theme>
-      </AuthProvider>
+          <Theme name="light">
+            <Stack>
+              <Stack.Screen name="index" options={{ title: "Home" }} />
+              <Stack.Screen
+                name="register/index"
+                options={{
+                  title: "Register",
+                  headerRight: () => (
+                    <Button
+                      title="Login"
+                      onPress={() => {
+                        router.push("/login");
+                      }}
+                    />
+                  ),
+                }}
+              />
+              <Stack.Screen
+                name="login"
+                options={{ title: "Login Modal", presentation: "modal" }}
+              />
+              <Stack.Screen
+                name="recipes/[id]"
+                options={{ title: "Recipe", presentation: "modal" }}
+              />
+              <Stack.Screen
+                name="update-inventory"
+                options={{ title: "Update Inventory", presentation: "modal" }}
+              />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="[missing]" options={{ title: "404" }} />
+            </Stack>
+          </Theme>
+        </AuthProvider>
       </QueryClientProvider>
     </TamaguiProvider>
   );

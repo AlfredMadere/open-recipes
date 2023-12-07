@@ -1,7 +1,8 @@
 # Open Recipes Frontend
-Welcome to the frontend! When designing the frontend for Open Recipes, we focused on creating something that is intuitive and appealing, unlike those recipe websites that bog you down with ads and are often frustrating to navigate. To view our frontend in action, please follow the quick start instructions below. 
 
-## Quick start instructions 
+Welcome to the frontend! When designing the frontend for Open Recipes, we focused on creating something that is intuitive and appealing, unlike those recipe websites that bog you down with ads and are often frustrating to navigate. To view our frontend in action, please follow the quick start instructions below.
+
+## Quick start instructions
 
 ### For Mac users with Xcode
 
@@ -31,7 +32,7 @@ React Native: https://reactnative.dev/docs/getting-started
 
 Thank you for considering contributing to our project! We follow certain coding standards and guidelines to maintain code consistency and quality. Please follow our guidelines when making contributions.
 
-**Contributors:** 
+**Contributors:**
 Alfred Madere,
 Abigayle Mercer,
 Pau Minguet,

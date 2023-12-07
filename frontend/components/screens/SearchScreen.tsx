@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 //import { useRouter } from "expo-router";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { FontAwesome } from '@expo/vector-icons'; 
+import { FontAwesome } from "@expo/vector-icons";
 
 async function getValueFor(key: string) {
   const result = await SecureStore.getItemAsync(key);
@@ -132,68 +132,65 @@ export default function SearchScreen() {
   });
 
   return (
-    <View width={"100%"} height={"100%"} style={{backgroundColor: "#EBE7E0"}}>
-    <YStack
-      width={400}
-      minHeight={250}
-      overflow="hidden"
-      space="$2"
-      margin="$3"
-      padding="$2"
+    <View width={"100%"} height={"100%"} style={{ backgroundColor: "#EBE7E0" }}>
+      <YStack
+        width={400}
+        minHeight={250}
+        overflow="hidden"
+        space="$2"
+        margin="$3"
+        padding="$2"
       >
         <View width={"90%"}>
-
-
-      <InputText
-        size="$5"
-        searchText={searchText}
-        setSearchText={setSearchText}
-        onPressGoButton={setPressed}
-      />
-        </View>
-      <ScrollView horizontal={true} height={50}>
-        <XStack space="$2">
-          {query1.data?.tags.map((tag: tagProps) => {
-            return (
-              <Button
-                themeInverse
-                borderWidth="1"
-                borderColor={"white"}
-                size="$3"
-                key={tag.id}
-                onPress={() => onPressButton(tag)}
-                // Apply different styles based on whether the button is selected
-                style={{
-                  backgroundColor:
-                    tag.id === selectedFilter ? "#6E6055" : "#D7783B",
-                }}
-              >
-                {tag.value}
-              </Button>
-            );
-          })}
-          
-        </XStack>
-      </ScrollView>
-
-      <ScrollView>
-        {(pressed ||
-          (filterKey.length > 0 && filterValue.length > 0) ||
-          inventoryButtonPressed) && (
-          <ComputeResults
+          <InputText
+            size="$5"
             searchText={searchText}
-            filterKey={filterKey}
-            filterValue={filterValue}
-            inventory={inventoryButtonPressed}
-            setInventory={setInventory}
-            setPress={setPressed}
-            req={req}
-            pressed={pressed}
+            setSearchText={setSearchText}
+            onPressGoButton={setPressed}
           />
-            )}
-          <View style={{height: 100}}></View>
-      </ScrollView>
-    </YStack>
+        </View>
+        <ScrollView horizontal={true} height={50}>
+          <XStack space="$2">
+            {query1.data?.tags.map((tag: tagProps) => {
+              return (
+                <Button
+                  themeInverse
+                  borderWidth="1"
+                  borderColor={"white"}
+                  size="$3"
+                  key={tag.id}
+                  onPress={() => onPressButton(tag)}
+                  // Apply different styles based on whether the button is selected
+                  style={{
+                    backgroundColor:
+                      tag.id === selectedFilter ? "#6E6055" : "#D7783B",
+                  }}
+                >
+                  {tag.value}
+                </Button>
+              );
+            })}
+          </XStack>
+        </ScrollView>
+
+        <ScrollView>
+          {(pressed ||
+            (filterKey.length > 0 && filterValue.length > 0) ||
+            inventoryButtonPressed) && (
+            <ComputeResults
+              searchText={searchText}
+              filterKey={filterKey}
+              filterValue={filterValue}
+              inventory={inventoryButtonPressed}
+              setInventory={setInventory}
+              setPress={setPressed}
+              req={req}
+              pressed={pressed}
+            />
+          )}
+          <View style={{ height: 100 }}></View>
+        </ScrollView>
+      </YStack>
     </View>
   );
 }
@@ -344,7 +341,6 @@ function ComputeResults(props: runQueryProps) {
 
   result = query.data?.recipe.map((recipe: RecipeProps) => {
     return (
-      
       <SearchResult
         key={recipe.id} // Use a combination of recipe.id and index
         name={recipe.name}
@@ -377,8 +373,13 @@ function InputText(props: InputTextProps) {
           onChangeText={(value) => props.setSearchText(value)}
         />
 
-      <FontAwesome.Button name="search" size={16} color="#4B4037" backgroundColor="#EBE7E0" onPress={() => props.onPressGoButton(true)}/>
-
+        <FontAwesome.Button
+          name="search"
+          size={16}
+          color="#4B4037"
+          backgroundColor="#EBE7E0"
+          onPress={() => props.onPressGoButton(true)}
+        />
       </XStack>
     </View>
   );

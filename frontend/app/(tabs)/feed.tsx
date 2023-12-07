@@ -22,17 +22,16 @@ import { removeDuplicateIds } from "../../helpers";
 import { useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { AuthContext } from "../AuthContext";
-import {Foundation} from "@expo/vector-icons";
+import { Foundation } from "@expo/vector-icons";
 
 export default function Feed() {
   const router = useRouter();
   const authContext = useContext(AuthContext);
 
-    if (!authContext) {
-      throw new Error("Feedmust be used within an AuthProvider");
-    }
-    const { authToken, } = authContext;
-
+  if (!authContext) {
+    throw new Error("Feedmust be used within an AuthProvider");
+  }
+  const { authToken } = authContext;
 
   async function getRecipesFeed(): Promise<SearchResult<Recipe>> {
     if (!authToken) {
@@ -58,16 +57,17 @@ export default function Feed() {
     enabled: !!authToken, // Only run the query if authToken is not empty
   });
 
-  
-
-
-
-
-
   const recipes = removeDuplicateIds(query.data?.recipe || []);
   return (
-    <View style={{ width: "100%", height:"100%", backgroundColor:"#EBE7E0"}}>
-      <View style={{ padding: 10 , display: "flex", flexDirection: "column", gap: 10}}>
+    <View style={{ width: "100%", height: "100%", backgroundColor: "#EBE7E0" }}>
+      <View
+        style={{
+          padding: 10,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
         <Button
           onPress={() => router.push("update-inventory")}
           bordered
@@ -77,7 +77,7 @@ export default function Feed() {
           //shadowColor="$shadow" // Add a shadow
           shadowRadius={10} // Shadow radius
           elevation={2} // Elevation for a 3D effect
-          pressStyle={{color: "white", backgroundColor: "#6E6055" }} // Change color on press
+          pressStyle={{ color: "white", backgroundColor: "#6E6055" }} // Change color on press
           fontFamily="$body" // Set the font family
           fontSize="$4" // Set the font size
           fontWeight="bold" // Make the text bold
@@ -106,9 +106,14 @@ export default function Feed() {
         </YStack>
       </ScrollView>
 
-      <Foundation.Button name="refresh" size={26} color="#6E6055" backgroundColor="#EBE7E0"
-        style={{ width: "100%", alignSelf: "flex-start"}} onPress={() => query.refetch()}/>
-
+      <Foundation.Button
+        name="refresh"
+        size={26}
+        color="#6E6055"
+        backgroundColor="#EBE7E0"
+        style={{ width: "100%", alignSelf: "flex-start" }}
+        onPress={() => query.refetch()}
+      />
     </View>
   );
 }
@@ -134,7 +139,7 @@ export function RecipeCard(props: RecipeCardProps) {
   const styles = StyleSheet.create({
     circularView: {
       marginTop: 60,
-      marginLeft:15,
+      marginLeft: 15,
       width: 200,
       height: 70,
       borderRadius: 5,
@@ -156,20 +161,20 @@ export function RecipeCard(props: RecipeCardProps) {
         <Paragraph theme="alt2">{recipe.description}</Paragraph>
       </Card.Header>
       <View style={styles.circularView}>
-            <Image
-              source={require("../../assets/recipie.png")}
-              style={styles.image}
-            />
-          </View>
+        <Image
+          source={require("../../assets/recipie.png")}
+          style={styles.image}
+        />
+      </View>
       <Card.Footer padded>
         <XStack flex={1} />
         <Button
           shadowRadius={10} // Shadow radius
           elevation={2} // Elevation for a 3D effect
           color="#6E6055"
-          hoverStyle={{color: "white", backgroundColor: "#D7783B" }} // Change color on hover
+          hoverStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on hover
           pressStyle={{ color: "white", backgroundColor: "#D7783B" }} // Change color on press
-          size="$3" 
+          size="$3"
           borderRadius="$6" // Round the corners
           onPress={() => {
             router.push(`/recipes/${recipe.id}`);
