@@ -15,7 +15,7 @@ import {
   Text,
   View,
   XStack,
-  YStack
+  YStack,
 } from "tamagui";
 import { removeDuplicateIds } from "../../helpers";
 import { AuthContext } from "../AuthContext";

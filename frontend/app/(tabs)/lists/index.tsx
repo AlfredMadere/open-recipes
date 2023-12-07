@@ -350,7 +350,6 @@ export function ListCard(props: {
     try {
       console.log("id to delet is", id);
       await axios.delete(
-
         `https://open-recipes.onrender.com/recipe-lists/${id}`,
         {
           headers: {

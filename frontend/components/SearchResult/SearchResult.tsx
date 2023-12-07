@@ -1,14 +1,6 @@
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
-import {
-  Button,
-  Card,
-  H2,
-  Image,
-  Paragraph,
-  View,
-  XStack
-} from "tamagui";
+import { Button, Card, H2, Image, Paragraph, View, XStack } from "tamagui";
 
 type RecipeCardProps = {
   id: number;

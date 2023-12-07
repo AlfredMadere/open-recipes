@@ -7,7 +7,7 @@ import { Button, ScrollView } from "tamagui";
 import {
   FormattedRecipe,
   Recipe,
-  emptyData
+  emptyData,
 } from "../../components/create-recipe-types/create-recipe-helper";
 import { AuthContext } from "../AuthContext";
 

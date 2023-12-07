@@ -1,7 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { router, useGlobalSearchParams, useRouter } from "expo-router";
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { Alert, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 import {
   Button,
@@ -10,14 +16,11 @@ import {
   Spinner,
   Stack,
   XStack,
-  YStack
+  YStack,
 } from "tamagui";
 import { getValueFor } from "../../helpers/auth";
 import { AuthContext } from "../AuthContext";
-import {
-  PopulatedRecipe,
-  RecipeList
-} from "../interfaces/models";
+import { PopulatedRecipe, RecipeList } from "../interfaces/models";
 
 const Register = () => {
   const [visible, setVisible] = useState(false);

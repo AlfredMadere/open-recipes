@@ -1,8 +1,5 @@
 import { StyleSheet } from "react-native";
-import {
-  H1,
-  View
-} from "tamagui";
+import { H1, View } from "tamagui";
 
 export default function ProfileScreen() {
   const styles = StyleSheet.create({
