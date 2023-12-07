@@ -50,7 +50,7 @@ export default function One() {
     console.log("data", data);
     console.log("stringified", JSON.stringify(data));
     try {
-      const response = await axios.post(
+      await axios.post(
         "https://open-recipes.onrender.com/recipe-lists",
         {
           name: data.name,
@@ -349,7 +349,8 @@ export function ListCard(props: {
   const handleDelete = async () => {
     try {
       console.log("id to delet is", id);
-      const response = await axios.delete(
+      await axios.delete(
+
         `https://open-recipes.onrender.com/recipe-lists/${id}`,
         {
           headers: {

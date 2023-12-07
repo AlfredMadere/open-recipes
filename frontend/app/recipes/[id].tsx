@@ -1,28 +1,23 @@
-import { Text, View, StyleSheet, ScrollView, Alert, Modal } from "react-native";
-import React, { Dispatch, SetStateAction, useContext, useEffect } from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { router, useGlobalSearchParams, useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { router, useGlobalSearchParams, useRouter } from "expo-router";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { Alert, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 import {
-  H1,
-  Spinner,
   Button,
-  Stack,
   Card,
-  XStack,
   Paragraph,
-  YStack,
+  Spinner,
+  Stack,
+  XStack,
+  YStack
 } from "tamagui";
+import { getValueFor } from "../../helpers/auth";
+import { AuthContext } from "../AuthContext";
 import {
   PopulatedRecipe,
-  Ingredient,
-  Tag,
-  RecipeList,
+  RecipeList
 } from "../interfaces/models";
-import { useState } from "react";
-import { getValueFor } from "../../helpers/auth";
-import * as SecureStore from "expo-secure-store";
-import { AuthContext } from "../AuthContext";
 
 const Register = () => {
   const [visible, setVisible] = useState(false);

@@ -1,17 +1,15 @@
-import { Text, View, StyleSheet, ScrollView, Alert } from "react-native";
-import React, { useEffect } from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { router, useGlobalSearchParams } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { H1, Spinner, Button } from "tamagui";
-import { PopulatedRecipe, Ingredient, Tag } from "../interfaces/models";
-import { useState } from "react";
+import { useGlobalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Button, Spinner } from "tamagui";
 import { getValueFor } from "../../helpers/auth";
+import { PopulatedRecipe } from "../interfaces/models";
 
 const Register = () => {
   const [authToken, setAuthToken] = useState("");
   const [myId, setMyId] = useState<number | null>(null);
-  const queryClient = useQueryClient();
   const { id } = useGlobalSearchParams();
   console.log("id: ", id);
   async function getRecipe(): Promise<PopulatedRecipe> {
@@ -70,29 +68,29 @@ const Register = () => {
   const ingredients = data?.ingredients || []; // Assuming ingredients are stored in an array
   const tags = data?.tags || []; // Assuming tags are stored in an array
 
-  async function addToList(list_id: number, recipe_id: number) {
-    axios
-      .post(
-        `https://open-recipes.onrender.com/recipe-lists/${list_id}/recipe/${recipe_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            Accept: "application/json",
-          },
-        },
-      )
-      .then(function (response) {
-        console.log(response, null, 2);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    router.push("recipe-lists");
-  }
+  // async function addToList(list_id: number, recipe_id: number) {
+  //   axios
+  //     .post(
+  //       `https://open-recipes.onrender.com/recipe-lists/${list_id}/recipe/${recipe_id}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${authToken}`,
+  //           Accept: "application/json",
+  //         },
+  //       },
+  //     )
+  //     .then(function (response) {
+  //       console.log(response, null, 2);
+  //     })
+  //     .catch(function (error) {
+  //       console.log(error);
+  //     });
+  //   router.push("recipe-lists");
+  // }
 
-  function addToRecipeList(id: string | string[] | undefined) {
-    throw new Error("Function not implemented.");
-  }
+  // function addToRecipeList(id: string | string[] | undefined) {
+  //   throw new Error("Function not implemented.");
+  // }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

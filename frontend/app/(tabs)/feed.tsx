@@ -1,9 +1,12 @@
+import { Foundation } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { useRouter } from "expo-router";
+import { useContext } from "react";
+import { StyleSheet } from "react-native";
 import {
   Button,
   Card,
-  CardProps,
-  H1,
   H2,
   Image,
   Paragraph,
@@ -12,17 +15,11 @@ import {
   Text,
   View,
   XStack,
-  YStack,
+  YStack
 } from "tamagui";
-import { Alert, StyleSheet } from "react-native";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { Recipe } from "../interfaces/models";
 import { removeDuplicateIds } from "../../helpers";
-import { useContext, useEffect, useState } from "react";
-import * as SecureStore from "expo-secure-store";
 import { AuthContext } from "../AuthContext";
-import { Foundation } from "@expo/vector-icons";
+import { Recipe } from "../interfaces/models";
 
 export default function Feed() {
   const router = useRouter();

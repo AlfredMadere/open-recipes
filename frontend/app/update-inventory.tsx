@@ -1,11 +1,11 @@
-import { Text, View } from "react-native";
-import React, { useContext, useEffect } from "react";
-import { Button, Input, Spinner, getFontSize } from "tamagui";
+import { Foundation, Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import React, { useContext, useEffect } from "react";
 import { Control, Controller, useFieldArray, useForm } from "react-hook-form";
+import { Text, View } from "react-native";
+import { Button, Input, Spinner } from "tamagui";
 import { AuthContext } from "./AuthContext";
-import { Ionicons, Foundation } from "@expo/vector-icons";
 
 type Ingredient = {
   id: number | null;

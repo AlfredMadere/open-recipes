@@ -26,9 +26,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const authProvider = useContext(AuthContext);
   const [phone, setPhone] = useState("");
-  const [toggle, setToggle] = useState(false);
   const [key, onChangeKey] = React.useState("authtoken");
-  const [value, onChangeValue] = React.useState("Your value here");
 
   if (!authProvider) {
     throw new Error("authProvider is not defined");

@@ -1,25 +1,25 @@
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, FlatList, StyleSheet } from "react-native";
+import { useContext } from "react";
+import { StyleSheet } from "react-native";
 import {
-  View,
+  Button,
   Card,
   H2,
   Image,
   Paragraph,
-  XStack,
-  Stack,
-  Spinner,
   ScrollView,
-  Button,
+  Spinner,
+  Stack,
+  View,
+  XStack,
 } from "tamagui";
-import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import {
   BaseRecipe,
   PopulatedRecipeList,
 } from "../../../components/create-recipe-types/create-recipe-helper";
+import { AuthContext } from "../../AuthContext";
 
 export default function Page() {
   const { id } = useLocalSearchParams();

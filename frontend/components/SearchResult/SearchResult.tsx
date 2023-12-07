@@ -1,16 +1,14 @@
-import {
-  Button,
-  H2,
-  H5,
-  Card,
-  Paragraph,
-  Image,
-  Text,
-  View,
-  XStack,
-} from "tamagui";
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
+import {
+  Button,
+  Card,
+  H2,
+  Image,
+  Paragraph,
+  View,
+  XStack
+} from "tamagui";
 
 type RecipeCardProps = {
   id: number;

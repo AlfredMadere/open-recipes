@@ -1,22 +1,21 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable react/prop-types */
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   Button,
   Input,
+  ScrollView,
   SizeTokens,
+  View,
   XStack,
   YStack,
-  View,
-  ScrollView,
 } from "tamagui";
-import { Alert } from "react-native";
 import SearchResult from "../SearchResult/SearchResult";
-import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 //import { useRouter } from "expo-router";
+import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { FontAwesome } from "@expo/vector-icons";
 
 async function getValueFor(key: string) {
   const result = await SecureStore.getItemAsync(key);
@@ -64,7 +63,7 @@ type tagProps = {
 type runQueryProps = {
   req: string;
   setPress: Function;
-  setInventory: Function;
+  // setInventory: Function;
   inventory: boolean;
   searchText: String;
   filterKey: String;
@@ -79,7 +78,7 @@ export default function SearchScreen() {
   const [filterKey, setFilterKey] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [pressed, setPressed] = useState(false);
-  const [inventory, setInventory] = useState(false);
+  // const [inventory, setInventory] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(-1); // New state to track the selected filter
   const [inventoryButtonPressed, setInventoryButtonPressed] = useState(false);
 
@@ -90,25 +89,25 @@ export default function SearchScreen() {
       // If the tapped filter is already selected, deselect it
       setFilterKey("");
       setFilterValue("");
-      setInventory(false);
+      // setInventory(false);
       setSelectedFilter(-1);
       setInventoryButtonPressed(false);
     } else {
       // Otherwise, select the filter
       setFilterKey(props.key);
       setFilterValue(props.value);
-      setInventory(false);
+      // setInventory(false);
       setSelectedFilter(props.id);
       setInventoryButtonPressed(false);
     }
   };
 
-  function onUseInventory() {
-    setPressed(false);
-    setInventory(true);
-    setSelectedFilter(-1);
-    setInventoryButtonPressed(!inventoryButtonPressed);
-  }
+  // function onUseInventory() {
+  //   setPressed(false);
+  //   setInventory(true);
+  //   setSelectedFilter(-1);
+  //   setInventoryButtonPressed(!inventoryButtonPressed);
+  // }
 
   const req =
     "https://open-recipes.onrender.com/recipes?name=" +
@@ -182,7 +181,7 @@ export default function SearchScreen() {
               filterKey={filterKey}
               filterValue={filterValue}
               inventory={inventoryButtonPressed}
-              setInventory={setInventory}
+              // setInventory={setInventory}
               setPress={setPressed}
               req={req}
               pressed={pressed}

@@ -1,8 +1,5 @@
-import React from "react";
 // import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from "@react-navigation/native";
-import { TamaguiProvider, Text, View } from "tamagui";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { View } from "tamagui";
 
 // import HomeScreen from '../screens/HomeScreen';
 // import SettingsScreen from '../screens/SettingsScreen';

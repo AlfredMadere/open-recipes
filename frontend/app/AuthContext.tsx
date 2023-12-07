@@ -1,7 +1,6 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { getValueFor } from "../helpers/auth";
-import { set } from "react-hook-form";
 
 // Define the type for your context state
 type AuthContextType = {

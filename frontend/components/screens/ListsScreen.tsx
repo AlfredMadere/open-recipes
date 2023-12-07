@@ -1,5 +1,5 @@
-import { Button, H1, Paragraph, Text, View } from "tamagui";
 import { StyleSheet } from "react-native";
+import { H1, View } from "tamagui";
 
 export default function ListsScreen() {
   const styles = StyleSheet.create({

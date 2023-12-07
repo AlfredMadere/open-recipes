@@ -1,4 +1,4 @@
-import { Link, usePathname, useRouter } from "expo-router";
+import { Link, usePathname } from "expo-router";
 import { Button, Text, View } from "react-native";
 
 export default function Page() {

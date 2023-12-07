@@ -50,6 +50,10 @@ Our style guide follows standard Prettier formatting guidelines. See https://pre
 
 2. **ESLint**: Install ESLint in your code editor to catch and fix code errors and enforce our coding standards. Make sure you npm install because ESLint will have been added to your node modules.
 
+NOTE about CI: You must run `npm run check` without errors before merging to main to pass CI tests run on github. 
+
+
+
 We adhere to the following ESLint standards for our code:
 "eslint:recommended",
 "plugin:react/recommended",

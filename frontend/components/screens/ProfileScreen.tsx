@@ -1,13 +1,8 @@
-import {
-  Button,
-  H1,
-  Paragraph,
-  Text,
-  View,
-  Circle,
-  SizableText,
-} from "tamagui";
 import { StyleSheet } from "react-native";
+import {
+  H1,
+  View
+} from "tamagui";
 
 export default function ProfileScreen() {
   const styles = StyleSheet.create({

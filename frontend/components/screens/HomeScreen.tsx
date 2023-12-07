@@ -1,5 +1,5 @@
-import { Button, H1, Paragraph, Text, View } from "tamagui";
 import { StyleSheet } from "react-native";
+import { H1, Paragraph, View } from "tamagui";
 import HomeIcon from "../icons/HomeIcon";
 
 export default function HomeScreen() {
