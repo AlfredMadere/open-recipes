@@ -66,6 +66,10 @@ We adhere to the following ESLint standards for our code:
 4. Scan the QR code in your terminal with your Iphone camera (your phone and computer must be on the same wifi network for this to work, you must have your network configured for devices to be able to see the other devices on the network. School wifi will not work for this.)
 5. Finished! you should now be able to see the app live update on your phone (you need Xcode which is only available on mac for the emulator to work)
 
+NOTE about CI: You must run `npm run check` without errors before merging to main to pass CI tests run on github.
+
+NOTE about CD: our backend is continuously deployed on render with every push. We were given permission not to deploy our front end as its very hard and costly to become a registered developer on the app store. Our backend takes a few minuites to wake up as the free tier of render spins down after a period of activity. Here's the link: https://open-recipes.onrender.com/docs
+
 ## Technical Specifications
 
 ### Backend Requirements
