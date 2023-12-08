@@ -54,6 +54,13 @@ NOTE about CI: You must run `npm run check` without errors before merging to mai
 
 NOTE about CD: our backend is continuously deployed on render with every push. We were given permission not to deploy our front end as its very hard and costly to become a registered developer on the app store. Our backend takes a few minuites to wake up as the free tier of render spins down after a period of activity. Here's the link: https://open-recipes.onrender.com/docs
 
+3. **Component-Testing**
+see the following repository for the testing of the Login page component of this repo:
+ https://github.com/Abigayle-Mercer/CSC307-ComponentTesting
+into the terminal type:
+>> npm run coverage 
+
+
 We adhere to the following ESLint standards for our code:
 "eslint:recommended",
 "plugin:react/recommended",
