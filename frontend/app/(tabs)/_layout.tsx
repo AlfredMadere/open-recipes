@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { View } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons from @expo/vector-icons
 
 function _layout() {
@@ -11,7 +11,7 @@ function _layout() {
         options={{
           tabBarLabel: "Feed",
           headerTitle: "Feed",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons name="home" size={30} color={color} /> // Change the icon here
           ),
         }}
@@ -21,7 +21,7 @@ function _layout() {
         options={{
           tabBarLabel: "Search",
           headerTitle: "Search",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons name="list" size={30} color={color} /> // Change the icon here
           ),
         }}
@@ -31,7 +31,7 @@ function _layout() {
         options={{
           tabBarLabel: "Create",
           headerTitle: "Create Recipe",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons name="create" size={30} color={color} /> // Change the icon here
           ),
         }}
@@ -42,7 +42,7 @@ function _layout() {
           tabBarLabel: "Lists",
           headerTitle: "Lists",
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons name="list" size={30} color={color} /> // Change the icon here
           ),
         }}
@@ -52,7 +52,7 @@ function _layout() {
         options={{
           tabBarLabel: "Profile",
           headerTitle: "Profile",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons name="ios-person" size={30} color={color} /> // Change the icon here
           ),
         }}

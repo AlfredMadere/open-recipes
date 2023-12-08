@@ -2,7 +2,6 @@ import { useRouter } from "expo-router";
 import {
   Button,
   View,
-  Circle,
   Stack,
   ScrollView,
   Card,
@@ -11,14 +10,14 @@ import {
   XStack,
   YStack,
 } from "tamagui";
-import { Alert, Text, Image, StyleSheet } from "react-native";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { Text, Image, StyleSheet } from "react-native";
+import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
 import { PopulatedRecipe } from "../interfaces/models";
 import { removeDuplicateIds } from "../../helpers";
-import * as SecureStore from "expo-secure-store";
-import { useContext, useEffect, useState } from "react";
+
+import { useContext } from "react";
 import { AuthContext } from "../AuthContext";
 import {
   Foundation,

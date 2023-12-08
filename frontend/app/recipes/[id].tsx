@@ -101,7 +101,7 @@ const Register = () => {
     router.push("profile");
   }
 
-  function addToRecipeList(id: string | string[] | undefined) {
+  function addToRecipeList() {
     setVisible(true);
   }
   const recipe_id = data?.id;
@@ -301,7 +301,7 @@ function RecipeListModal(params: recipeModalInputs) {
     //console.log("data", list_id);
     //console.log("stringified", JSON.stringify(data));
     try {
-      const response = await axios.post(
+      await axios.post(
         `https://open-recipes.onrender.com/recipe-lists/${list_id}/recipe/${recipe_id}`,
         {
           name: "cd",

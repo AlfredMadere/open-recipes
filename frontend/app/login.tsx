@@ -11,7 +11,7 @@ import axios from "axios";
 import { Image } from "tamagui";
 
 import * as SecureStore from "expo-secure-store";
-import { getValueFor } from "../helpers/auth";
+
 import { AuthContext } from "./AuthContext";
 
 async function save(key: string, value: string) {
@@ -26,14 +26,14 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const authProvider = useContext(AuthContext);
   const [phone, setPhone] = useState("");
-  const [key, onChangeKey] = React.useState("authtoken");
+  const key = "authtoken";
 
   if (!authProvider) {
     throw new Error("authProvider is not defined");
   }
 
-  const { authToken, setAuthToken, userId, setUserId, userName, setUserName } =
-    authProvider;
+  // const { authToken, setAuthToken, userId, setUserId, userName, setUserName } =
+  //   authProvider;
 
   const handleSignUp = async () => {
     //alert("name: " + username + " password: " + password + " email: " + email + " phone: " + phone);
@@ -96,11 +96,12 @@ function LoginPage() {
 
         if (response.status === 200) {
           const authToken = response.data.access_token;
+
           // Save the auth token
           console.log("about to storer auth token", authToken);
           console.log("type of auth token", typeof authToken);
           await save(key, authToken);
-
+          console.log("we are here?");
           const results = await axios.get(
             "https://open-recipes.onrender.com/users/me/",
             {
